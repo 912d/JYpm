@@ -43,7 +43,6 @@ Instructions below are for linux system. For other systems process is probably s
 
 * MacOS support
 * Video format conversion
-* Dumping YouTube API completely
 * Playlist deletion should affect downloaded files
 
 # Licensing
@@ -58,4 +57,5 @@ JYpm depends on:
 * [Gson](https://github.com/google/gson) which is distributed under Apache-2.0 license
 * [Retrofit](https://github.com/square/retrofit) which is distributed under Apache-2.0 license
 * [Commons Lang](https://github.com/apache/commons-lang) which is distributed under Apache-2.0 license
+* [jsoup](https://github.com/jhy/jsoup) which is distributed under MIT license
 * And their respective dependencies...
