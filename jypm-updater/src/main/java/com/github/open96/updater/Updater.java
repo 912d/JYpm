@@ -249,7 +249,7 @@ public class Updater {
         String negativeButtonText = "Later";
 
         EventHandler<ActionEvent> positiveButtonEventHandler;
-        if (SettingsManager.getInstance().getOS() == OS_TYPE.WINDOWS) {
+        if (SettingsManager.getInstance().getOS() != OS_TYPE.WINDOWS) {
             positiveButtonEventHandler = event -> upgrade();
         } else {
             positiveButtonEventHandler = event -> log.info(messageBuilder.toString());
