@@ -1,0 +1,18 @@
+# Maven target directory shouldn't appear in master tree
+target/
+
+# This application has been developed using IntelliJ IDEA, but IDE related files shouldn't land in master tree
+.idea/
+*.iml
+
+# Prevent logs from getting into master
+logs/
+
+# Any .json files are unwelcome
+*.json
+
+# Directory with youtube-dl executables
+youtube-dl/
+
+# Don't include downloaded jars into the project
+*.jar

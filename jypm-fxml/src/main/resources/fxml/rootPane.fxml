@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import javafx.scene.layout.BorderPane?>
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:id="rootPane" maxHeight="1.7976931348623157E308"
+            maxWidth="1.7976931348623157E308"
+            minHeight="-Infinity" minWidth="-Infinity" prefHeight="450.0" prefWidth="800.0"
+            stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx/8"
+            fx:controller="com.github.open96.fxml.RootPaneController"/>

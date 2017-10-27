@@ -1,0 +1,105 @@
+/**
+Container classes
+ */
+
+.root {
+    -fx-background-color: #31363B;
+    -fx-text-fill: #EFF0F1;
+}
+
+.hbox {
+    -fx-background-color: #2B3034;
+    -fx-text-fill: inherit;
+    -fx-padding: 15px;
+    -fx-spacing: 5px;
+    -fx-alignment: center;
+}
+
+.grid-pane {
+    -fx-background-color: #31363B;
+    -fx-border-color: transparent;
+}
+
+.parent {
+    -fx-border-width: 0;;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+    -fx-background-color: transparent;
+}
+
+/**
+Button classes
+ */
+
+.button {
+    -fx-background-color: #2B3034;
+    -fx-text-fill: #EFF0F1;
+    -fx-border-radius: 10 10 10 10;
+    -fx-background-radius: 10 10 10 10;
+}
+
+.menu-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: inherit;
+}
+
+.context-menu {
+    -fx-background-color: #31363B;
+}
+
+.menu-item {
+    -fx-background-color: inherit;
+    -fx-text-fill: #EFF0F1;
+}
+
+.menu-item:focused {
+    -fx-background-color: #2B3034;
+    -fx-text-fill: #EFF0F1;
+}
+
+/**
+ListView classes
+ */
+
+.list-cell:filled:selected:focused, .list-cell:filled:selected {
+    -fx-background-color: #505457;
+}
+
+.list-cell:even {
+    -fx-background-color: #2B3034;
+}
+
+.list-cell:odd {
+    -fx-background-color: #31363B;
+}
+
+.list-cell .label {
+    -fx-text-fill: #EFF0F1;
+}
+
+.list-view {
+    -fx-border-width: 0;;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+    -fx-background-color: transparent;
+}
+
+.list-view .scroll-bar:vertical {
+    -fx-background-color: transparent;
+}
+
+/**
+Text container classes
+ */
+
+.label {
+    -fx-text-fill: #EFF0F1;
+}
+
+.check-box {
+    -fx-text-fill: #EFF0F1;
+}
+
+.text {
+    -fx-fill: #EFF0F1;
+}
