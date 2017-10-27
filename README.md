@@ -45,6 +45,12 @@ Instructions below are for linux system. For other systems process is probably s
 * Video format conversion
 * Playlist deletion should affect downloaded files
 
+# Maven dependency graph
+
+If you want to contribute it might be useful.
+
+![Dependency graph](https://i.imgur.com/9YKIlBj.png)
+
 # Licensing
 
 This application is distributed under Apache-2.0 license, see LICENSE.md for more details.
