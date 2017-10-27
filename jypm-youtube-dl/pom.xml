@@ -20,7 +20,6 @@
             <version>${project.version}</version>
         </dependency>
 
-
         <dependency>
             <groupId>com.github.open96</groupId>
             <artifactId>jypm-thread-manager</artifactId>

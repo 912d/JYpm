@@ -59,9 +59,7 @@
             <version>2.9.1</version>
         </dependency>
 
-
         <!-- TESTING LIBRARIES BEGIN HERE -->
-
 
         <!-- https://mvnrepository.com/artifact/junit/junit -->
         <dependency>
@@ -70,7 +68,6 @@
             <version>4.12</version>
             <scope>test</scope>
         </dependency>
-
 
     </dependencies>
 
