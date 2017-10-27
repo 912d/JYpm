@@ -28,6 +28,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <retrofitVersion>2.3.0</retrofitVersion>
         <gsonVersion>2.8.2</gsonVersion>
+        <commonsLangVersion>3.6</commonsLangVersion>
     </properties>
 
     <build>
