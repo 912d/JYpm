@@ -29,6 +29,7 @@
         <retrofitVersion>2.3.0</retrofitVersion>
         <gsonVersion>2.8.2</gsonVersion>
         <commonsLangVersion>3.6</commonsLangVersion>
+        <jsoupVersion>1.10.3</jsoupVersion>
     </properties>
 
     <build>
