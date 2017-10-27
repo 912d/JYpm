@@ -21,24 +21,11 @@
             <version>${retrofitVersion}</version>
         </dependency>
 
-
         <!-- https://mvnrepository.com/artifact/com.squareup.retrofit2/converter-gson -->
         <dependency>
             <groupId>com.squareup.retrofit2</groupId>
             <artifactId>converter-gson</artifactId>
             <version>${retrofitVersion}</version>
-        </dependency>
-
-
-        <!-- TESTING LIBRARIES BEGIN HERE -->
-
-
-        <!-- https://mvnrepository.com/artifact/com.squareup.retrofit2/retrofit-mock -->
-        <dependency>
-            <groupId>com.squareup.retrofit2</groupId>
-            <artifactId>retrofit-mock</artifactId>
-            <version>${retrofitVersion}</version>
-            <scope>test</scope>
         </dependency>
 
     </dependencies>
