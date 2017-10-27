@@ -43,7 +43,6 @@ Instructions below are for linux system. For other systems process is probably s
 
 * MacOS support
 * Video format conversion
-* Dumping YouTube API completely
 * Playlist deletion should affect downloaded files
 
 # Licensing
