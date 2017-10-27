@@ -4,6 +4,7 @@ import com.github.open96.api.github.GitHubApiClient;
 import com.github.open96.api.github.GitHubApiEndpointInterface;
 import com.github.open96.api.github.pojo.release.ReleaseJSON;
 import com.github.open96.fxml.DialogWindowController;
+import com.github.open96.settings.OS_TYPE;
 import com.github.open96.settings.SettingsManager;
 import com.github.open96.thread.TASK_TYPE;
 import com.github.open96.thread.ThreadManager;
@@ -238,10 +239,22 @@ public class Updater {
         messageBuilder.append("Visit").append(" ").append(releaseJSON.getHtmlUrl()).append(" ").append("for changelog and more details.")
                 .append("\n");
 
-        String positiveButtonText = "Upgrade";
+        //Windows users have executables, so they have to visit GitHub and download it manually for the time being
+        String positiveButtonText;
+        if (SettingsManager.getInstance().getOS() == OS_TYPE.WINDOWS) {
+            positiveButtonText = "Ok";
+        } else {
+            positiveButtonText = "Upgrade";
+        }
         String negativeButtonText = "Later";
 
-        EventHandler<ActionEvent> positiveButtonEventHandler = event -> upgrade();
+        EventHandler<ActionEvent> positiveButtonEventHandler;
+        if (SettingsManager.getInstance().getOS() == OS_TYPE.WINDOWS) {
+            positiveButtonEventHandler = event -> upgrade();
+        } else {
+            positiveButtonEventHandler = event -> log.info(messageBuilder.toString());
+        }
+
 
         Stage subStage = new Stage();
         subStage.setTitle("Update available");
