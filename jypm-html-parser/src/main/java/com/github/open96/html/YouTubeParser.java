@@ -51,7 +51,7 @@ public class YouTubeParser {
         if (document != null) {
             Elements element = document.select("[class*=\"-header\"] > li:nth-child(2)");
             String videoCount = element.get(0).text();
-            videoCount = videoCount.replaceAll("[a-z]", "");
+            videoCount = videoCount.replaceAll("[^0-9]", "");
             videoCount = videoCount.replaceAll(" ", "");
             log.debug("Got playlist video count: " + videoCount);
             return videoCount;
