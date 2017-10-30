@@ -16,9 +16,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Queue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class DownloadManager {
     //This object is a singleton thus storing instance of it is needed
@@ -71,23 +73,25 @@ public class DownloadManager {
                     }
                 }
                 if (SettingsManager.getInstance().checkInternetConnection()) {
-                    int resumedCount = 0;
+                    Queue<Playlist> resumedPlaylists = new LinkedBlockingQueue<>();
                     for (Playlist p : PlaylistManager.getInstance().getPlaylists()) {
                         if (p.getStatus() == QUEUE_STATUS.DOWNLOADING) {
                             download(p);
-                            resumedCount++;
+                            resumedPlaylists.add(p);
                         }
                     }
                     try {
-                        Thread.sleep(500);
+                        Thread.sleep(100);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                     //Resume all queued tasks
                     for (Playlist p : PlaylistManager.getInstance().getPlaylists()) {
                         if (p.getStatus() == QUEUE_STATUS.QUEUED) {
-                            download(p);
-                            resumedCount++;
+                            if (!resumedPlaylists.contains(p)) {
+                                download(p);
+                                resumedPlaylists.add(p);
+                            }
                         }
                     }
                     //Wait for TrayIcon initialization
@@ -104,8 +108,8 @@ public class DownloadManager {
                         }
                     }
                     //Send notification
-                    if (resumedCount > 0 && TrayIcon.isTrayWorking()) {
-                        TrayIcon.getInstance().displayNotification("JYpm - resuming downloads", "Resuming " + resumedCount + " playlist downloads");
+                    if (resumedPlaylists.size() > 0 && TrayIcon.isTrayWorking()) {
+                        TrayIcon.getInstance().displayNotification("JYpm - resuming downloads", "Resuming " + resumedPlaylists.size() + " playlist downloads");
                     }
                     log.debug("Initializer thread has completed initialization...");
                     break;

@@ -1,4 +1,4 @@
-# JYpm - Java YouTube Playlist Manager 1.0.0 [![Build Status](https://travis-ci.org/Open96/JYpm.svg?branch=master)](https://travis-ci.org/Open96/JYpm)
+# JYpm - Java YouTube Playlist Manager [![Build Status](https://travis-ci.org/Open96/JYpm.svg?branch=master)](https://travis-ci.org/Open96/JYpm)
 
 This Java application lets you download YouTube playlists to your local storage and manage them in a a simple manner.
 
@@ -32,7 +32,7 @@ Instructions below are for linux system. For other systems process is probably s
 
 ```cd jypm-app/target/```
 
-* There should be a file called jypm-app-1.0.0-jar-with-dependencies.jar - this is file you can open to run Ypm by clicking on it or by typing:
+* There should be a file called jypm-app-<version>-jar-with-dependencies.jar - this is file you can open to run Ypm by clicking on it or by typing:
 
 ```java -jar <FILENAME>```
 
