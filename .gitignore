@@ -16,3 +16,6 @@ youtube-dl/
 
 # Don't include downloaded jars into the project
 *.jar
+
+# Say no to linux executable in reop
+JYpm
