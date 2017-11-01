@@ -4,11 +4,9 @@ import com.github.open96.api.github.GitHubApiClient;
 import com.github.open96.api.github.GitHubApiEndpointInterface;
 import com.github.open96.api.github.pojo.release.ReleaseJSON;
 import com.github.open96.fxml.DialogWindowController;
-import com.github.open96.settings.OS_TYPE;
 import com.github.open96.settings.SettingsManager;
 import com.github.open96.thread.TASK_TYPE;
 import com.github.open96.thread.ThreadManager;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
@@ -21,10 +19,13 @@ import org.apache.logging.log4j.Logger;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 
+import java.awt.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
@@ -108,28 +109,6 @@ public class Updater {
             log.error("API object is empty!", new IllegalStateException("API object is empty!"));
         }
         return null;
-    }
-
-    public void upgrade() {
-        if (download()) {
-            String newJarName = releaseJSON.getAssets().stream()
-                    .filter(asset -> asset.getContentType().equals("application/x-java-archive"))
-                    .findFirst().get().getName();
-            ProcessBuilder processBuilder = new ProcessBuilder("java", "-jar", newJarName);
-            try {
-                log.info("Restarting...");
-                processBuilder.start();
-            } catch (IOException e) {
-                log.error("Encountered problem with creating new process", e);
-            }
-            Platform.exit();
-            try {
-                Thread.sleep(5000);
-                System.exit(0);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     /**
@@ -223,11 +202,6 @@ public class Updater {
         }
     }
 
-    /**
-     * Displays window that lets user choose to make update.
-     *
-     * @throws IOException Thrown in case .fxml is not found.
-     */
     private void alertUser() throws IOException {
 
         //Create message
@@ -240,21 +214,20 @@ public class Updater {
                 .append("\n");
 
         //Windows users have executables, so they have to visit GitHub and download it manually for the time being
-        String positiveButtonText;
-        if (SettingsManager.getInstance().getOS() == OS_TYPE.WINDOWS) {
-            positiveButtonText = "Ok";
-        } else {
-            positiveButtonText = "Upgrade";
-        }
+        String positiveButtonText = "Visit github";
         String negativeButtonText = "Later";
 
-        EventHandler<ActionEvent> positiveButtonEventHandler;
-        if (SettingsManager.getInstance().getOS() != OS_TYPE.WINDOWS) {
-            positiveButtonEventHandler = event -> upgrade();
-        } else {
-            positiveButtonEventHandler = event -> log.info(messageBuilder.toString());
-        }
-
+        EventHandler<ActionEvent> positiveButtonEventHandler = event -> {
+            if (Desktop.isDesktopSupported()) {
+                try {
+                    Desktop.getDesktop().browse(new URI(releaseJSON.getHtmlUrl()));
+                } catch (IOException | URISyntaxException e) {
+                    log.error(e);
+                } catch (UnsupportedOperationException e) {
+                    log.error("Browsing is not supported on this system");
+                }
+            }
+        };
 
         Stage subStage = new Stage();
         subStage.setTitle("Update available");
