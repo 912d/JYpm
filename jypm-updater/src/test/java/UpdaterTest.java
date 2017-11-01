@@ -68,7 +68,7 @@ public class UpdaterTest {
                 setFakeRuntimeVersion("-1");
                 Updater.getInstance().refresh();
                 String updatedVersion = Updater.getInstance().checkForUpdate();
-                if (updatedVersion != properties.getProperty("runtime.version")) {
+                if (!updatedVersion.equals(properties.getProperty("runtime.version"))) {
                     assertEquals(newestVersion, Updater.getInstance().checkForUpdate());
                 }
             } catch (IllegalStateException e) {
