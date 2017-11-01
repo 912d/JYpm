@@ -29,6 +29,7 @@ import java.io.IOException;
 public class RootListCellController extends ListCell<Playlist> {
 
     private static Logger log = LogManager.getLogger(RootListCellController.class.getName());
+    private Image thumbnailImage;
 
     //Load elements from fxml file that have id and cast them to objects of their respective types
 
@@ -83,7 +84,10 @@ public class RootListCellController extends ListCell<Playlist> {
                 while (ThreadManager.getExecutionPermission()) {
                     try {
                         if (SettingsManager.getInstance().checkInternetConnection()) {
-                            Platform.runLater(() -> thumbnailImageView.setImage(new Image(playlist.getPlaylistThumbnailUrl())));
+                            if (thumbnailImage == null) {
+                                thumbnailImage = new Image(playlist.getPlaylistThumbnailUrl());
+                            }
+                            Platform.runLater(() -> thumbnailImageView.setImage(thumbnailImage));
                             break;
                         }
                         Thread.sleep(1000 * 3); //3 seconds
