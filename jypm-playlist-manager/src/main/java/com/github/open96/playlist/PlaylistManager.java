@@ -14,10 +14,7 @@ import javafx.collections.ObservableList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
@@ -146,7 +143,7 @@ public class PlaylistManager {
      *
      * @param playlist Object of Playlist class that should be removed from PlaylistManager's playlists variable.
      */
-    public void remove(Playlist playlist) {
+    public void remove(Playlist playlist, boolean deleteDir) {
         ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
             //Look for playlist that matches playlist that was requested to be removed
             playlists.stream()
@@ -158,6 +155,26 @@ public class PlaylistManager {
                         saveToJson();
                     });
         }), TASK_TYPE.PLAYLIST);
+        //Delete playlist directory
+        if (deleteDir) {
+            ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
+                //Give DownloadManager time to stop downloading.
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                //Proceed to delete every file in playlist directory
+                File playlistDirectory = new File(playlist.getPlaylistLocation());
+                if (playlistDirectory.exists() && playlistDirectory.listFiles() != null) {
+                    for (File f : playlistDirectory.listFiles()) {
+                        f.delete();
+                    }
+                    playlistDirectory.delete();
+                }
+            }), TASK_TYPE.OTHER);
+        }
+
     }
 
 

@@ -94,7 +94,7 @@ public class PlaylistManagerTest {
             ArrayList<Playlist> playlists = PlaylistManager.getInstance().getPlaylists();
             assertEquals(1, playlists.size());
             assertNotNull(PlaylistManager.getInstance().getPlaylistByLink(samplePlaylist.getPlaylistLink()));
-            PlaylistManager.getInstance().remove(samplePlaylist);
+            PlaylistManager.getInstance().remove(samplePlaylist,true);
             Thread.sleep(400);
             assertEquals(0, playlists.size());
             assertNull(PlaylistManager.getInstance().getPlaylistByLink(samplePlaylist.getPlaylistLink()));
@@ -118,7 +118,7 @@ public class PlaylistManagerTest {
             assertEquals(1, PlaylistManager.getInstance().getPlaylists().size());
             assertEquals(samplePlaylist, PlaylistManager.getInstance().getPlaylists().get(0));
             assertEquals(samplePlaylist, PlaylistManager.getInstance().getPlaylistByLink(samplePlaylist.getPlaylistLink()));
-            PlaylistManager.getInstance().remove(samplePlaylist);
+            PlaylistManager.getInstance().remove(samplePlaylist,true);
             Thread.sleep(500);
             assertNull(PlaylistManager.getInstance().getPlaylistByLink(samplePlaylist.getPlaylistLink()));
             assertEquals(0, PlaylistManager.getInstance().getPlaylists().size());
