@@ -2,6 +2,7 @@ package com.github.open96.fxml;
 
 import com.github.open96.download.DownloadManager;
 import com.github.open96.playlist.PlaylistManager;
+import com.github.open96.playlist.QUEUE_STATUS;
 import com.github.open96.playlist.pojo.Playlist;
 import com.github.open96.settings.SettingsManager;
 import com.github.open96.thread.TASK_TYPE;
@@ -94,6 +95,7 @@ public class RootListCellController extends ListCell<Playlist> {
 
 
             ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
+                QUEUE_STATUS lastKnownState = QUEUE_STATUS.UNKNOWN;
                 while (ThreadManager.getExecutionPermission()) {
                     //Dirty cheat because JavaFX changes references to objects on listview update, so it is obligatory to make sure we are still operating on same object.
                     if (!playlistNameLabel.getText().equals(playlist.getPlaylistName())) {
@@ -103,19 +105,29 @@ public class RootListCellController extends ListCell<Playlist> {
                     try {
                         switch (PlaylistManager.getInstance().getPlaylistByLink(playlist.getPlaylistLink()).getStatus()) {
                             case QUEUED:
-                                Platform.runLater(() -> currentStatusLabel.setText("In queue"));
+                                if (lastKnownState != QUEUE_STATUS.QUEUED) {
+                                    Platform.runLater(() -> currentStatusLabel.setText("In queue"));
+                                    lastKnownState = QUEUE_STATUS.QUEUED;
+                                }
                                 break;
                             case DOWNLOADING:
                                 Integer currentCount = DownloadManager.getInstance().getDownloadProgress();
                                 if (currentCount != null) {
                                     Platform.runLater(() -> currentStatusLabel.setText("Downloading (" + currentCount + "/" + playlist.getVideoCount() + ")"));
                                 }
+                                lastKnownState = QUEUE_STATUS.DOWNLOADING;
                                 break;
                             case DOWNLOADED:
-                                Platform.runLater(() -> currentStatusLabel.setText("Downloaded"));
+                                if (lastKnownState != QUEUE_STATUS.DOWNLOADED) {
+                                    Platform.runLater(() -> currentStatusLabel.setText("Downloaded"));
+                                    lastKnownState = QUEUE_STATUS.DOWNLOADED;
+                                }
                                 break;
                             case FAILED:
-                                Platform.runLater(() -> currentStatusLabel.setText("Error during downloading"));
+                                if (lastKnownState != QUEUE_STATUS.FAILED) {
+                                    Platform.runLater(() -> currentStatusLabel.setText("Error during downloading"));
+                                    lastKnownState = QUEUE_STATUS.FAILED;
+                                }
                                 break;
                         }
                         try {
