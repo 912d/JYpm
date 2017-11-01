@@ -45,9 +45,7 @@ Instructions below are for linux system. For other systems process is probably s
 
 ### Future development plans
 
-* MacOS support
 * Video format conversion
-* Playlist deletion should affect downloaded files
 
 # Maven dependency graph
 

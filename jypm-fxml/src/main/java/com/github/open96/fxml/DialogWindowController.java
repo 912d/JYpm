@@ -46,4 +46,23 @@ public class DialogWindowController implements Initializable {
             negativeButton.setText(negativeButtonText);
         });
     }
+
+    /**
+     * Sets texts and button functions for this DialogWindow instance.
+     *
+     * @param message              Message that should be displayed in center of the window.
+     * @param positiveButtonText   Text in button on the left.
+     * @param negativeButtonText   Text in button on the right.
+     * @param positiveButtonAction Functionality of button on the left.
+     */
+    public void setData(String message, String positiveButtonText, String negativeButtonText, EventHandler<ActionEvent> positiveButtonAction, EventHandler<ActionEvent> negativeButtonAction) {
+        Platform.runLater(() -> {
+            messageText.setText(message);
+            positiveButton.setText(positiveButtonText);
+            positiveButton.setOnAction(positiveButtonAction);
+            negativeButton.setText(negativeButtonText);
+            negativeButton.setOnAction(negativeButtonAction);
+        });
+    }
+
 }

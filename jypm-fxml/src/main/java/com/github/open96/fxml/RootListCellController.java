@@ -8,8 +8,12 @@ import com.github.open96.settings.SettingsManager;
 import com.github.open96.thread.TASK_TYPE;
 import com.github.open96.thread.ThreadManager;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.MenuButton;
@@ -17,6 +21,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -149,13 +154,48 @@ public class RootListCellController extends ListCell<Playlist> {
 
             //Set button behaviours
             deleteItem.setOnAction(actionEvent -> {
-                log.trace("Proceeding to remove " + playlist.getPlaylistName());
-                PlaylistManager.getInstance().getPlaylists().stream()
-                        .filter(playlist1 -> playlist1.getPlaylistLink().equals(playlist.getPlaylistLink()))
-                        .forEach(playlist1 -> {
-                            PlaylistManager.getInstance().getObservablePlaylists().remove(playlist1);
-                            PlaylistManager.getInstance().remove(playlist1);
-                        });
+                try {
+                    Stage subStage = new Stage();
+                    subStage.setTitle("Playlist deletion");
+                    subStage.getIcons().add(new Image("/icon/launcher-128-128.png"));
+                    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/dialogWindow.fxml"));
+                    Parent root = fxmlLoader.load();
+                    DialogWindowController controller = fxmlLoader.getController();
+
+                    String message = "Do you want to delete all files linked to playlist or just a playlist entry?";
+                    String positiveButtonText = "Delete all files";
+                    String negativeButtonText = "Only delete entry in JYpm";
+                    EventHandler<ActionEvent> positiveButtonEventHandler = event -> {
+                        PlaylistManager.getInstance().getPlaylists().stream()
+                                .filter(playlist1 -> playlist1.getPlaylistLink().equals(playlist.getPlaylistLink()))
+                                .forEach(playlist1 -> {
+                                    PlaylistManager.getInstance().getObservablePlaylists().remove(playlist1);
+                                    PlaylistManager.getInstance().remove(playlist1, true);
+                                });
+                        subStage.close();
+                    };
+
+
+                    EventHandler<ActionEvent> negativeButtonEventHandler = event -> {
+                        PlaylistManager.getInstance().getPlaylists().stream()
+                                .filter(playlist1 -> playlist1.getPlaylistLink().equals(playlist.getPlaylistLink()))
+                                .forEach(playlist1 -> {
+                                    PlaylistManager.getInstance().getObservablePlaylists().remove(playlist1);
+                                    PlaylistManager.getInstance().remove(playlist1, false);
+                                });
+                        subStage.close();
+                    };
+
+
+                    controller.setData(message, positiveButtonText, negativeButtonText, positiveButtonEventHandler, negativeButtonEventHandler);
+                    Scene scene = new Scene(root);
+                    subStage.setScene(scene);
+                    subStage.show();
+                    subStage.setAlwaysOnTop(true);
+                    subStage.requestFocus();
+                } catch (IOException e) {
+                    log.error(e);
+                }
             });
 
             updateItem.setOnAction(actionEvent -> {
