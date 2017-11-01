@@ -14,6 +14,8 @@ Works on Windows and Linux. On MacOS some features are disabled, if you have acc
 
 # How to compile
 
+While it is strongly recommended to download executable from releases page, you still can do it yourself.
+
 Instructions below are for linux system. For other systems process is probably similar.
 
 * Open your terminal in location where you want to download source code and type the following:
@@ -37,6 +39,8 @@ Instructions below are for linux system. For other systems process is probably s
 ```java -jar <FILENAME>```
 
 * Move that .jar to separate directory of your choice and run it.
+
+* (ADDITIONAL) Look into executables directory if you want to wrap your jar file into executable.
 
 
 ### Future development plans
