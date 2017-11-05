@@ -2,13 +2,18 @@ package com.github.open96.fxml;
 
 import com.github.open96.download.DownloadManager;
 import com.github.open96.playlist.PlaylistManager;
+import com.github.open96.playlist.QUEUE_STATUS;
 import com.github.open96.playlist.pojo.Playlist;
 import com.github.open96.settings.SettingsManager;
 import com.github.open96.thread.TASK_TYPE;
 import com.github.open96.thread.ThreadManager;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.MenuButton;
@@ -16,6 +21,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -28,6 +34,7 @@ import java.io.IOException;
 public class RootListCellController extends ListCell<Playlist> {
 
     private static Logger log = LogManager.getLogger(RootListCellController.class.getName());
+    private Image thumbnailImage;
 
     //Load elements from fxml file that have id and cast them to objects of their respective types
 
@@ -82,7 +89,10 @@ public class RootListCellController extends ListCell<Playlist> {
                 while (ThreadManager.getExecutionPermission()) {
                     try {
                         if (SettingsManager.getInstance().checkInternetConnection()) {
-                            Platform.runLater(() -> thumbnailImageView.setImage(new Image(playlist.getPlaylistThumbnailUrl())));
+                            if (thumbnailImage == null) {
+                                thumbnailImage = new Image(playlist.getPlaylistThumbnailUrl());
+                            }
+                            Platform.runLater(() -> thumbnailImageView.setImage(thumbnailImage));
                             break;
                         }
                         Thread.sleep(1000 * 3); //3 seconds
@@ -94,6 +104,7 @@ public class RootListCellController extends ListCell<Playlist> {
 
 
             ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
+                QUEUE_STATUS lastKnownState = QUEUE_STATUS.UNKNOWN;
                 while (ThreadManager.getExecutionPermission()) {
                     //Dirty cheat because JavaFX changes references to objects on listview update, so it is obligatory to make sure we are still operating on same object.
                     if (!playlistNameLabel.getText().equals(playlist.getPlaylistName())) {
@@ -103,19 +114,29 @@ public class RootListCellController extends ListCell<Playlist> {
                     try {
                         switch (PlaylistManager.getInstance().getPlaylistByLink(playlist.getPlaylistLink()).getStatus()) {
                             case QUEUED:
-                                Platform.runLater(() -> currentStatusLabel.setText("In queue"));
+                                if (lastKnownState != QUEUE_STATUS.QUEUED) {
+                                    Platform.runLater(() -> currentStatusLabel.setText("In queue"));
+                                    lastKnownState = QUEUE_STATUS.QUEUED;
+                                }
                                 break;
                             case DOWNLOADING:
                                 Integer currentCount = DownloadManager.getInstance().getDownloadProgress();
                                 if (currentCount != null) {
                                     Platform.runLater(() -> currentStatusLabel.setText("Downloading (" + currentCount + "/" + playlist.getVideoCount() + ")"));
                                 }
+                                lastKnownState = QUEUE_STATUS.DOWNLOADING;
                                 break;
                             case DOWNLOADED:
-                                Platform.runLater(() -> currentStatusLabel.setText("Downloaded"));
+                                if (lastKnownState != QUEUE_STATUS.DOWNLOADED) {
+                                    Platform.runLater(() -> currentStatusLabel.setText("Downloaded"));
+                                    lastKnownState = QUEUE_STATUS.DOWNLOADED;
+                                }
                                 break;
                             case FAILED:
-                                Platform.runLater(() -> currentStatusLabel.setText("Error during downloading"));
+                                if (lastKnownState != QUEUE_STATUS.FAILED) {
+                                    Platform.runLater(() -> currentStatusLabel.setText("Error during downloading"));
+                                    lastKnownState = QUEUE_STATUS.FAILED;
+                                }
                                 break;
                         }
                         try {
@@ -133,13 +154,48 @@ public class RootListCellController extends ListCell<Playlist> {
 
             //Set button behaviours
             deleteItem.setOnAction(actionEvent -> {
-                log.trace("Proceeding to remove " + playlist.getPlaylistName());
-                PlaylistManager.getInstance().getPlaylists().stream()
-                        .filter(playlist1 -> playlist1.getPlaylistLink().equals(playlist.getPlaylistLink()))
-                        .forEach(playlist1 -> {
-                            PlaylistManager.getInstance().getObservablePlaylists().remove(playlist1);
-                            PlaylistManager.getInstance().remove(playlist1);
-                        });
+                try {
+                    Stage subStage = new Stage();
+                    subStage.setTitle("Playlist deletion");
+                    subStage.getIcons().add(new Image("/icon/launcher-128-128.png"));
+                    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/dialogWindow.fxml"));
+                    Parent root = fxmlLoader.load();
+                    DialogWindowController controller = fxmlLoader.getController();
+
+                    String message = "Do you want to delete all files linked to playlist or just a playlist entry?";
+                    String positiveButtonText = "Delete all files";
+                    String negativeButtonText = "Only delete entry in JYpm";
+                    EventHandler<ActionEvent> positiveButtonEventHandler = event -> {
+                        PlaylistManager.getInstance().getPlaylists().stream()
+                                .filter(playlist1 -> playlist1.getPlaylistLink().equals(playlist.getPlaylistLink()))
+                                .forEach(playlist1 -> {
+                                    PlaylistManager.getInstance().getObservablePlaylists().remove(playlist1);
+                                    PlaylistManager.getInstance().remove(playlist1, true);
+                                });
+                        subStage.close();
+                    };
+
+
+                    EventHandler<ActionEvent> negativeButtonEventHandler = event -> {
+                        PlaylistManager.getInstance().getPlaylists().stream()
+                                .filter(playlist1 -> playlist1.getPlaylistLink().equals(playlist.getPlaylistLink()))
+                                .forEach(playlist1 -> {
+                                    PlaylistManager.getInstance().getObservablePlaylists().remove(playlist1);
+                                    PlaylistManager.getInstance().remove(playlist1, false);
+                                });
+                        subStage.close();
+                    };
+
+
+                    controller.setData(message, positiveButtonText, negativeButtonText, positiveButtonEventHandler, negativeButtonEventHandler);
+                    Scene scene = new Scene(root);
+                    subStage.setScene(scene);
+                    subStage.show();
+                    subStage.setAlwaysOnTop(true);
+                    subStage.requestFocus();
+                } catch (IOException e) {
+                    log.error(e);
+                }
             });
 
             updateItem.setOnAction(actionEvent -> {

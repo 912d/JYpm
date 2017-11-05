@@ -5,6 +5,7 @@ import com.github.open96.settings.SettingsManager;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.net.MalformedURLException;
@@ -94,7 +95,7 @@ public class PlaylistManagerTest {
             ArrayList<Playlist> playlists = PlaylistManager.getInstance().getPlaylists();
             assertEquals(1, playlists.size());
             assertNotNull(PlaylistManager.getInstance().getPlaylistByLink(samplePlaylist.getPlaylistLink()));
-            PlaylistManager.getInstance().remove(samplePlaylist);
+            PlaylistManager.getInstance().remove(samplePlaylist, false);
             Thread.sleep(400);
             assertEquals(0, playlists.size());
             assertNull(PlaylistManager.getInstance().getPlaylistByLink(samplePlaylist.getPlaylistLink()));
@@ -102,6 +103,36 @@ public class PlaylistManagerTest {
             e.printStackTrace();
         } catch (IllegalStateException e) {
             System.out.println("Empty API object");
+        }
+    }
+
+    @Test
+    public void testRemoveDirectoryDeletion() {
+        try {
+            resetSingleton();
+            File samplePlaylistDir = new File(pathToClass);
+            PlaylistManager.getInstance().add(samplePlaylist);
+            Thread.sleep(1000);
+            assertFalse(samplePlaylistDir.exists());
+            samplePlaylistDir.mkdir();
+            File sampleVid1 = new File(pathToClass + "/v1");
+            File sampleVid2 = new File(pathToClass + "/v2");
+            sampleVid1.createNewFile();
+            sampleVid2.createNewFile();
+            assertEquals(samplePlaylistDir.listFiles().length, 2);
+            PlaylistManager.getInstance().remove(samplePlaylist, false);
+            Thread.sleep(1000);
+            assertTrue(samplePlaylistDir.exists());
+            assertEquals(samplePlaylistDir.listFiles().length, 2);
+            PlaylistManager.getInstance().add(samplePlaylist);
+            Thread.sleep(1000);
+            PlaylistManager.getInstance().remove(samplePlaylist, true);
+            Thread.sleep(2000);
+            assertFalse(samplePlaylistDir.exists());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -118,7 +149,7 @@ public class PlaylistManagerTest {
             assertEquals(1, PlaylistManager.getInstance().getPlaylists().size());
             assertEquals(samplePlaylist, PlaylistManager.getInstance().getPlaylists().get(0));
             assertEquals(samplePlaylist, PlaylistManager.getInstance().getPlaylistByLink(samplePlaylist.getPlaylistLink()));
-            PlaylistManager.getInstance().remove(samplePlaylist);
+            PlaylistManager.getInstance().remove(samplePlaylist, false);
             Thread.sleep(500);
             assertNull(PlaylistManager.getInstance().getPlaylistByLink(samplePlaylist.getPlaylistLink()));
             assertEquals(0, PlaylistManager.getInstance().getPlaylists().size());

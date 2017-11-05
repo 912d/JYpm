@@ -74,6 +74,7 @@ public class JYpm extends Application {
         stage.setScene(scene);
         stage.show();
         stage.requestFocus();
+        stage.toFront();
 
         try {
             Updater.getInstance().checkForUpdate();
