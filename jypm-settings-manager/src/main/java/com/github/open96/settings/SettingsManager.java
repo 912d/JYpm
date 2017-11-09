@@ -87,6 +87,14 @@ public class SettingsManager {
             settings.setOsType(OS_TYPE.UNKNOWN);
             log.warn("Unsupported OS, you are on your own...");
         }
+        if(getFileManagerCommand().equals("")){
+            if(getOS()==OS_TYPE.WINDOWS){
+                setFileManagerCommand("explorer");
+            } else if (getOS()==OS_TYPE.OPEN_SOURCE_UNIX){
+                setFileManagerCommand("xdg-open");
+            }
+        }
+        saveToJson();
         //Check internet connection and start thread that will check it in time intervals
         criticalLinksArray = new ArrayList<>();
         criticalLinksArray.add("localhost");
