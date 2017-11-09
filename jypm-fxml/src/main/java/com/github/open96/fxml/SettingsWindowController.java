@@ -1,5 +1,6 @@
 package com.github.open96.fxml;
 
+import com.github.open96.settings.OS_TYPE;
 import com.github.open96.settings.SettingsManager;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -32,6 +33,8 @@ public class SettingsWindowController implements Initializable {
     @FXML
     Button saveSettingsButton;
     @FXML
+    Button restoreDefaultsButton;
+    @FXML
     TextField fileManagerCommandTextField;
     @FXML
     CheckBox notificationCheckBox;
@@ -63,5 +66,16 @@ public class SettingsWindowController implements Initializable {
         rootPane.getScene().getWindow().hide();
     }
 
+    /**
+     * Show user default settings
+     */
+    public void onRestoreDefaultsButtonClick(ActionEvent actionEvent) {
+        if (SettingsManager.getInstance().getOS() == OS_TYPE.WINDOWS) {
+            fileManagerCommandTextField.setText("explorer");
+        } else if (SettingsManager.getInstance().getOS() == OS_TYPE.OPEN_SOURCE_UNIX) {
+            fileManagerCommandTextField.setText("xdg-open");
+        }
+        notificationCheckBox.setSelected(true);
+    }
 
 }
