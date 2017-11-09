@@ -16,6 +16,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Queue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -67,14 +68,15 @@ public class DownloadManager {
                 //Wait for YoutubeDlManager first
                 while (YoutubeDlManager.getInstance().getExecutableState() == EXECUTABLE_STATE.NOT_READY) {
                     try {
-                        Thread.sleep(250);
+                        Thread.sleep(10);
                     } catch (InterruptedException e) {
                         log.error("Thread sleep has been interrupted", e);
                     }
                 }
                 if (SettingsManager.getInstance().checkInternetConnection()) {
+                    ArrayList<Playlist> playlists = PlaylistManager.getInstance().getPlaylists();
                     Queue<Playlist> resumedPlaylists = new LinkedBlockingQueue<>();
-                    for (Playlist p : PlaylistManager.getInstance().getPlaylists()) {
+                    for (Playlist p : playlists) {
                         if (p.getStatus() == QUEUE_STATUS.DOWNLOADING) {
                             download(p);
                             resumedPlaylists.add(p);
@@ -86,7 +88,7 @@ public class DownloadManager {
                         e.printStackTrace();
                     }
                     //Resume all queued tasks
-                    for (Playlist p : PlaylistManager.getInstance().getPlaylists()) {
+                    for (Playlist p : playlists) {
                         if (p.getStatus() == QUEUE_STATUS.QUEUED) {
                             if (!resumedPlaylists.contains(p)) {
                                 download(p);
