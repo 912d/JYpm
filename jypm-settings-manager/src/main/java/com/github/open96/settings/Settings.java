@@ -13,6 +13,7 @@ public class Settings {
         fileManagerCommand = "";
         notificationPolicy = true;
         youtubeDlVersion = "";
+        runtimeVersion="";
     }
 
     String getYoutubeDlExecutable() {
