@@ -4,6 +4,7 @@ import com.github.open96.api.github.GitHubApiClient;
 import com.github.open96.api.github.GitHubApiEndpointInterface;
 import com.github.open96.api.github.pojo.release.ReleaseJSON;
 import com.github.open96.fxml.DialogWindowController;
+import com.github.open96.settings.OS_TYPE;
 import com.github.open96.settings.SettingsManager;
 import com.github.open96.thread.TASK_TYPE;
 import com.github.open96.thread.ThreadManager;
@@ -220,7 +221,12 @@ public class Updater {
         EventHandler<ActionEvent> positiveButtonEventHandler = event -> {
             if (Desktop.isDesktopSupported()) {
                 try {
-                    Desktop.getDesktop().browse(new URI(releaseJSON.getHtmlUrl()));
+                    if (SettingsManager.getInstance().getOS() == OS_TYPE.OPEN_SOURCE_UNIX) {
+                        Runtime.getRuntime().exec("xdg-open " + releaseJSON.getHtmlUrl(), null);
+                    } else if (SettingsManager.getInstance().getOS() == OS_TYPE.WINDOWS) {
+                        Desktop.getDesktop().browse(new URI(releaseJSON.getHtmlUrl()));
+                    }
+
                 } catch (IOException | URISyntaxException e) {
                     log.error(e);
                 } catch (UnsupportedOperationException e) {
