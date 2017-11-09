@@ -105,7 +105,7 @@ public class DownloadManager {
                                 break;
                             }
                         } catch (InterruptedException e) {
-                            e.printStackTrace();
+                            log.error("TrayIcon has timed out, you may encounter some strange and scary things...");
                         }
                     }
                     //Send notification
