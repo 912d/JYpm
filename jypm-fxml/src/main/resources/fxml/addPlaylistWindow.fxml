@@ -3,10 +3,9 @@
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<GridPane xmlns:fx="http://javafx.com/fxml/1" fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity"
-          minHeight="-Infinity"
-          minWidth="-Infinity" prefHeight="256.0" prefWidth="600.0" stylesheets="@../stylesheet.css"
-          xmlns="http://javafx.com/javafx/8.0.141" fx:controller="com.github.open96.fxml.AddPlaylistWindowController">
+<GridPane fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+          prefHeight="256.0" prefWidth="600.0" stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx/8.0.141"
+          xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.open96.fxml.AddPlaylistWindowController">
     <columnConstraints>
         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
     </columnConstraints>
@@ -70,8 +69,8 @@
                 </GridPane>
             </children>
         </GridPane>
-        <Button fx:id="addPlaylistButton" mnemonicParsing="false" onAction="#onAddPlaylistButtonClick"
-                text="Add playlist" textAlignment="CENTER" GridPane.halignment="CENTER" GridPane.rowIndex="1"
-                GridPane.valignment="CENTER"/>
+        <Button fx:id="addPlaylistButton" minHeight="26.0" minWidth="150.0" mnemonicParsing="false"
+                onAction="#onAddPlaylistButtonClick" text="Add playlist" textAlignment="CENTER"
+                GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER"/>
     </children>
 </GridPane>
