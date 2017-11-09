@@ -43,13 +43,9 @@ public class SettingsWindowController implements Initializable {
         String runtimeVersion = SettingsManager.getInstance().getRuntimeVersion();
         if (!runtimeVersion.equals("")) {
             runtimeVersionLabel.setText(runtimeVersion);
-        } else {
-            runtimeVersionLabel.setText("None");
         }
         if (!youtubeDlStringLocation.equals("")) {
             executableVersionLabel.setText(SettingsManager.getInstance().getYoutubeDlVersion());
-        } else {
-            executableVersionLabel.setText("None");
         }
         fileManagerCommandTextField.setText(SettingsManager.getInstance().getFileManagerCommand());
         if (SettingsManager.getInstance().getNotificationPolicy()) {
