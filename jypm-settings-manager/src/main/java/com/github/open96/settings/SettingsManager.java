@@ -87,10 +87,10 @@ public class SettingsManager {
             settings.setOsType(OS_TYPE.UNKNOWN);
             log.warn("Unsupported OS, you are on your own...");
         }
-        if(getFileManagerCommand().equals("")){
-            if(getOS()==OS_TYPE.WINDOWS){
+        if (getFileManagerCommand().equals("")) {
+            if (getOS() == OS_TYPE.WINDOWS) {
                 setFileManagerCommand("explorer");
-            } else if (getOS()==OS_TYPE.OPEN_SOURCE_UNIX){
+            } else if (getOS() == OS_TYPE.OPEN_SOURCE_UNIX) {
                 setFileManagerCommand("xdg-open");
             }
         }
@@ -247,6 +247,39 @@ public class SettingsManager {
         //Create a Runnable thread that will download needed playlist and video data
         ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
             settings.setYoutubeDlVersion(version);
+            if (ThreadManager.getExecutionPermission()) {
+                saveToJson();
+            }
+        }), TASK_TYPE.SETTING);
+    }
+
+
+    /**
+     * @return runtime version stored in SettingsManager in form of String object
+     */
+    public String getRuntimeVersion() {
+
+        Callable<String> settingsGetterThread = () -> settings.getRuntimeVersion();
+        Future<String> settingsFuture = ThreadManager.getInstance().sendTask(settingsGetterThread, TASK_TYPE.SETTING);
+
+        try {
+            return settingsFuture.get();
+        } catch (InterruptedException | ExecutionException e) {
+            log.error("Failed to retrieve setting", e);
+        }
+        return null;
+    }
+
+    /**
+     * Sets runtime version and saves it in SettingsManager
+     *
+     * @param version Runtime version
+     */
+    public void setRuntimeVersion(String version) {
+
+        //Create a Runnable thread that will download needed playlist and video data
+        ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
+            settings.setRuntimeVersion(version);
             if (ThreadManager.getExecutionPermission()) {
                 saveToJson();
             }

@@ -78,6 +78,8 @@ public class Updater {
             log.error("Missing or corrupt version.properties file!", e);
         }
 
+        SettingsManager.getInstance().setRuntimeVersion(runtimeVersion);
+
         //Initialize GitHubApiClient
         Retrofit retrofit = GitHubApiClient.getInstance().getClient();
         apiService = retrofit.create(GitHubApiEndpointInterface.class);
