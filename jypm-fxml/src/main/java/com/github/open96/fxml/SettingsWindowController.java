@@ -13,6 +13,10 @@ import javafx.scene.layout.GridPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.awt.*;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -27,9 +31,15 @@ public class SettingsWindowController implements Initializable {
     @FXML
     Label executableVersionLabel;
     @FXML
+    Label runtimeVersionLabel;
+    @FXML
     Label notificationLabel;
     @FXML
     Button saveSettingsButton;
+    @FXML
+    Button restoreDefaultsButton;
+    @FXML
+    Button visitGitHubButton;
     @FXML
     TextField fileManagerCommandTextField;
     @FXML
@@ -39,21 +49,14 @@ public class SettingsWindowController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         //Load data from SettingsManager if it exists
         String youtubeDlStringLocation = SettingsManager.getInstance().getYoutubeDlExecutable();
+        String runtimeVersion = SettingsManager.getInstance().getRuntimeVersion();
+        if (!runtimeVersion.equals("")) {
+            runtimeVersionLabel.setText(runtimeVersion);
+        }
         if (!youtubeDlStringLocation.equals("")) {
             executableVersionLabel.setText(SettingsManager.getInstance().getYoutubeDlVersion());
-        } else {
-            executableVersionLabel.setText("None");
         }
-        if (SettingsManager.getInstance().getOS() == OS_TYPE.WINDOWS) {
-            fileManagerCommandTextField.setText("explorer");
-            fileManagerCommandTextField.setDisable(true);
-        } else {
-            if (!SettingsManager.getInstance().getFileManagerCommand().equals("")) {
-                fileManagerCommandTextField.setText(SettingsManager.getInstance().getFileManagerCommand());
-            } else {
-                fileManagerCommandTextField.setText("");
-            }
-        }
+        fileManagerCommandTextField.setText(SettingsManager.getInstance().getFileManagerCommand());
         if (SettingsManager.getInstance().getNotificationPolicy()) {
             notificationCheckBox.setSelected(true);
         }
@@ -69,5 +72,36 @@ public class SettingsWindowController implements Initializable {
         rootPane.getScene().getWindow().hide();
     }
 
+    /**
+     * Show user default settings
+     */
+    public void onRestoreDefaultsButtonClick(ActionEvent actionEvent) {
+        if (SettingsManager.getInstance().getOS() == OS_TYPE.WINDOWS) {
+            fileManagerCommandTextField.setText("explorer");
+        } else if (SettingsManager.getInstance().getOS() == OS_TYPE.OPEN_SOURCE_UNIX) {
+            fileManagerCommandTextField.setText("xdg-open");
+        }
+        notificationCheckBox.setSelected(true);
+    }
 
+    /**
+     * Open github page of JYpm
+     */
+    public void onVisitGitHubButtonClick(ActionEvent actionEvent) {
+        String githubURL = "https://github.com/Open96/JYpm";
+        if (Desktop.isDesktopSupported()) {
+            try {
+                if (SettingsManager.getInstance().getOS() == OS_TYPE.OPEN_SOURCE_UNIX) {
+                    Runtime.getRuntime().exec("xdg-open " + githubURL, null);
+                } else if (SettingsManager.getInstance().getOS() == OS_TYPE.WINDOWS) {
+                    Desktop.getDesktop().browse(new URI(githubURL));
+                }
+
+            } catch (IOException | URISyntaxException e) {
+                log.error(e);
+            } catch (UnsupportedOperationException e) {
+                log.error("Browsing is not supported on this system");
+            }
+        }
+    }
 }
