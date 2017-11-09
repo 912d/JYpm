@@ -79,8 +79,7 @@ public class JYpm extends Application {
         try {
             Updater.getInstance().checkForUpdate();
         } catch (IllegalStateException e) {
-            log.warn("You have probably exceeded your GitHub API call limit. You won't be able to check for updates in 1 hour.");
-            log.info("Also, don't abuse GitHub API if you can :)");
+            log.warn("You have probably exceeded your GitHub API call limit. You won't be able to check for updates in 1 hour. Also, don't abuse GitHub API if you can :)");
         }
     }
 
