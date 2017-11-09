@@ -110,7 +110,7 @@ public class DownloadManager {
                     break;
                 } else {
                     try {
-                        Thread.sleep(1000 * 3); //3 seconds
+                        Thread.sleep(1000); //1 seconds
                     } catch (InterruptedException e) {
                         log.error(e);
                     }
