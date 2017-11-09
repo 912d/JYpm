@@ -33,7 +33,8 @@
                 </Label>
                 <Label fx:id="executableVersionLabel" alignment="CENTER_RIGHT" maxHeight="-Infinity"
                        maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0"
-                       prefWidth="300.0" text="None" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                       prefWidth="200.0" text="None" GridPane.columnIndex="1" GridPane.halignment="RIGHT"
+                       GridPane.rowIndex="1">
                     <GridPane.margin>
                         <Insets/>
                     </GridPane.margin>
@@ -80,14 +81,17 @@
                     </GridPane.margin>
                 </Label>
                 <Label fx:id="runtimeVersionLabel" alignment="CENTER_RIGHT" maxHeight="-Infinity" maxWidth="-Infinity"
-                       minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="300.0" text="None"
-                       GridPane.columnIndex="1">
+                       minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="200.0" text="None"
+                       GridPane.columnIndex="1" GridPane.halignment="RIGHT">
                     <opaqueInsets>
                         <Insets/>
                     </opaqueInsets>
                     <padding>
                         <Insets right="10.0"/>
                     </padding>
+                    <GridPane.margin>
+                        <Insets/>
+                    </GridPane.margin>
                 </Label>
             </children>
         </GridPane>
