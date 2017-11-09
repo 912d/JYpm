@@ -217,7 +217,7 @@ public class Updater {
                 .append("\n");
 
         //Windows users have executables, so they have to visit GitHub and download it manually for the time being
-        String positiveButtonText = "Visit github";
+        String positiveButtonText = "Visit GitHub";
         String negativeButtonText = "Later";
 
         EventHandler<ActionEvent> positiveButtonEventHandler = event -> {
