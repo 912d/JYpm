@@ -35,6 +35,8 @@ public class SettingsWindowController implements Initializable {
     @FXML
     Button restoreDefaultsButton;
     @FXML
+    Button visitGitHubButton;
+    @FXML
     TextField fileManagerCommandTextField;
     @FXML
     CheckBox notificationCheckBox;
@@ -78,4 +80,10 @@ public class SettingsWindowController implements Initializable {
         notificationCheckBox.setSelected(true);
     }
 
+    /**
+     * Open github page of JYpm
+     */
+    public void onVisitGitHubButtonClick(ActionEvent actionEvent) {
+        //TODO
+    }
 }
