@@ -27,6 +27,8 @@ public class SettingsWindowController implements Initializable {
     @FXML
     Label executableVersionLabel;
     @FXML
+    Label runtimeVersionLabel;
+    @FXML
     Label notificationLabel;
     @FXML
     Button saveSettingsButton;
@@ -39,6 +41,12 @@ public class SettingsWindowController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         //Load data from SettingsManager if it exists
         String youtubeDlStringLocation = SettingsManager.getInstance().getYoutubeDlExecutable();
+        String runtimeVersion = SettingsManager.getInstance().getRuntimeVersion();
+        if (!runtimeVersion.equals("")) {
+            runtimeVersionLabel.setText(runtimeVersion);
+        } else {
+            runtimeVersionLabel.setText("None");
+        }
         if (!youtubeDlStringLocation.equals("")) {
             executableVersionLabel.setText(SettingsManager.getInstance().getYoutubeDlVersion());
         } else {

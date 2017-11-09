@@ -23,16 +23,17 @@
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
             </rowConstraints>
             <children>
-                <Label fx:id="executableVersionTextLabel" text="youtube-dl executable version">
+                <Label fx:id="executableVersionTextLabel" text="youtube-dl executable version" GridPane.rowIndex="1">
                     <GridPane.margin>
                         <Insets left="10.0"/>
                     </GridPane.margin>
                 </Label>
                 <Label fx:id="executableVersionLabel" alignment="CENTER_RIGHT" maxHeight="-Infinity"
                        maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0"
-                       prefWidth="300.0" text="None" GridPane.columnIndex="1">
+                       prefWidth="300.0" text="None" GridPane.columnIndex="1" GridPane.rowIndex="1">
                     <GridPane.margin>
                         <Insets/>
                     </GridPane.margin>
@@ -44,13 +45,13 @@
                     </padding>
                 </Label>
                 <Label fx:id="fileManagerCommandLabel" layoutX="20.0" layoutY="105.0" text="File manager command"
-                       GridPane.rowIndex="1">
+                       GridPane.rowIndex="2">
                     <GridPane.margin>
                         <Insets left="10.0"/>
                     </GridPane.margin>
                 </Label>
                 <TextField fx:id="fileManagerCommandTextField" alignment="CENTER" GridPane.columnIndex="1"
-                           GridPane.rowIndex="1">
+                           GridPane.rowIndex="2">
                     <opaqueInsets>
                         <Insets/>
                     </opaqueInsets>
@@ -58,14 +59,14 @@
                         <Insets left="10.0" right="10.0"/>
                     </GridPane.margin>
                 </TextField>
-                <Label fx:id="notificationLabel" text="Notifications" GridPane.rowIndex="2">
+                <Label fx:id="notificationLabel" text="Notifications" GridPane.rowIndex="3">
                     <GridPane.margin>
                         <Insets left="10.0"/>
                     </GridPane.margin>
                 </Label>
                 <CheckBox fx:id="notificationCheckBox" alignment="CENTER_RIGHT" ellipsisString=""
                           mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" textAlignment="RIGHT"
-                          GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="2">
+                          GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="3">
                     <padding>
                         <Insets right="10.0"/>
                     </padding>
@@ -73,6 +74,21 @@
                         <Insets right="10.0"/>
                     </GridPane.margin>
                 </CheckBox>
+                <Label fx:id="runtimeVersionTextLabel" text="JYpm version">
+                    <GridPane.margin>
+                        <Insets left="10.0"/>
+                    </GridPane.margin>
+                </Label>
+                <Label fx:id="runtimeVersionLabel" alignment="CENTER_RIGHT" maxHeight="-Infinity" maxWidth="-Infinity"
+                       minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="300.0" text="None"
+                       GridPane.columnIndex="1">
+                    <opaqueInsets>
+                        <Insets/>
+                    </opaqueInsets>
+                    <padding>
+                        <Insets right="10.0"/>
+                    </padding>
+                </Label>
             </children>
         </GridPane>
         <Button fx:id="saveSettingsButton" mnemonicParsing="false" onAction="#onSaveSettingsButtonClick"
