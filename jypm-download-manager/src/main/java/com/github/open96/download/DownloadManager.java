@@ -67,7 +67,7 @@ public class DownloadManager {
                 //Wait for YoutubeDlManager first
                 while (YoutubeDlManager.getInstance().getExecutableState() == EXECUTABLE_STATE.NOT_READY) {
                     try {
-                        Thread.sleep(250);
+                        Thread.sleep(10);
                     } catch (InterruptedException e) {
                         log.error("Thread sleep has been interrupted", e);
                     }
