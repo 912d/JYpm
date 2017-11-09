@@ -13,6 +13,10 @@ import javafx.scene.layout.GridPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.awt.*;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -84,6 +88,20 @@ public class SettingsWindowController implements Initializable {
      * Open github page of JYpm
      */
     public void onVisitGitHubButtonClick(ActionEvent actionEvent) {
-        //TODO
+        String githubURL = "https://github.com/Open96/JYpm";
+        if (Desktop.isDesktopSupported()) {
+            try {
+                if (SettingsManager.getInstance().getOS() == OS_TYPE.OPEN_SOURCE_UNIX) {
+                    Runtime.getRuntime().exec("xdg-open " + githubURL, null);
+                } else if (SettingsManager.getInstance().getOS() == OS_TYPE.WINDOWS) {
+                    Desktop.getDesktop().browse(new URI(githubURL));
+                }
+
+            } catch (IOException | URISyntaxException e) {
+                log.error(e);
+            } catch (UnsupportedOperationException e) {
+                log.error("Browsing is not supported on this system");
+            }
+        }
     }
 }
