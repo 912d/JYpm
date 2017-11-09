@@ -80,11 +80,6 @@ public class DownloadManager {
                             resumedPlaylists.add(p);
                         }
                     }
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
                     //Resume all queued tasks
                     for (Playlist p : PlaylistManager.getInstance().getPlaylists()) {
                         if (p.getStatus() == QUEUE_STATUS.QUEUED) {
