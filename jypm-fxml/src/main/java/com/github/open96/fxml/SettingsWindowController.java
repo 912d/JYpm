@@ -1,6 +1,5 @@
 package com.github.open96.fxml;
 
-import com.github.open96.settings.OS_TYPE;
 import com.github.open96.settings.SettingsManager;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -52,16 +51,7 @@ public class SettingsWindowController implements Initializable {
         } else {
             executableVersionLabel.setText("None");
         }
-        if (SettingsManager.getInstance().getOS() == OS_TYPE.WINDOWS) {
-            fileManagerCommandTextField.setText("explorer");
-            fileManagerCommandTextField.setDisable(true);
-        } else {
-            if (!SettingsManager.getInstance().getFileManagerCommand().equals("")) {
-                fileManagerCommandTextField.setText(SettingsManager.getInstance().getFileManagerCommand());
-            } else {
-                fileManagerCommandTextField.setText("");
-            }
-        }
+        fileManagerCommandTextField.setText(SettingsManager.getInstance().getFileManagerCommand());
         if (SettingsManager.getInstance().getNotificationPolicy()) {
             notificationCheckBox.setSelected(true);
         }
