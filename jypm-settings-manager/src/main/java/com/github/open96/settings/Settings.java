@@ -56,11 +56,11 @@ class Settings {
         this.youtubeDlVersion = youtubeDlVersion;
     }
 
-    public String getRuntimeVersion() {
+    String getRuntimeVersion() {
         return runtimeVersion;
     }
 
-    public void setRuntimeVersion(String runtimeVersion) {
+    void setRuntimeVersion(String runtimeVersion) {
         this.runtimeVersion = runtimeVersion;
     }
 }
