@@ -6,8 +6,6 @@ import com.github.open96.api.github.pojo.release.ReleaseJSON;
 import com.github.open96.fxml.DialogWindowController;
 import com.github.open96.settings.OS_TYPE;
 import com.github.open96.settings.SettingsManager;
-import com.github.open96.thread.TASK_TYPE;
-import com.github.open96.thread.ThreadManager;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
@@ -21,19 +19,10 @@ import retrofit2.Call;
 import retrofit2.Retrofit;
 
 import java.awt.*;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
 import java.util.Properties;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 public class Updater {
     //This object is a singleton thus storing instance of it is needed
@@ -112,62 +101,6 @@ public class Updater {
             log.error("API object is empty!", new IllegalStateException("API object is empty!"));
         }
         return null;
-    }
-
-    /**
-     * Downloads new version of JYpm
-     */
-    private Boolean download() {
-        Callable<Boolean> downloadCallable = () -> {
-            //Wait for internet connection
-            while (!SettingsManager.getInstance().checkInternetConnection()) {
-                try {
-                    Thread.sleep(250);
-                } catch (InterruptedException e) {
-                    log.error("Thread sleep has been interrupted", e);
-                }
-            }
-            if (releaseJSON != null) {
-                log.info("Downloading new JYpm release...");
-                try {
-                    //Create URL
-                    URL downloadLink = new URL(releaseJSON.getAssets().stream()
-                            .filter(asset -> asset.getContentType()
-                                    .equals("application/x-java-archive"))
-                            .findFirst().get().getBrowserDownloadUrl());
-
-                    //Clean previous download if it exists
-                    File newExecutable = new File(releaseJSON.getAssets().stream()
-                            .filter(asset -> asset.getContentType()
-                                    .equals("application/x-java-archive"))
-                            .findFirst().get().getName());
-                    newExecutable.delete();
-
-                    //Download new JYpm release
-                    ReadableByteChannel readableByteChannel = Channels.newChannel(downloadLink.openStream());
-                    String pathToExecutable = newExecutable.getAbsolutePath();
-                    FileOutputStream fileOutputStream = new FileOutputStream(pathToExecutable);
-                    fileOutputStream.getChannel().transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
-                    fileOutputStream.close();
-                    readableByteChannel.close();
-
-                    log.info("Download finished");
-                    return true;
-                } catch (MalformedURLException e) {
-                    log.error("Invalid GitHub url", e);
-                } catch (IOException e) {
-                    log.error("Error during opening stream", e);
-                }
-            }
-            return false;
-        };
-        try {
-            Future<Boolean> downloadFuture = ThreadManager.getInstance().sendTask(downloadCallable, TASK_TYPE.OTHER);
-            return downloadFuture.get();
-        } catch (ExecutionException | InterruptedException e) {
-            log.error("Error during receiving download result", e);
-        }
-        return false;
     }
 
     /**
