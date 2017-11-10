@@ -76,6 +76,7 @@ public class DownloadManager {
                 if (SettingsManager.getInstance().checkInternetConnection()) {
                     ArrayList<Playlist> playlists = PlaylistManager.getInstance().getPlaylists();
                     Queue<Playlist> resumedPlaylists = new LinkedBlockingQueue<>();
+                    //Redownload playlist if its download was interrupted during last shutdown
                     for (Playlist p : playlists) {
                         if (p.getStatus() == QUEUE_STATUS.DOWNLOADING) {
                             download(p);
@@ -106,7 +107,7 @@ public class DownloadManager {
                                 break;
                             }
                         } catch (InterruptedException e) {
-                            e.printStackTrace();
+                            log.error("TrayIcon has timed out, you may encounter some strange and scary things...");
                         }
                     }
                     //Send notification
