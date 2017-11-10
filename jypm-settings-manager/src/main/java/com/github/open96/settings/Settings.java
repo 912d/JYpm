@@ -1,6 +1,6 @@
 package com.github.open96.settings;
 
-public class Settings {
+class Settings {
     private String youtubeDlExecutable;
     private OS_TYPE osType;
     private String fileManagerCommand;
