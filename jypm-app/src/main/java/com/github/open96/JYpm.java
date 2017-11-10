@@ -79,13 +79,12 @@ public class JYpm extends Application {
         try {
             Updater.getInstance().checkForUpdate();
         } catch (IllegalStateException e) {
-            log.warn("You have probably exceeded your GitHub API call limit. You won't be able to check for updates in 1 hour.");
-            log.info("Also, don't abuse GitHub API if you can :)");
+            log.warn("You have probably exceeded your GitHub API call limit. You won't be able to check for updates in 1 hour. Also, don't abuse GitHub API if you can :)");
         }
     }
 
     /**
-     * stop() is caled when application is closed the correct way (i.e. by clicking close button).
+     * stop() is called when application is closed the correct way (i.e. by clicking close button).
      * IMPORTANT: It won't run if application was killed, so it is not a reliable way to perform critical operations.
      */
     @Override
