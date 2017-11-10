@@ -60,8 +60,10 @@ public class DownloadManager {
         YoutubeDlManager.getInstance();
         log.trace("Initializing DownloadManager");
         executableWrapper = ExecutableWrapper.getInstance();
-        detailsString = new StringBuilder();
         threadLock = false;
+        //Create a header for details to avoid "Details" window from looking empty
+        detailsString = new StringBuilder();
+        detailsString.append("JYPM ").append(SettingsManager.getInstance().getRuntimeVersion()).append("\n");
         //Resume all interrupted tasks
         ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
             while (ThreadManager.getExecutionPermission()) {
