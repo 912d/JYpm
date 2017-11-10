@@ -36,16 +36,8 @@ public class Playlist {
         return playlistLink;
     }
 
-    public void setPlaylistLink(String playlistLink) {
-        this.playlistLink = playlistLink;
-    }
-
     public String getPlaylistLocation() {
         return playlistLocation;
-    }
-
-    public void setPlaylistLocation(String playlistLocation) {
-        this.playlistLocation = playlistLocation;
     }
 
     public Integer getVideoCount() {

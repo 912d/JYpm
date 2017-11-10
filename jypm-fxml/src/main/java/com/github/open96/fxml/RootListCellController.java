@@ -83,18 +83,12 @@ public class RootListCellController extends ListCell<Playlist> {
             playlistNameLabel.setText(playlist.getPlaylistName());
             videoCountLabel.setText(playlist.getVideoCount() + " videos");
 
-            //Load thumbnail (should be asynchronously but its a hotfix) from main JavaFX thread
-            Image thumbnailImage = new Image(playlist.getPlaylistThumbnailUrl());
+            //Load thumbnail asynchronously from main JavaFX thread
+            thumbnailImageView.setImage(null);
             ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
-                try {
-                    while (thumbnailImage == null) {
-                        Thread.sleep(10);
-                    }
-                    if (ThreadManager.getExecutionPermission()) {
-                        Platform.runLater(() -> thumbnailImageView.setImage(thumbnailImage));
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                Image thumbnailImage = new Image(playlist.getPlaylistThumbnailUrl());
+                if (ThreadManager.getExecutionPermission()) {
+                    Platform.runLater(() -> thumbnailImageView.setImage(thumbnailImage));
                 }
             }), TASK_TYPE.UI);
 

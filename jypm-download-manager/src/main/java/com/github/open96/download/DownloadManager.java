@@ -16,6 +16,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Queue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -59,34 +60,33 @@ public class DownloadManager {
         YoutubeDlManager.getInstance();
         log.trace("Initializing DownloadManager");
         executableWrapper = ExecutableWrapper.getInstance();
-        detailsString = new StringBuilder();
         threadLock = false;
+        //Create a header for details to avoid "Details" window from looking empty
+        detailsString = new StringBuilder();
+        detailsString.append("JYPM ").append(SettingsManager.getInstance().getRuntimeVersion()).append("\n");
         //Resume all interrupted tasks
         ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
             while (ThreadManager.getExecutionPermission()) {
                 //Wait for YoutubeDlManager first
                 while (YoutubeDlManager.getInstance().getExecutableState() == EXECUTABLE_STATE.NOT_READY) {
                     try {
-                        Thread.sleep(250);
+                        Thread.sleep(10);
                     } catch (InterruptedException e) {
                         log.error("Thread sleep has been interrupted", e);
                     }
                 }
                 if (SettingsManager.getInstance().checkInternetConnection()) {
+                    ArrayList<Playlist> playlists = PlaylistManager.getInstance().getPlaylists();
                     Queue<Playlist> resumedPlaylists = new LinkedBlockingQueue<>();
-                    for (Playlist p : PlaylistManager.getInstance().getPlaylists()) {
+                    //Redownload playlist if its download was interrupted during last shutdown
+                    for (Playlist p : playlists) {
                         if (p.getStatus() == QUEUE_STATUS.DOWNLOADING) {
                             download(p);
                             resumedPlaylists.add(p);
                         }
                     }
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
                     //Resume all queued tasks
-                    for (Playlist p : PlaylistManager.getInstance().getPlaylists()) {
+                    for (Playlist p : playlists) {
                         if (p.getStatus() == QUEUE_STATUS.QUEUED) {
                             if (!resumedPlaylists.contains(p)) {
                                 download(p);
@@ -104,7 +104,7 @@ public class DownloadManager {
                                 break;
                             }
                         } catch (InterruptedException e) {
-                            e.printStackTrace();
+                            log.error("TrayIcon has timed out, you may encounter some strange and scary things...");
                         }
                     }
                     //Send notification
@@ -115,7 +115,7 @@ public class DownloadManager {
                     break;
                 } else {
                     try {
-                        Thread.sleep(1000 * 3); //3 seconds
+                        Thread.sleep(1000); //1 seconds
                     } catch (InterruptedException e) {
                         log.error(e);
                     }

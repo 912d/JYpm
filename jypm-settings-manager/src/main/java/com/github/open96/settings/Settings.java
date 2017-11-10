@@ -1,17 +1,19 @@
 package com.github.open96.settings;
 
-public class Settings {
+class Settings {
     private String youtubeDlExecutable;
     private OS_TYPE osType;
     private String fileManagerCommand;
     private boolean notificationPolicy;
     private String youtubeDlVersion;
+    private String runtimeVersion;
 
     public Settings() {
         youtubeDlExecutable = "";
         fileManagerCommand = "";
         notificationPolicy = true;
         youtubeDlVersion = "";
+        runtimeVersion="";
     }
 
     String getYoutubeDlExecutable() {
@@ -52,5 +54,13 @@ public class Settings {
 
     void setYoutubeDlVersion(String youtubeDlVersion) {
         this.youtubeDlVersion = youtubeDlVersion;
+    }
+
+    String getRuntimeVersion() {
+        return runtimeVersion;
+    }
+
+    void setRuntimeVersion(String runtimeVersion) {
+        this.runtimeVersion = runtimeVersion;
     }
 }

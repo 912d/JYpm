@@ -64,7 +64,7 @@ public class NotificationBarController implements Initializable {
                         Platform.runLater(() -> notificationText.setText("Waiting for internet connection..."));
                     }
                     if (YoutubeDlManager.getInstance().getExecutableState() == EXECUTABLE_STATE.NOT_READY) {
-                        Platform.runLater(() -> notificationText.setText("Locating youtube-dl executable..."));
+                        Platform.runLater(() -> notificationText.setText("Looking for youtube-dl executable..."));
                     }
                     int queued = 0;
                     boolean isDownloadInProgress = false;
