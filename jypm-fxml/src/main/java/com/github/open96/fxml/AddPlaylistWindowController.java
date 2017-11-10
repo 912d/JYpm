@@ -23,8 +23,8 @@ import java.util.ResourceBundle;
 public class AddPlaylistWindowController implements Initializable {
 
     private final static String BASE_YOUTUBE_URL = "https://www.youtube.com/playlist?list=";
-    private static File selectedDirectory;
-    private static boolean isDirectoryChosen = false;
+    private File selectedDirectory;
+    private boolean isDirectoryChosen = false;
     //Initialize log4j logger for later use in this class
     private static Logger log = LogManager.getLogger(AddPlaylistWindowController.class.getName());
     @FXML
@@ -51,10 +51,7 @@ public class AddPlaylistWindowController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        //As isDirectoryChosen is static along with selectedDirectory it is a good idea to reuse previously
-        //provided directory if possible.
-        if (isDirectoryChosen)
-            directoryLabel.setText(selectedDirectory.getAbsolutePath());
+        
     }
 
     /**
