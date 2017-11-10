@@ -34,7 +34,6 @@ import java.io.IOException;
 public class RootListCellController extends ListCell<Playlist> {
 
     private static Logger log = LogManager.getLogger(RootListCellController.class.getName());
-    private Image thumbnailImage;
 
     //Load elements from fxml file that have id and cast them to objects of their respective types
 
@@ -84,24 +83,20 @@ public class RootListCellController extends ListCell<Playlist> {
             playlistNameLabel.setText(playlist.getPlaylistName());
             videoCountLabel.setText(playlist.getVideoCount() + " videos");
 
-            //Load thumbnail asynchronously from main JavaFX thread
+            //Load thumbnail (should be asynchronously but its a hotfix) from main JavaFX thread
+            Image thumbnailImage = new Image(playlist.getPlaylistThumbnailUrl());
             ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
-                while (ThreadManager.getExecutionPermission()) {
-                    try {
-                        if (SettingsManager.getInstance().checkInternetConnection()) {
-                            if (thumbnailImage == null) {
-                                thumbnailImage = new Image(playlist.getPlaylistThumbnailUrl());
-                            }
-                            Platform.runLater(() -> thumbnailImageView.setImage(thumbnailImage));
-                            break;
-                        }
-                        Thread.sleep(1000 * 3); //3 seconds
-                    } catch (InterruptedException e) {
-                        log.error("Thread has been interrupted", e);
+                try {
+                    while (thumbnailImage == null) {
+                        Thread.sleep(10);
                     }
+                    if (ThreadManager.getExecutionPermission()) {
+                        Platform.runLater(() -> thumbnailImageView.setImage(thumbnailImage));
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             }), TASK_TYPE.UI);
-
 
             ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
                 QUEUE_STATUS lastKnownState = QUEUE_STATUS.UNKNOWN;
