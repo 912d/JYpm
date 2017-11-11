@@ -130,6 +130,7 @@ public class YoutubeDlManager {
      * Delete recursively directory in which youtube-dl is stored.
      */
     public void deletePreviousVersionIfExists() {
+        executableState = EXECUTABLE_STATE.NOT_READY;
         File youtubeDlDirectory = new File(YOUTUBE_DL_DIRECTORY);
         if (youtubeDlDirectory.exists() && youtubeDlDirectory.listFiles() != null) {
             for (File f : youtubeDlDirectory.listFiles()) {
