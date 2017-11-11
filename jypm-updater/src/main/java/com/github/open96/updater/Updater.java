@@ -106,7 +106,7 @@ public class Updater {
     /**
      * @return Version of JYpm that is currently running
      */
-    public String getRuntimeVersion() {
+    private String getRuntimeVersion() {
         return runtimeVersion;
     }
 
