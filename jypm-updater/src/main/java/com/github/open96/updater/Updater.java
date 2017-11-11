@@ -138,6 +138,8 @@ public class Updater {
         }
     }
 
+
+    //TODO Integrate code from this method into jypm-fxml to break circular dependency between jypm-fxml and jypm-updater
     private void alertUser() throws IOException {
 
         //Create message
