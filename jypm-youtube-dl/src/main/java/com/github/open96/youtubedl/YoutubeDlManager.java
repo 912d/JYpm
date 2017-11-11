@@ -141,9 +141,9 @@ public class YoutubeDlManager {
             }
 
             getAPIResponse();
-            boolean coreValidation = (!SettingsManager.getInstance().getYoutubeDlVersion().equals(onlineVersion));
-            boolean directoryValidation = !new File(YOUTUBE_DL_DIRECTORY).exists() || (new File(YOUTUBE_DL_DIRECTORY).exists() && new File(YOUTUBE_DL_DIRECTORY).listFiles().length != 1);
-            if ((coreValidation || directoryValidation) && ThreadManager.getExecutionPermission()) {
+            boolean isVersionOutOfDate = (!SettingsManager.getInstance().getYoutubeDlVersion().equals(onlineVersion));
+            boolean doesFileIntegritySeemOk = !new File(YOUTUBE_DL_DIRECTORY).exists() || (new File(YOUTUBE_DL_DIRECTORY).exists() && new File(YOUTUBE_DL_DIRECTORY).listFiles().length != 1);
+            if ((isVersionOutOfDate || doesFileIntegritySeemOk) && ThreadManager.getExecutionPermission()) {
                 log.debug("New youtube-dl version available, downloading...");
                 try {
                     //Create URL based on OS type
