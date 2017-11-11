@@ -1,5 +1,8 @@
 package com.github.open96.fxml;
 
+import com.github.open96.playlist.PlaylistManager;
+import com.github.open96.playlist.QUEUE_STATUS;
+import com.github.open96.playlist.pojo.Playlist;
 import com.github.open96.settings.OS_TYPE;
 import com.github.open96.settings.SettingsManager;
 import com.github.open96.thread.TASK_TYPE;
@@ -46,6 +49,8 @@ public class SettingsWindowController implements Initializable {
     @FXML
     Button visitGitHubButton;
     @FXML
+    Button updateYTDLButton;
+    @FXML
     TextField fileManagerCommandTextField;
     @FXML
     CheckBox notificationCheckBox;
@@ -65,6 +70,29 @@ public class SettingsWindowController implements Initializable {
         if (SettingsManager.getInstance().getNotificationPolicy()) {
             notificationCheckBox.setSelected(true);
         }
+
+        //Prevent user from enforcing youtube-dl from updating while download is in progress
+        ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
+            while (ThreadManager.getExecutionPermission()) {
+                boolean isDownloadInProgress = false;
+                for (Playlist p : PlaylistManager.getInstance().getPlaylists()) {
+                    if (p.getStatus() == QUEUE_STATUS.QUEUED || p.getStatus() == QUEUE_STATUS.DOWNLOADING) {
+                        isDownloadInProgress = true;
+                        break;
+                    }
+                }
+                if (isDownloadInProgress) {
+                    Platform.runLater(() -> updateYTDLButton.setDisable(true));
+                } else {
+                    Platform.runLater(() -> updateYTDLButton.setDisable(false));
+                }
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    log.error("Thread has been interrupted.", e);
+                }
+            }
+        }), TASK_TYPE.UI);
     }
 
     /**
