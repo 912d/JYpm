@@ -2,6 +2,11 @@ package com.github.open96.fxml;
 
 import com.github.open96.settings.OS_TYPE;
 import com.github.open96.settings.SettingsManager;
+import com.github.open96.thread.TASK_TYPE;
+import com.github.open96.thread.ThreadManager;
+import com.github.open96.youtubedl.EXECUTABLE_STATE;
+import com.github.open96.youtubedl.YoutubeDlManager;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -111,7 +116,21 @@ public class SettingsWindowController implements Initializable {
 
 
     public void onUpdateYTDLButtonClick(ActionEvent actionEvent) {
-
+        ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
+            YoutubeDlManager.getInstance().deletePreviousVersionIfExists();
+            YoutubeDlManager.getInstance().downloadYoutubeDl();
+            Platform.runLater(() -> executableVersionLabel.setText("Downloading..."));
+            while (YoutubeDlManager.getInstance().getExecutableState() == EXECUTABLE_STATE.NOT_READY) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    log.error("Thread has been interrupted.", e);
+                }
+            }
+            if (executableVersionLabel != null && executableVersionLabel.getText() != null) {
+                Platform.runLater(() -> executableVersionLabel.setText(SettingsManager.getInstance().getYoutubeDlVersion()));
+            }
+        }), TASK_TYPE.UI);
     }
 
 }
