@@ -104,4 +104,14 @@ public class SettingsWindowController implements Initializable {
             }
         }
     }
+
+    public void onUpdateAppButtonClick(ActionEvent actionEvent) {
+
+    }
+
+
+    public void onUpdateYTDLButtonClick(ActionEvent actionEvent) {
+
+    }
+
 }
