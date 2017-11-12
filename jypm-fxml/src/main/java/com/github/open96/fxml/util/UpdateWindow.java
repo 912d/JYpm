@@ -34,7 +34,7 @@ public class UpdateWindow {
     /**
      * Runs Updater class from jypm-updater and based on it's response it shows user that update is available.
      */
-    public void runUpdater() throws IOException {
+    public void runUpdater() {
         if (Updater.getInstance().checkForUpdate() != null) {
             ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
                 ReleaseJSON releaseJSON = Updater.getInstance().getJSONObject();
