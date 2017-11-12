@@ -1,5 +1,6 @@
 package com.github.open96.fxml;
 
+import com.github.open96.fxml.util.UpdateWindow;
 import com.github.open96.playlist.PlaylistManager;
 import com.github.open96.playlist.QUEUE_STATUS;
 import com.github.open96.playlist.pojo.Playlist;
@@ -7,6 +8,7 @@ import com.github.open96.settings.OS_TYPE;
 import com.github.open96.settings.SettingsManager;
 import com.github.open96.thread.TASK_TYPE;
 import com.github.open96.thread.ThreadManager;
+import com.github.open96.updater.Updater;
 import com.github.open96.youtubedl.EXECUTABLE_STATE;
 import com.github.open96.youtubedl.YoutubeDlManager;
 import javafx.application.Platform;
@@ -139,7 +141,8 @@ public class SettingsWindowController implements Initializable {
     }
 
     public void onUpdateAppButtonClick(ActionEvent actionEvent) {
-
+        Updater.getInstance().refresh();
+        new UpdateWindow().runUpdater();
     }
 
 
