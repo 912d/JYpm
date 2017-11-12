@@ -1,5 +1,6 @@
 package com.github.open96.fxml;
 
+import com.github.open96.fxml.util.UpdateWindow;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -26,6 +27,8 @@ public class RootPaneController implements Initializable {
         try {
             rootPane.setBottom(createStatusBar());
             rootPane.setCenter(createListView());
+            //Display update window if update is available
+            new UpdateWindow().runUpdater();
         } catch (IOException e) {
             log.error("Some .fxml files are corrupt or could not be loaded", e);
         }

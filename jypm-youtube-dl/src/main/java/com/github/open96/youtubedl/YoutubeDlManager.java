@@ -127,6 +127,21 @@ public class YoutubeDlManager {
     }
 
     /**
+     * Delete recursively directory in which youtube-dl is stored.
+     */
+    public void deletePreviousVersionIfExists() {
+        executableState = EXECUTABLE_STATE.NOT_READY;
+        File youtubeDlDirectory = new File(YOUTUBE_DL_DIRECTORY);
+        if (youtubeDlDirectory.exists() && youtubeDlDirectory.listFiles() != null) {
+            for (File f : youtubeDlDirectory.listFiles()) {
+                f.delete();
+            }
+        }
+        youtubeDlDirectory.delete();
+        youtubeDlDirectory.mkdir();
+    }
+
+    /**
      * Utilizing methods in this class this method checks for youtube-dl update and appends it if needed.
      */
     public void downloadYoutubeDl() {
@@ -157,14 +172,7 @@ public class YoutubeDlManager {
                     downloadLink = new URL(asset.getBrowserDownloadUrl());
 
                     //Clean youtube-dl directory before making any changes to it
-                    File youtubeDlDirectory = new File(YOUTUBE_DL_DIRECTORY);
-                    if (youtubeDlDirectory.exists() && youtubeDlDirectory.listFiles() != null) {
-                        for (File f : youtubeDlDirectory.listFiles()) {
-                            f.delete();
-                        }
-                    }
-                    youtubeDlDirectory.delete();
-                    youtubeDlDirectory.mkdir();
+                    deletePreviousVersionIfExists();
 
                     //Download youtube-dl
                     ReadableByteChannel readableByteChannel = Channels.newChannel(downloadLink.openStream());

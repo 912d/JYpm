@@ -1,7 +1,17 @@
 package com.github.open96.fxml;
 
+import com.github.open96.fxml.util.UpdateWindow;
+import com.github.open96.playlist.PlaylistManager;
+import com.github.open96.playlist.QUEUE_STATUS;
+import com.github.open96.playlist.pojo.Playlist;
 import com.github.open96.settings.OS_TYPE;
 import com.github.open96.settings.SettingsManager;
+import com.github.open96.thread.TASK_TYPE;
+import com.github.open96.thread.ThreadManager;
+import com.github.open96.updater.Updater;
+import com.github.open96.youtubedl.EXECUTABLE_STATE;
+import com.github.open96.youtubedl.YoutubeDlManager;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -41,6 +51,8 @@ public class SettingsWindowController implements Initializable {
     @FXML
     Button visitGitHubButton;
     @FXML
+    Button updateYTDLButton;
+    @FXML
     TextField fileManagerCommandTextField;
     @FXML
     CheckBox notificationCheckBox;
@@ -60,6 +72,29 @@ public class SettingsWindowController implements Initializable {
         if (SettingsManager.getInstance().getNotificationPolicy()) {
             notificationCheckBox.setSelected(true);
         }
+
+        //Prevent user from enforcing youtube-dl from updating while download is in progress
+        ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
+            while (ThreadManager.getExecutionPermission()) {
+                boolean isDownloadInProgress = false;
+                for (Playlist p : PlaylistManager.getInstance().getPlaylists()) {
+                    if (p.getStatus() == QUEUE_STATUS.QUEUED || p.getStatus() == QUEUE_STATUS.DOWNLOADING) {
+                        isDownloadInProgress = true;
+                        break;
+                    }
+                }
+                if (isDownloadInProgress) {
+                    Platform.runLater(() -> updateYTDLButton.setDisable(true));
+                } else {
+                    Platform.runLater(() -> updateYTDLButton.setDisable(false));
+                }
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    log.error("Thread has been interrupted.", e);
+                }
+            }
+        }), TASK_TYPE.UI);
     }
 
     /**
@@ -104,4 +139,29 @@ public class SettingsWindowController implements Initializable {
             }
         }
     }
+
+    public void onUpdateAppButtonClick(ActionEvent actionEvent) {
+        Updater.getInstance().refresh();
+        new UpdateWindow().runUpdater();
+    }
+
+
+    public void onUpdateYTDLButtonClick(ActionEvent actionEvent) {
+        ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
+            YoutubeDlManager.getInstance().deletePreviousVersionIfExists();
+            YoutubeDlManager.getInstance().downloadYoutubeDl();
+            Platform.runLater(() -> executableVersionLabel.setText("Downloading..."));
+            while (YoutubeDlManager.getInstance().getExecutableState() == EXECUTABLE_STATE.NOT_READY) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    log.error("Thread has been interrupted.", e);
+                }
+            }
+            if (executableVersionLabel != null && executableVersionLabel.getText() != null) {
+                Platform.runLater(() -> executableVersionLabel.setText(SettingsManager.getInstance().getYoutubeDlVersion()));
+            }
+        }), TASK_TYPE.UI);
+    }
+
 }
