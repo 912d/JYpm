@@ -76,17 +76,7 @@ public class SettingsManager {
         } catch (IOException e) {
             log.error("Unable to initialize FileReader...", e);
         }
-        //Determine host OS
-        if (SystemUtils.IS_OS_WINDOWS) {
-            settings.setOsType(OS_TYPE.WINDOWS);
-        } else if (SystemUtils.IS_OS_LINUX || SystemUtils.IS_OS_FREE_BSD || SystemUtils.IS_OS_NET_BSD || SystemUtils.IS_OS_OPEN_BSD) {
-            settings.setOsType(OS_TYPE.OPEN_SOURCE_UNIX);
-        } else if (SystemUtils.IS_OS_MAC) {
-            settings.setOsType(OS_TYPE.MAC_OS);
-        } else {
-            settings.setOsType(OS_TYPE.UNKNOWN);
-            log.warn("Unsupported OS, you are on your own...");
-        }
+        determineHostOS();
         if (getFileManagerCommand().equals("")) {
             if (getOS() == OS_TYPE.WINDOWS) {
                 setFileManagerCommand("explorer");
@@ -334,6 +324,19 @@ public class SettingsManager {
             log.error("There was an error during execution", e);
         }
         return false;
+    }
+
+    private void determineHostOS(){
+        if (SystemUtils.IS_OS_WINDOWS) {
+            settings.setOsType(OS_TYPE.WINDOWS);
+        } else if (SystemUtils.IS_OS_LINUX || SystemUtils.IS_OS_FREE_BSD || SystemUtils.IS_OS_NET_BSD || SystemUtils.IS_OS_OPEN_BSD) {
+            settings.setOsType(OS_TYPE.OPEN_SOURCE_UNIX);
+        } else if (SystemUtils.IS_OS_MAC) {
+            settings.setOsType(OS_TYPE.MAC_OS);
+        } else {
+            settings.setOsType(OS_TYPE.UNKNOWN);
+            log.warn("Unsupported OS, you are on your own...");
+        }
     }
 
 
