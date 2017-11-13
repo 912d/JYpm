@@ -293,7 +293,7 @@ public class SettingsManager {
                 }
                 List<Future<Boolean>> futures = new ArrayList<>();
                 for (String address : criticalLinksArray) {
-                    Callable<Boolean> pingCallabe = () -> {
+                    Callable<Boolean> pingCallable = () -> {
                         String[] command = {"ping", "-c 1", address};
                         Process p = Runtime.getRuntime().exec(command);
                         p.waitFor();
@@ -302,7 +302,7 @@ public class SettingsManager {
                         }
                         return true;
                     };
-                    futures.add(ThreadManager.getInstance().sendTask(pingCallabe, TASK_TYPE.OTHER));
+                    futures.add(ThreadManager.getInstance().sendTask(pingCallable, TASK_TYPE.OTHER));
                 }
                 for (Future<Boolean> future : futures) {
                     if (!future.get()) {
