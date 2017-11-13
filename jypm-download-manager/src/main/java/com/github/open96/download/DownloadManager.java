@@ -52,7 +52,6 @@ public class DownloadManager {
         return singletonInstance;
     }
 
-
     /**
      * Initialize subcomponents on first instance creation
      */
@@ -65,63 +64,7 @@ public class DownloadManager {
         detailsString = new StringBuilder();
         detailsString.append("JYPM ").append(SettingsManager.getInstance().getRuntimeVersion()).append("\n");
         //Resume all interrupted tasks
-        ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
-            while (ThreadManager.getExecutionPermission()) {
-                //Wait for YoutubeDlManager first
-                while (YoutubeDlManager.getInstance().getExecutableState() == EXECUTABLE_STATE.NOT_READY) {
-                    try {
-                        Thread.sleep(10);
-                    } catch (InterruptedException e) {
-                        log.error("Thread sleep has been interrupted", e);
-                    }
-                }
-                if (SettingsManager.getInstance().checkInternetConnection()) {
-                    ArrayList<Playlist> playlists = PlaylistManager.getInstance().getPlaylists();
-                    Queue<Playlist> resumedPlaylists = new LinkedBlockingQueue<>();
-                    //Redownload playlist if its download was interrupted during last shutdown
-                    for (Playlist p : playlists) {
-                        if (p.getStatus() == QUEUE_STATUS.DOWNLOADING) {
-                            download(p);
-                            resumedPlaylists.add(p);
-                        }
-                    }
-                    //Resume all queued tasks
-                    for (Playlist p : playlists) {
-                        if (p.getStatus() == QUEUE_STATUS.QUEUED) {
-                            if (!resumedPlaylists.contains(p)) {
-                                download(p);
-                                resumedPlaylists.add(p);
-                            }
-                        }
-                    }
-                    //Wait for TrayIcon initialization
-                    int trayTimeout = 0;
-                    while (!TrayIcon.isTrayWorking()) {
-                        try {
-                            Thread.sleep(50);
-                            trayTimeout += 50;
-                            if (trayTimeout > 500) {
-                                break;
-                            }
-                        } catch (InterruptedException e) {
-                            log.error("TrayIcon has timed out, you may encounter some strange and scary things...");
-                        }
-                    }
-                    //Send notification
-                    if (resumedPlaylists.size() > 0 && TrayIcon.isTrayWorking()) {
-                        TrayIcon.getInstance().displayNotification("JYpm - resuming downloads", "Resuming " + resumedPlaylists.size() + " playlist downloads");
-                    }
-                    log.debug("Initializer thread has completed initialization...");
-                    break;
-                } else {
-                    try {
-                        Thread.sleep(1000); //1 seconds
-                    } catch (InterruptedException e) {
-                        log.error(e);
-                    }
-                }
-            }
-        }), TASK_TYPE.DOWNLOAD);
+        resumeInterruptedPlaylists();
         log.debug("DownloadManager has been initialized");
     }
 
@@ -246,6 +189,69 @@ public class DownloadManager {
             log.error("Thread has been interrupted");
         }
         return output;
+    }
+
+    /**
+     * Downloads every playlist that status is different from QUEUE_STATUS.DOWNLOADED.
+     */
+    private void resumeInterruptedPlaylists() {
+        ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
+            while (ThreadManager.getExecutionPermission()) {
+                //Wait for YoutubeDlManager first
+                while (YoutubeDlManager.getInstance().getExecutableState() == EXECUTABLE_STATE.NOT_READY) {
+                    try {
+                        Thread.sleep(10);
+                    } catch (InterruptedException e) {
+                        log.error("Thread sleep has been interrupted", e);
+                    }
+                }
+                if (SettingsManager.getInstance().checkInternetConnection()) {
+                    ArrayList<Playlist> playlists = PlaylistManager.getInstance().getPlaylists();
+                    Queue<Playlist> resumedPlaylists = new LinkedBlockingQueue<>();
+                    //Redownload playlist if its download was interrupted during last shutdown
+                    for (Playlist p : playlists) {
+                        if (p.getStatus() == QUEUE_STATUS.DOWNLOADING) {
+                            download(p);
+                            resumedPlaylists.add(p);
+                        }
+                    }
+                    //Resume all queued tasks
+                    for (Playlist p : playlists) {
+                        if (p.getStatus() == QUEUE_STATUS.QUEUED) {
+                            if (!resumedPlaylists.contains(p)) {
+                                download(p);
+                                resumedPlaylists.add(p);
+                            }
+                        }
+                    }
+                    //Wait for TrayIcon initialization
+                    int trayTimeout = 0;
+                    while (!TrayIcon.isTrayWorking()) {
+                        try {
+                            Thread.sleep(50);
+                            trayTimeout += 50;
+                            if (trayTimeout > 500) {
+                                break;
+                            }
+                        } catch (InterruptedException e) {
+                            log.error("TrayIcon has timed out, you may encounter some strange and scary things...");
+                        }
+                    }
+                    //Send notification
+                    if (resumedPlaylists.size() > 0 && TrayIcon.isTrayWorking()) {
+                        TrayIcon.getInstance().displayNotification("JYpm - resuming downloads", "Resuming " + resumedPlaylists.size() + " playlist downloads");
+                    }
+                    log.debug("Initializer thread has completed initialization...");
+                    break;
+                } else {
+                    try {
+                        Thread.sleep(1000); //1 seconds
+                    } catch (InterruptedException e) {
+                        log.error(e);
+                    }
+                }
+            }
+        }), TASK_TYPE.DOWNLOAD);
     }
 }
 
