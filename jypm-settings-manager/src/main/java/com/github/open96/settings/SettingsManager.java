@@ -77,20 +77,9 @@ public class SettingsManager {
             log.error("Unable to initialize FileReader...", e);
         }
         determineHostOS();
-        if (getFileManagerCommand().equals("")) {
-            if (getOS() == OS_TYPE.WINDOWS) {
-                setFileManagerCommand("explorer");
-            } else if (getOS() == OS_TYPE.OPEN_SOURCE_UNIX) {
-                setFileManagerCommand("xdg-open");
-            }
-        }
+        setDefaultFileManagerIfNotSet();
         saveToJson();
-        //Check internet connection and start thread that will check it in time intervals
-        criticalLinksArray = new ArrayList<>();
-        criticalLinksArray.add("localhost");
-        criticalLinksArray.add("www.google.com");
-        criticalLinksArray.add("www.youtube.com");
-        isInternetAvailableWithTimeout = new Pair<>(Boolean.FALSE, new Date());
+        initializeInternetConnectionChecker();
         log.debug("SettingsManager has been successfully initialized");
     }
 
@@ -326,7 +315,7 @@ public class SettingsManager {
         return false;
     }
 
-    private void determineHostOS(){
+    private void determineHostOS() {
         if (SystemUtils.IS_OS_WINDOWS) {
             settings.setOsType(OS_TYPE.WINDOWS);
         } else if (SystemUtils.IS_OS_LINUX || SystemUtils.IS_OS_FREE_BSD || SystemUtils.IS_OS_NET_BSD || SystemUtils.IS_OS_OPEN_BSD) {
@@ -339,5 +328,22 @@ public class SettingsManager {
         }
     }
 
+    private void setDefaultFileManagerIfNotSet() {
+        if (getFileManagerCommand().equals("")) {
+            if (getOS() == OS_TYPE.WINDOWS) {
+                setFileManagerCommand("explorer");
+            } else if (getOS() == OS_TYPE.OPEN_SOURCE_UNIX) {
+                setFileManagerCommand("xdg-open");
+            }
+        }
+    }
 
+    private void initializeInternetConnectionChecker() {
+        criticalLinksArray = new ArrayList<>();
+        criticalLinksArray.add("localhost");
+        criticalLinksArray.add("www.google.com");
+        criticalLinksArray.add("www.youtube.com");
+        isInternetAvailableWithTimeout = new Pair<>(Boolean.FALSE, new Date());
+        checkInternetConnection();
+    }
 }
