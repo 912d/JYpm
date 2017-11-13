@@ -81,34 +81,14 @@ public class DownloadManager {
         log.trace("Downloading playlist \"" + playlist.getPlaylistName() + "\" " + "specified by link " + playlist.getPlaylistLink() + " to location " + playlist.getPlaylistLocation());
         detailsString.append("Downloading playlist \"").append(playlist.getPlaylistName()).append("\" ").append("specified by link ").append(playlist.getPlaylistLink()).append(" to location ").append(playlist.getPlaylistLocation()).append("\n");
 
+        //Download playlist
         ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
             try {
                 PlaylistManager.getInstance().updatePlaylistStatus(playlist, QUEUE_STATUS.DOWNLOADING);
                 //Start the download
                 Process process = executableWrapper.downloadPlaylist(playlist);
                 try (InputStream inputStream = process.getInputStream()) {
-                    //Create BufferedReader and read all output of the process until it dies
-                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-                    String line;
-                    while (process.isAlive() && PlaylistManager.getInstance().getPlaylistByLink(playlist.getPlaylistLink()) != null && ThreadManager.getExecutionPermission()) {
-                        if (!threadLock) {
-                            if ((line = bufferedReader.readLine()) != null || line != null) {
-                                detailsString.append(line).append("\n");
-                                //Trim the StringBuilder to reduce memory usage
-                                if (detailsString.length() > 16000) {
-                                    detailsString.trimToSize();
-                                    detailsString = new StringBuilder(detailsString.toString().substring(detailsString.length() - 16000));
-                                }
-                                Thread.sleep(250);
-                            }
-                        }
-                    }
-                    if (PlaylistManager.getInstance().getPlaylistByLink(playlist.getPlaylistLink()) != null) {
-                        TrayIcon.getInstance().displayNotification("JYpm - download completed", "Playlist " + playlist.getPlaylistName() + " has been downloaded");
-                    }
-                    detailsString.append("\n").append("-----------Task finished-----------\n").append("\n");
-                    PlaylistManager.getInstance().updatePlaylistStatus(playlist, QUEUE_STATUS.DOWNLOADED);
-                    bufferedReader.close();
+                    parseOutputWhileProcessIsAlive(playlist, process, inputStream);
                 }
             } catch (InterruptedException | IOException | NullPointerException e) {
                 log.warn("Missing executable, start the download again after executable is finished downloading.");
@@ -253,5 +233,25 @@ public class DownloadManager {
             }
         }), TASK_TYPE.DOWNLOAD);
     }
+
+    private void parseOutputWhileProcessIsAlive(Playlist playlist, Process process, InputStream inputStream) throws IOException, InterruptedException {
+        //Create BufferedReader and read all output of the process until it dies
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+        String line;
+        while (process.isAlive() && PlaylistManager.getInstance().getPlaylistByLink(playlist.getPlaylistLink()) != null && ThreadManager.getExecutionPermission()) {
+            if (!threadLock) {
+                if ((line = bufferedReader.readLine()) != null || line != null) {
+                    detailsString.append(line).append("\n");
+                    //Trim the StringBuilder to reduce memory usage
+                    if (detailsString.length() > 16000) {
+                        detailsString.trimToSize();
+                        detailsString = new StringBuilder(detailsString.toString().substring(detailsString.length() - 16000));
+                    }
+                    Thread.sleep(250);
+                }
+            }
+        }
+    }
+
 }
 
