@@ -1,3 +1,4 @@
+import com.github.open96.internetconnection.ConnectionChecker;
 import com.github.open96.settings.SettingsManager;
 import com.github.open96.updater.Updater;
 import org.junit.Test;
@@ -40,7 +41,7 @@ public class UpdaterTest {
 
     @Test
     public void testCheckForUpdate() {
-        if (SettingsManager.getInstance().checkInternetConnection()) {
+        if (ConnectionChecker.getInstance().checkInternetConnection()) {
             try {
                 resetSingleton();
                 setFakeRuntimeVersion("-1");
@@ -58,7 +59,7 @@ public class UpdaterTest {
 
     @Test
     public void testRefresh() {
-        if (SettingsManager.getInstance().checkInternetConnection()) {
+        if (ConnectionChecker.getInstance().checkInternetConnection()) {
             try {
                 //Get runtime version
                 Properties properties = new Properties();

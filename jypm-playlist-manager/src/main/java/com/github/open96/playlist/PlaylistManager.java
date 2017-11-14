@@ -1,8 +1,8 @@
 package com.github.open96.playlist;
 
 import com.github.open96.html.YouTubeParser;
+import com.github.open96.internetconnection.ConnectionChecker;
 import com.github.open96.playlist.pojo.Playlist;
-import com.github.open96.settings.SettingsManager;
 import com.github.open96.thread.TASK_TYPE;
 import com.github.open96.thread.ThreadManager;
 import com.google.gson.Gson;
@@ -128,7 +128,7 @@ public class PlaylistManager {
             playlist.setVideoCount(Integer.parseInt(youTubeParser.getVideoCount()));
             playlist.setPlaylistThumbnailUrl(youTubeParser.getThumbnailLink());
             log.trace("Playlist data successfully parsed.");
-            if (ThreadManager.getExecutionPermission() && SettingsManager.getInstance().checkInternetConnection()) {
+            if (ThreadManager.getExecutionPermission() && ConnectionChecker.getInstance().checkInternetConnection()) {
                 ThreadManager.getInstance().sendVoidTask(new Thread(() -> Platform.runLater(() -> observablePlaylists.add(playlist))), TASK_TYPE.UI);
                 saveToJson();
             } else {

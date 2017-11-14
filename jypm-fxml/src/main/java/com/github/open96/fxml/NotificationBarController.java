@@ -1,9 +1,9 @@
 package com.github.open96.fxml;
 
 import com.github.open96.download.DownloadManager;
+import com.github.open96.internetconnection.ConnectionChecker;
 import com.github.open96.playlist.PlaylistManager;
 import com.github.open96.playlist.pojo.Playlist;
-import com.github.open96.settings.SettingsManager;
 import com.github.open96.thread.TASK_TYPE;
 import com.github.open96.thread.ThreadManager;
 import com.github.open96.youtubedl.EXECUTABLE_STATE;
@@ -186,7 +186,7 @@ public class NotificationBarController implements Initializable {
             while (ThreadManager.getExecutionPermission()) {
                 try {
                     Platform.runLater(() -> notificationText.setText(""));
-                    if (!SettingsManager.getInstance().checkInternetConnection()) {
+                    if (!ConnectionChecker.getInstance().checkInternetConnection()) {
                         Platform.runLater(() -> notificationText.setText("Waiting for internet connection..."));
                     }
                     if (YoutubeDlManager.getInstance().getExecutableState() == EXECUTABLE_STATE.NOT_READY) {

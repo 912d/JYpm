@@ -1,5 +1,6 @@
 package com.github.open96.download;
 
+import com.github.open96.internetconnection.ConnectionChecker;
 import com.github.open96.playlist.PlaylistManager;
 import com.github.open96.playlist.QUEUE_STATUS;
 import com.github.open96.playlist.pojo.Playlist;
@@ -185,7 +186,7 @@ public class DownloadManager {
                         log.error("Thread sleep has been interrupted", e);
                     }
                 }
-                if (SettingsManager.getInstance().checkInternetConnection()) {
+                if (ConnectionChecker.getInstance().checkInternetConnection()) {
                     ArrayList<Playlist> playlists = PlaylistManager.getInstance().getPlaylists();
                     Queue<Playlist> resumedPlaylists = new LinkedBlockingQueue<>();
                     //Redownload playlist if its download was interrupted during last shutdown

@@ -1,6 +1,7 @@
 package com.github.open96.fxml;
 
 import com.github.open96.download.DownloadManager;
+import com.github.open96.internetconnection.ConnectionChecker;
 import com.github.open96.playlist.PlaylistManager;
 import com.github.open96.playlist.pojo.Playlist;
 import com.github.open96.settings.SettingsManager;
@@ -51,7 +52,7 @@ public class AddPlaylistWindowController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        
+
     }
 
     /**
@@ -64,7 +65,7 @@ public class AddPlaylistWindowController implements Initializable {
 
         //Check if link is valid, if directory was chosen and if user has write/read access to it.
         boolean validation = validateLink(playlistLink) && isDirectoryChosen
-                && selectedDirectory.canRead() && selectedDirectory.canWrite() && SettingsManager.getInstance().checkInternetConnection();
+                && selectedDirectory.canRead() && selectedDirectory.canWrite() && ConnectionChecker.getInstance().checkInternetConnection();
 
         //Trim link for easier operations on it later
         try {

@@ -4,6 +4,7 @@ import com.github.open96.api.github.GitHubApiClient;
 import com.github.open96.api.github.GitHubApiEndpointInterface;
 import com.github.open96.api.github.pojo.release.Asset;
 import com.github.open96.api.github.pojo.release.ReleaseJSON;
+import com.github.open96.internetconnection.ConnectionChecker;
 import com.github.open96.settings.OS_TYPE;
 import com.github.open96.settings.SettingsManager;
 import com.github.open96.thread.TASK_TYPE;
@@ -147,7 +148,7 @@ public class YoutubeDlManager {
     public void downloadYoutubeDl() {
         ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
             //Wait for internet connection
-            while (!SettingsManager.getInstance().checkInternetConnection()) {
+            while (!ConnectionChecker.getInstance().checkInternetConnection()) {
                 try {
                     Thread.sleep(250);
                 } catch (InterruptedException e) {
