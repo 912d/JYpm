@@ -1,3 +1,4 @@
+import com.github.open96.internetconnection.ConnectionChecker;
 import com.github.open96.settings.OS_TYPE;
 import com.github.open96.settings.SettingsManager;
 import com.github.open96.thread.ThreadManager;
@@ -15,7 +16,7 @@ public class YoutubeDlManagerTest {
 
     @Test
     public void testDownloadYoutubeDl() {
-        if (SettingsManager.getInstance().checkInternetConnection()) {
+        if (ConnectionChecker.getInstance().checkInternetConnection()) {
             try {
                 ThreadManager.getInstance();
                 YoutubeDlManager.getInstance();

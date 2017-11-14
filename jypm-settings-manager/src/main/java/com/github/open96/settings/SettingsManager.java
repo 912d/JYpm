@@ -5,7 +5,6 @@ import com.github.open96.thread.ThreadManager;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import javafx.util.Pair;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,9 +14,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -29,11 +25,9 @@ public class SettingsManager {
     private static SettingsManager singletonInstance;
     //Initialize log4j logger for later use in this class
     private static Logger log = LogManager.getLogger(SettingsManager.class.getName());
-    //Set of links that will be tested for internet connection
-    private static ArrayList<String> criticalLinksArray;
     //Pojo object where settings are stored during the runtime
     private Settings settings;
-    private Pair<Boolean, Date> isInternetAvailableWithTimeout;
+
 
     private SettingsManager() {
         init();
@@ -76,31 +70,9 @@ public class SettingsManager {
         } catch (IOException e) {
             log.error("Unable to initialize FileReader...", e);
         }
-        //Determine host OS
-        if (SystemUtils.IS_OS_WINDOWS) {
-            settings.setOsType(OS_TYPE.WINDOWS);
-        } else if (SystemUtils.IS_OS_LINUX || SystemUtils.IS_OS_FREE_BSD || SystemUtils.IS_OS_NET_BSD || SystemUtils.IS_OS_OPEN_BSD) {
-            settings.setOsType(OS_TYPE.OPEN_SOURCE_UNIX);
-        } else if (SystemUtils.IS_OS_MAC) {
-            settings.setOsType(OS_TYPE.MAC_OS);
-        } else {
-            settings.setOsType(OS_TYPE.UNKNOWN);
-            log.warn("Unsupported OS, you are on your own...");
-        }
-        if (getFileManagerCommand().equals("")) {
-            if (getOS() == OS_TYPE.WINDOWS) {
-                setFileManagerCommand("explorer");
-            } else if (getOS() == OS_TYPE.OPEN_SOURCE_UNIX) {
-                setFileManagerCommand("xdg-open");
-            }
-        }
+        determineHostOS();
+        setDefaultFileManagerIfNotSet();
         saveToJson();
-        //Check internet connection and start thread that will check it in time intervals
-        criticalLinksArray = new ArrayList<>();
-        criticalLinksArray.add("localhost");
-        criticalLinksArray.add("www.google.com");
-        criticalLinksArray.add("www.youtube.com");
-        isInternetAvailableWithTimeout = new Pair<>(Boolean.FALSE, new Date());
         log.debug("SettingsManager has been successfully initialized");
     }
 
@@ -124,7 +96,9 @@ public class SettingsManager {
     public String getYoutubeDlExecutable() {
 
         Callable<String> settingsGetterThread = () -> settings.getYoutubeDlExecutable();
-        Future<String> settingsFuture = ThreadManager.getInstance().sendTask(settingsGetterThread, TASK_TYPE.SETTING);
+        Future<String> settingsFuture = ThreadManager
+                .getInstance()
+                .sendTask(settingsGetterThread, TASK_TYPE.SETTING);
 
         try {
             return settingsFuture.get();
@@ -142,12 +116,14 @@ public class SettingsManager {
     public void setYoutubeDlExecutable(String executableLocation) {
 
         //Create a Runnable thread that will download needed playlist and video data
-        ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
-            settings.setYoutubeDlExecutable(executableLocation);
-            if (ThreadManager.getExecutionPermission()) {
-                saveToJson();
-            }
-        }), TASK_TYPE.SETTING);
+        ThreadManager
+                .getInstance()
+                .sendVoidTask(new Thread(() -> {
+                    settings.setYoutubeDlExecutable(executableLocation);
+                    if (ThreadManager.getExecutionPermission()) {
+                        saveToJson();
+                    }
+                }), TASK_TYPE.SETTING);
     }
 
     /**
@@ -164,7 +140,9 @@ public class SettingsManager {
     public String getFileManagerCommand() {
 
         Callable<String> settingsGetterThread = () -> settings.getFileManagerCommand();
-        Future<String> settingsFuture = ThreadManager.getInstance().sendTask(settingsGetterThread, TASK_TYPE.SETTING);
+        Future<String> settingsFuture = ThreadManager
+                .getInstance()
+                .sendTask(settingsGetterThread, TASK_TYPE.SETTING);
 
         try {
             return settingsFuture.get();
@@ -182,10 +160,12 @@ public class SettingsManager {
     public void setFileManagerCommand(String fileManagerCommand) {
 
         //Create a Runnable thread that will download needed playlist and video data
-        ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
-            settings.setFileManagerCommand(fileManagerCommand);
-            saveToJson();
-        }), TASK_TYPE.SETTING);
+        ThreadManager
+                .getInstance()
+                .sendVoidTask(new Thread(() -> {
+                    settings.setFileManagerCommand(fileManagerCommand);
+                    saveToJson();
+                }), TASK_TYPE.SETTING);
     }
 
 
@@ -195,7 +175,9 @@ public class SettingsManager {
     public Boolean getNotificationPolicy() {
 
         Callable<Boolean> settingsGetterThread = () -> settings.getNotificationPolicy();
-        Future<Boolean> settingsFuture = ThreadManager.getInstance().sendTask(settingsGetterThread, TASK_TYPE.SETTING);
+        Future<Boolean> settingsFuture = ThreadManager
+                .getInstance()
+                .sendTask(settingsGetterThread, TASK_TYPE.SETTING);
 
         try {
             return settingsFuture.get();
@@ -213,12 +195,14 @@ public class SettingsManager {
     public void setNotificationPolicy(Boolean isEnabled) {
 
         //Create a Runnable thread that will download needed playlist and video data
-        ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
-            settings.setNotificationPolicy(isEnabled);
-            if (ThreadManager.getExecutionPermission()) {
-                saveToJson();
-            }
-        }), TASK_TYPE.SETTING);
+        ThreadManager
+                .getInstance()
+                .sendVoidTask(new Thread(() -> {
+                    settings.setNotificationPolicy(isEnabled);
+                    if (ThreadManager.getExecutionPermission()) {
+                        saveToJson();
+                    }
+                }), TASK_TYPE.SETTING);
     }
 
     /**
@@ -227,7 +211,9 @@ public class SettingsManager {
     public String getYoutubeDlVersion() {
 
         Callable<String> settingsGetterThread = () -> settings.getYoutubeDlVersion();
-        Future<String> settingsFuture = ThreadManager.getInstance().sendTask(settingsGetterThread, TASK_TYPE.SETTING);
+        Future<String> settingsFuture = ThreadManager
+                .getInstance()
+                .sendTask(settingsGetterThread, TASK_TYPE.SETTING);
 
         try {
             return settingsFuture.get();
@@ -245,12 +231,14 @@ public class SettingsManager {
     public void setYoutubeDlVersion(String version) {
 
         //Create a Runnable thread that will download needed playlist and video data
-        ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
-            settings.setYoutubeDlVersion(version);
-            if (ThreadManager.getExecutionPermission()) {
-                saveToJson();
-            }
-        }), TASK_TYPE.SETTING);
+        ThreadManager
+                .getInstance()
+                .sendVoidTask(new Thread(() -> {
+                    settings.setYoutubeDlVersion(version);
+                    if (ThreadManager.getExecutionPermission()) {
+                        saveToJson();
+                    }
+                }), TASK_TYPE.SETTING);
     }
 
 
@@ -260,7 +248,9 @@ public class SettingsManager {
     public String getRuntimeVersion() {
 
         Callable<String> settingsGetterThread = () -> settings.getRuntimeVersion();
-        Future<String> settingsFuture = ThreadManager.getInstance().sendTask(settingsGetterThread, TASK_TYPE.SETTING);
+        Future<String> settingsFuture = ThreadManager
+                .getInstance()
+                .sendTask(settingsGetterThread, TASK_TYPE.SETTING);
 
         try {
             return settingsFuture.get();
@@ -278,63 +268,38 @@ public class SettingsManager {
     public void setRuntimeVersion(String version) {
 
         //Create a Runnable thread that will download needed playlist and video data
-        ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
-            settings.setRuntimeVersion(version);
-            if (ThreadManager.getExecutionPermission()) {
-                saveToJson();
-            }
-        }), TASK_TYPE.SETTING);
-    }
-
-
-    /**
-     * Checks internet connection to sites application uses
-     * NOTE: This operation is fairly memory expensive as it uses finalizers which reside in heap for a long time.
-     * Only use it when necessary.
-     *
-     * @return true if connection is up and running, false otherwise
-     */
-    public boolean checkInternetConnection() {
-        Callable<Boolean> internetCallable = () -> {
-            if (ThreadManager.getExecutionPermission()) {
-                //If there was less than 30 seconds since last successful check just return previous value
-                if (new Date().getTime() - isInternetAvailableWithTimeout.getValue().getTime() <= 1000 * 30 && isInternetAvailableWithTimeout.getKey()) {
-                    return isInternetAvailableWithTimeout.getKey();
-                }
-                List<Future<Boolean>> futures = new ArrayList<>();
-                for (String address : criticalLinksArray) {
-                    Callable<Boolean> pingCallabe = () -> {
-                        String[] command = {"ping", "-c 1", address};
-                        Process p = Runtime.getRuntime().exec(command);
-                        p.waitFor();
-                        if (p.exitValue() != 0) {
-                            return false;
-                        }
-                        return true;
-                    };
-                    futures.add(ThreadManager.getInstance().sendTask(pingCallabe, TASK_TYPE.OTHER));
-                }
-                for (Future<Boolean> future : futures) {
-                    if (!future.get()) {
-                        isInternetAvailableWithTimeout = new Pair<>(Boolean.TRUE, new Date());
-                        return false;
+        ThreadManager
+                .getInstance()
+                .sendVoidTask(new Thread(() -> {
+                    settings.setRuntimeVersion(version);
+                    if (ThreadManager.getExecutionPermission()) {
+                        saveToJson();
                     }
-                }
-                isInternetAvailableWithTimeout = new Pair<>(Boolean.TRUE, new Date());
-                return true;
-            }
-            return false;
-        };
-        Future<Boolean> internetFuture = ThreadManager.getInstance().sendTask(internetCallable, TASK_TYPE.SETTING);
-        try {
-            return internetFuture.get();
-        } catch (InterruptedException e) {
-            log.error("Thread has been interrupted", e);
-        } catch (ExecutionException e) {
-            log.error("There was an error during execution", e);
-        }
-        return false;
+                }), TASK_TYPE.SETTING);
     }
 
+
+    private void determineHostOS() {
+        if (SystemUtils.IS_OS_WINDOWS) {
+            settings.setOsType(OS_TYPE.WINDOWS);
+        } else if (SystemUtils.IS_OS_LINUX || SystemUtils.IS_OS_FREE_BSD || SystemUtils.IS_OS_NET_BSD || SystemUtils.IS_OS_OPEN_BSD) {
+            settings.setOsType(OS_TYPE.OPEN_SOURCE_UNIX);
+        } else if (SystemUtils.IS_OS_MAC) {
+            settings.setOsType(OS_TYPE.MAC_OS);
+        } else {
+            settings.setOsType(OS_TYPE.UNKNOWN);
+            log.warn("Unsupported OS, you are on your own...");
+        }
+    }
+
+    private void setDefaultFileManagerIfNotSet() {
+        if (getFileManagerCommand().equals("")) {
+            if (getOS() == OS_TYPE.WINDOWS) {
+                setFileManagerCommand("explorer");
+            } else if (getOS() == OS_TYPE.OPEN_SOURCE_UNIX) {
+                setFileManagerCommand("xdg-open");
+            }
+        }
+    }
 
 }

@@ -31,6 +31,13 @@
 
         <dependency>
             <groupId>com.github.open96</groupId>
+            <artifactId>jypm-internet-checker</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.open96</groupId>
             <artifactId>jypm-thread-manager</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -38,12 +45,6 @@
         <dependency>
             <groupId>com.github.open96</groupId>
             <artifactId>jypm-settings-manager</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.github.open96</groupId>
-            <artifactId>jypm-fxml</artifactId>
             <version>${project.version}</version>
         </dependency>
 

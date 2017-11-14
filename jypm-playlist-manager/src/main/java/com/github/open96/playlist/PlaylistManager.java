@@ -1,8 +1,8 @@
 package com.github.open96.playlist;
 
 import com.github.open96.html.YouTubeParser;
+import com.github.open96.internetconnection.ConnectionChecker;
 import com.github.open96.playlist.pojo.Playlist;
-import com.github.open96.settings.SettingsManager;
 import com.github.open96.thread.TASK_TYPE;
 import com.github.open96.thread.ThreadManager;
 import com.google.gson.Gson;
@@ -122,19 +122,25 @@ public class PlaylistManager {
         playlists.add(playlist);
 
         //Create a Runnable thread that will download needed playlist data
-        ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
-            YouTubeParser youTubeParser = new YouTubeParser(playlist.getPlaylistLink());
-            playlist.setPlaylistName(youTubeParser.getPlaylistName());
-            playlist.setVideoCount(Integer.parseInt(youTubeParser.getVideoCount()));
-            playlist.setPlaylistThumbnailUrl(youTubeParser.getThumbnailLink());
-            log.trace("Playlist data successfully parsed.");
-            if (ThreadManager.getExecutionPermission() && SettingsManager.getInstance().checkInternetConnection()) {
-                ThreadManager.getInstance().sendVoidTask(new Thread(() -> Platform.runLater(() -> observablePlaylists.add(playlist))), TASK_TYPE.UI);
-                saveToJson();
-            } else {
-                playlists.remove(playlist);
-            }
-        }), TASK_TYPE.PLAYLIST);
+        ThreadManager
+                .getInstance().
+                sendVoidTask(new Thread(() -> {
+                    YouTubeParser youTubeParser = new YouTubeParser(playlist.getPlaylistLink());
+                    playlist.setPlaylistName(youTubeParser.getPlaylistName());
+                    playlist.setVideoCount(Integer.parseInt(youTubeParser.getVideoCount()));
+                    playlist.setPlaylistThumbnailUrl(youTubeParser.getThumbnailLink());
+                    log.trace("Playlist data successfully parsed.");
+                    if (ThreadManager.getExecutionPermission() && ConnectionChecker
+                            .getInstance()
+                            .checkInternetConnection()) {
+                        ThreadManager
+                                .getInstance()
+                                .sendVoidTask(new Thread(() -> Platform.runLater(() -> observablePlaylists.add(playlist))), TASK_TYPE.UI);
+                        saveToJson();
+                    } else {
+                        playlists.remove(playlist);
+                    }
+                }), TASK_TYPE.PLAYLIST);
         return true;
     }
 
@@ -144,35 +150,39 @@ public class PlaylistManager {
      * @param playlist Object of Playlist class that should be removed from PlaylistManager's playlists variable.
      */
     public void remove(Playlist playlist, boolean deleteDir) {
-        ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
-            //Look for playlist that matches playlist that was requested to be removed
-            playlists.stream()
-                    .filter(playlist1 -> playlist1.getPlaylistLink()
-                            .equals(playlist.getPlaylistLink()))
-                    .forEach(playlist1 -> {
-                        log.trace("Removing " + playlist1.getPlaylistName());
-                        playlists.remove(playlist1);
-                        saveToJson();
-                    });
-        }), TASK_TYPE.PLAYLIST);
+        ThreadManager
+                .getInstance()
+                .sendVoidTask(new Thread(() -> {
+                    //Look for playlist that matches playlist that was requested to be removed
+                    playlists.stream()
+                            .filter(playlist1 -> playlist1.getPlaylistLink()
+                                    .equals(playlist.getPlaylistLink()))
+                            .forEach(playlist1 -> {
+                                log.trace("Removing " + playlist1.getPlaylistName());
+                                playlists.remove(playlist1);
+                                saveToJson();
+                            });
+                }), TASK_TYPE.PLAYLIST);
         //Delete playlist directory
         if (deleteDir) {
-            ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
-                //Give DownloadManager time to stop downloading.
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                //Proceed to delete every file in playlist directory
-                File playlistDirectory = new File(playlist.getPlaylistLocation());
-                if (playlistDirectory.exists() && playlistDirectory.listFiles() != null) {
-                    for (File f : playlistDirectory.listFiles()) {
-                        f.delete();
-                    }
-                    playlistDirectory.delete();
-                }
-            }), TASK_TYPE.OTHER);
+            ThreadManager
+                    .getInstance()
+                    .sendVoidTask(new Thread(() -> {
+                        //Give DownloadManager time to stop downloading.
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        //Proceed to delete every file in playlist directory
+                        File playlistDirectory = new File(playlist.getPlaylistLocation());
+                        if (playlistDirectory.exists() && playlistDirectory.listFiles() != null) {
+                            for (File f : playlistDirectory.listFiles()) {
+                                f.delete();
+                            }
+                            playlistDirectory.delete();
+                        }
+                    }), TASK_TYPE.OTHER);
         }
 
     }
@@ -185,7 +195,9 @@ public class PlaylistManager {
 
         //Get playlist asynchronously via executorService, this ensures playlists object is in readable state
         Callable<ObservableList<Playlist>> observablePlaylistGetterThread = () -> observablePlaylists;
-        Future<ObservableList<Playlist>> observablePlaylistFuture = ThreadManager.getInstance().sendTask(observablePlaylistGetterThread, TASK_TYPE.PLAYLIST);
+        Future<ObservableList<Playlist>> observablePlaylistFuture = ThreadManager
+                .getInstance()
+                .sendTask(observablePlaylistGetterThread, TASK_TYPE.PLAYLIST);
 
         try {
             return observablePlaylistFuture.get();
@@ -203,7 +215,9 @@ public class PlaylistManager {
 
         //Get playlist asynchronously via executorService, this ensures playlists object is in readable state
         Callable<ArrayList<Playlist>> playlistGetterThread = () -> playlists;
-        Future<ArrayList<Playlist>> playlistFuture = ThreadManager.getInstance().sendTask(playlistGetterThread, TASK_TYPE.PLAYLIST);
+        Future<ArrayList<Playlist>> playlistFuture = ThreadManager
+                .getInstance()
+                .sendTask(playlistGetterThread, TASK_TYPE.PLAYLIST);
 
         try {
             return playlistFuture.get();
@@ -225,7 +239,9 @@ public class PlaylistManager {
                     .filter(playlist -> playlist.getPlaylistLink()
                             .equals(link)).collect(Collectors.toList())
                     .get(0);
-            Future<Playlist> playlistFuture = ThreadManager.getInstance().sendTask(playlistGetterThread, TASK_TYPE.PLAYLIST);
+            Future<Playlist> playlistFuture = ThreadManager
+                    .getInstance()
+                    .sendTask(playlistGetterThread, TASK_TYPE.PLAYLIST);
             return playlistFuture.get();
         } catch (InterruptedException | ExecutionException e) {
             //If stream threw IndexOutOfBoundsException the playlist with specified link has not been found
@@ -243,15 +259,17 @@ public class PlaylistManager {
      * Sets requested status of requested playlist
      */
     public void updatePlaylistStatus(Playlist playlist, QUEUE_STATUS status) {
-        ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
-            playlists.stream()
-                    .filter(playlist1 -> playlist.getPlaylistLink()
-                            .equals(playlist1.getPlaylistLink()))
-                    .forEach(playlist1 -> {
-                        playlist1.setStatus(status);
-                        saveToJson();
-                    });
-        }), TASK_TYPE.PLAYLIST);
+        ThreadManager
+                .getInstance()
+                .sendVoidTask(new Thread(() -> {
+                    playlists.stream()
+                            .filter(playlist1 -> playlist.getPlaylistLink()
+                                    .equals(playlist1.getPlaylistLink()))
+                            .forEach(playlist1 -> {
+                                playlist1.setStatus(status);
+                                saveToJson();
+                            });
+                }), TASK_TYPE.PLAYLIST);
     }
 
 }

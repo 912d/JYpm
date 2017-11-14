@@ -4,6 +4,7 @@ import com.github.open96.api.github.GitHubApiClient;
 import com.github.open96.api.github.GitHubApiEndpointInterface;
 import com.github.open96.api.github.pojo.release.Asset;
 import com.github.open96.api.github.pojo.release.ReleaseJSON;
+import com.github.open96.internetconnection.ConnectionChecker;
 import com.github.open96.settings.OS_TYPE;
 import com.github.open96.settings.SettingsManager;
 import com.github.open96.thread.TASK_TYPE;
@@ -127,12 +128,29 @@ public class YoutubeDlManager {
     }
 
     /**
+     * Delete recursively directory in which youtube-dl is stored.
+     */
+    public void deletePreviousVersionIfExists() {
+        executableState = EXECUTABLE_STATE.NOT_READY;
+        File youtubeDlDirectory = new File(YOUTUBE_DL_DIRECTORY);
+        if (youtubeDlDirectory.exists() && youtubeDlDirectory.listFiles() != null) {
+            for (File f : youtubeDlDirectory.listFiles()) {
+                f.delete();
+            }
+        }
+        youtubeDlDirectory.delete();
+        youtubeDlDirectory.mkdir();
+    }
+
+    /**
      * Utilizing methods in this class this method checks for youtube-dl update and appends it if needed.
      */
     public void downloadYoutubeDl() {
         ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
             //Wait for internet connection
-            while (!SettingsManager.getInstance().checkInternetConnection()) {
+            while (!ConnectionChecker
+                    .getInstance()
+                    .checkInternetConnection()) {
                 try {
                     Thread.sleep(250);
                 } catch (InterruptedException e) {
@@ -141,15 +159,19 @@ public class YoutubeDlManager {
             }
 
             getAPIResponse();
-            boolean coreValidation = (!SettingsManager.getInstance().getYoutubeDlVersion().equals(onlineVersion));
-            boolean directoryValidation = !new File(YOUTUBE_DL_DIRECTORY).exists() || (new File(YOUTUBE_DL_DIRECTORY).exists() && new File(YOUTUBE_DL_DIRECTORY).listFiles().length != 1);
-            if ((coreValidation || directoryValidation) && ThreadManager.getExecutionPermission()) {
+            boolean isVersionOutOfDate = (!SettingsManager
+                    .getInstance()
+                    .getYoutubeDlVersion().equals(onlineVersion));
+            boolean doesFileIntegritySeemOk = !new File(YOUTUBE_DL_DIRECTORY).exists() || (new File(YOUTUBE_DL_DIRECTORY).exists() && new File(YOUTUBE_DL_DIRECTORY).listFiles().length != 1);
+            if ((isVersionOutOfDate || doesFileIntegritySeemOk) && ThreadManager.getExecutionPermission()) {
                 log.debug("New youtube-dl version available, downloading...");
                 try {
                     //Create URL based on OS type
                     URL downloadLink;
                     Asset asset;
-                    if (SettingsManager.getInstance().getOS() == OS_TYPE.WINDOWS) {
+                    if (SettingsManager
+                            .getInstance()
+                            .getOS() == OS_TYPE.WINDOWS) {
                         asset = assets.get(OS_TYPE.WINDOWS);
                     } else {
                         asset = assets.get(OS_TYPE.OPEN_SOURCE_UNIX);
@@ -157,14 +179,7 @@ public class YoutubeDlManager {
                     downloadLink = new URL(asset.getBrowserDownloadUrl());
 
                     //Clean youtube-dl directory before making any changes to it
-                    File youtubeDlDirectory = new File(YOUTUBE_DL_DIRECTORY);
-                    if (youtubeDlDirectory.exists() && youtubeDlDirectory.listFiles() != null) {
-                        for (File f : youtubeDlDirectory.listFiles()) {
-                            f.delete();
-                        }
-                    }
-                    youtubeDlDirectory.delete();
-                    youtubeDlDirectory.mkdir();
+                    deletePreviousVersionIfExists();
 
                     //Download youtube-dl
                     ReadableByteChannel readableByteChannel = Channels.newChannel(downloadLink.openStream());
@@ -175,13 +190,19 @@ public class YoutubeDlManager {
                     readableByteChannel.close();
 
                     //Make file executable
-                    if (SettingsManager.getInstance().getOS() != OS_TYPE.WINDOWS) {
+                    if (SettingsManager
+                            .getInstance()
+                            .getOS() != OS_TYPE.WINDOWS) {
                         String[] command = new String[]{"chmod", "+x", pathToExecutable};
                         Runtime.getRuntime().exec(command);
                     }
 
-                    SettingsManager.getInstance().setYoutubeDlVersion(onlineVersion);
-                    SettingsManager.getInstance().setYoutubeDlExecutable(new File(pathToExecutable).getAbsolutePath());
+                    SettingsManager
+                            .getInstance()
+                            .setYoutubeDlVersion(onlineVersion);
+                    SettingsManager
+                            .getInstance()
+                            .setYoutubeDlExecutable(new File(pathToExecutable).getAbsolutePath());
                     log.debug("Download finished");
                 } catch (MalformedURLException e) {
                     log.error("Invalid GitHub url", e);

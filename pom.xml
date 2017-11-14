@@ -22,6 +22,7 @@
         <module>jypm-youtube-dl</module>
         <module>jypm-updater</module>
         <module>jypm-html-parser</module>
+        <module>jypm-internet-checker</module>
     </modules>
 
     <properties>

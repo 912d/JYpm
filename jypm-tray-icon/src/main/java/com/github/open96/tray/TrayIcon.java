@@ -141,8 +141,12 @@ public class TrayIcon {
      * @return true if notification was displayed, false otherwise.
      */
     public boolean displayNotification(String title, String description) {
-        if (SettingsManager.getInstance().getNotificationPolicy()) {
-            switch (SettingsManager.getInstance().getOS()) {
+        if (SettingsManager
+                .getInstance()
+                .getNotificationPolicy()) {
+            switch (SettingsManager
+                    .getInstance()
+                    .getOS()) {
                 case WINDOWS:
                     trayIcon.displayMessage(title, description, java.awt.TrayIcon.MessageType.INFO);
                     return true;
