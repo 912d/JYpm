@@ -1,5 +1,6 @@
 package com.github.open96.download;
 
+import com.github.open96.internetconnection.ConnectionChecker;
 import com.github.open96.playlist.PlaylistManager;
 import com.github.open96.playlist.QUEUE_STATUS;
 import com.github.open96.playlist.pojo.Playlist;
@@ -52,7 +53,6 @@ public class DownloadManager {
         return singletonInstance;
     }
 
-
     /**
      * Initialize subcomponents on first instance creation
      */
@@ -65,63 +65,7 @@ public class DownloadManager {
         detailsString = new StringBuilder();
         detailsString.append("JYPM ").append(SettingsManager.getInstance().getRuntimeVersion()).append("\n");
         //Resume all interrupted tasks
-        ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
-            while (ThreadManager.getExecutionPermission()) {
-                //Wait for YoutubeDlManager first
-                while (YoutubeDlManager.getInstance().getExecutableState() == EXECUTABLE_STATE.NOT_READY) {
-                    try {
-                        Thread.sleep(10);
-                    } catch (InterruptedException e) {
-                        log.error("Thread sleep has been interrupted", e);
-                    }
-                }
-                if (SettingsManager.getInstance().checkInternetConnection()) {
-                    ArrayList<Playlist> playlists = PlaylistManager.getInstance().getPlaylists();
-                    Queue<Playlist> resumedPlaylists = new LinkedBlockingQueue<>();
-                    //Redownload playlist if its download was interrupted during last shutdown
-                    for (Playlist p : playlists) {
-                        if (p.getStatus() == QUEUE_STATUS.DOWNLOADING) {
-                            download(p);
-                            resumedPlaylists.add(p);
-                        }
-                    }
-                    //Resume all queued tasks
-                    for (Playlist p : playlists) {
-                        if (p.getStatus() == QUEUE_STATUS.QUEUED) {
-                            if (!resumedPlaylists.contains(p)) {
-                                download(p);
-                                resumedPlaylists.add(p);
-                            }
-                        }
-                    }
-                    //Wait for TrayIcon initialization
-                    int trayTimeout = 0;
-                    while (!TrayIcon.isTrayWorking()) {
-                        try {
-                            Thread.sleep(50);
-                            trayTimeout += 50;
-                            if (trayTimeout > 500) {
-                                break;
-                            }
-                        } catch (InterruptedException e) {
-                            log.error("TrayIcon has timed out, you may encounter some strange and scary things...");
-                        }
-                    }
-                    //Send notification
-                    if (resumedPlaylists.size() > 0 && TrayIcon.isTrayWorking()) {
-                        TrayIcon.getInstance().displayNotification("JYpm - resuming downloads", "Resuming " + resumedPlaylists.size() + " playlist downloads");
-                    }
-                    log.debug("Initializer thread has completed initialization...");
-                    break;
-                } else {
-                    try {
-                        Thread.sleep(1000); //1 seconds
-                    } catch (InterruptedException e) {
-                        log.error(e);
-                    }
-                }
-            }
-        }), TASK_TYPE.DOWNLOAD);
+        resumeInterruptedPlaylists();
         log.debug("DownloadManager has been initialized");
     }
 
@@ -138,43 +82,27 @@ public class DownloadManager {
         log.trace("Downloading playlist \"" + playlist.getPlaylistName() + "\" " + "specified by link " + playlist.getPlaylistLink() + " to location " + playlist.getPlaylistLocation());
         detailsString.append("Downloading playlist \"").append(playlist.getPlaylistName()).append("\" ").append("specified by link ").append(playlist.getPlaylistLink()).append(" to location ").append(playlist.getPlaylistLocation()).append("\n");
 
-        ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
-            try {
-                PlaylistManager.getInstance().updatePlaylistStatus(playlist, QUEUE_STATUS.DOWNLOADING);
-                //Start the download
-                Process process = executableWrapper.downloadPlaylist(playlist);
-                try (InputStream inputStream = process.getInputStream()) {
-                    //Create BufferedReader and read all output of the process until it dies
-                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-                    String line;
-                    while (process.isAlive() && PlaylistManager.getInstance().getPlaylistByLink(playlist.getPlaylistLink()) != null && ThreadManager.getExecutionPermission()) {
-                        if (!threadLock) {
-                            if ((line = bufferedReader.readLine()) != null || line != null) {
-                                detailsString.append(line).append("\n");
-                                //Trim the StringBuilder to reduce memory usage
-                                if (detailsString.length() > 16000) {
-                                    detailsString.trimToSize();
-                                    detailsString = new StringBuilder(detailsString.toString().substring(detailsString.length() - 16000));
-                                }
-                                Thread.sleep(250);
-                            }
+        //Download playlist
+        ThreadManager
+                .getInstance()
+                .sendVoidTask(new Thread(() -> {
+                    try {
+                        PlaylistManager
+                                .getInstance()
+                                .updatePlaylistStatus(playlist, QUEUE_STATUS.DOWNLOADING);
+                        //Start the download
+                        Process process = executableWrapper.downloadPlaylist(playlist);
+                        try (InputStream inputStream = process.getInputStream()) {
+                            parseOutputWhileProcessIsAlive(playlist, process, inputStream);
                         }
+                    } catch (InterruptedException | IOException | NullPointerException e) {
+                        log.warn("Missing executable, start the download again after executable is finished downloading.");
+                        ExecutableWrapper.getInstance().triggerExecutableRedownload();
+                        detailsString.append("\n").append("-----------Task failed-----------").append("\n").append(e.toString());
+                        log.error("Download failed", e);
+                        PlaylistManager.getInstance().updatePlaylistStatus(playlist, QUEUE_STATUS.FAILED);
                     }
-                    if (PlaylistManager.getInstance().getPlaylistByLink(playlist.getPlaylistLink()) != null) {
-                        TrayIcon.getInstance().displayNotification("JYpm - download completed", "Playlist " + playlist.getPlaylistName() + " has been downloaded");
-                    }
-                    detailsString.append("\n").append("-----------Task finished-----------\n").append("\n");
-                    PlaylistManager.getInstance().updatePlaylistStatus(playlist, QUEUE_STATUS.DOWNLOADED);
-                    bufferedReader.close();
-                }
-            } catch (InterruptedException | IOException | NullPointerException e) {
-                log.warn("Missing executable, start the download again after executable is finished downloading.");
-                ExecutableWrapper.getInstance().triggerExecutableRedownload();
-                detailsString.append("\n").append("-----------Task failed-----------").append("\n").append(e.toString());
-                log.error("Download failed", e);
-                PlaylistManager.getInstance().updatePlaylistStatus(playlist, QUEUE_STATUS.FAILED);
-            }
-        }), TASK_TYPE.DOWNLOAD);
+                }), TASK_TYPE.DOWNLOAD);
     }
 
     /**
@@ -188,7 +116,9 @@ public class DownloadManager {
                 return output;
             return null;
         };
-        Future<String> stringGetterFuture = ThreadManager.getInstance().sendTask(stringGetterThread, TASK_TYPE.OTHER);
+        Future<String> stringGetterFuture = ThreadManager
+                .getInstance()
+                .sendTask(stringGetterThread, TASK_TYPE.OTHER);
 
         try {
             return stringGetterFuture.get();
@@ -217,7 +147,9 @@ public class DownloadManager {
             }
             return null;
         };
-        Future<Integer> countGetterFuture = ThreadManager.getInstance().sendTask(countGetterThread, TASK_TYPE.OTHER);
+        Future<Integer> countGetterFuture = ThreadManager
+                .getInstance()
+                .sendTask(countGetterThread, TASK_TYPE.OTHER);
         try {
             return countGetterFuture.get();
         } catch (InterruptedException e) {
@@ -247,5 +179,98 @@ public class DownloadManager {
         }
         return output;
     }
+
+    /**
+     * Downloads every playlist that status is different from QUEUE_STATUS.DOWNLOADED.
+     */
+    private void resumeInterruptedPlaylists() {
+        ThreadManager
+                .getInstance()
+                .sendVoidTask(new Thread(() -> {
+                    while (ThreadManager.getExecutionPermission()) {
+                        //Wait for YoutubeDlManager first
+                        while (YoutubeDlManager
+                                .getInstance()
+                                .getExecutableState() == EXECUTABLE_STATE.NOT_READY) {
+                            try {
+                                Thread.sleep(10);
+                            } catch (InterruptedException e) {
+                                log.error("Thread sleep has been interrupted", e);
+                            }
+                        }
+                        if (ConnectionChecker
+                                .getInstance()
+                                .checkInternetConnection()) {
+                            ArrayList<Playlist> playlists = PlaylistManager.getInstance().getPlaylists();
+                            Queue<Playlist> resumedPlaylists = new LinkedBlockingQueue<>();
+                            //Redownload playlist if its download was interrupted during last shutdown
+                            for (Playlist p : playlists) {
+                                if (p.getStatus() == QUEUE_STATUS.DOWNLOADING) {
+                                    download(p);
+                                    resumedPlaylists.add(p);
+                                }
+                            }
+                            //Resume all queued tasks
+                            for (Playlist p : playlists) {
+                                if (p.getStatus() == QUEUE_STATUS.QUEUED) {
+                                    if (!resumedPlaylists.contains(p)) {
+                                        download(p);
+                                        resumedPlaylists.add(p);
+                                    }
+                                }
+                            }
+                            //Wait for TrayIcon initialization
+                            int trayTimeout = 0;
+                            while (!TrayIcon.isTrayWorking()) {
+                                try {
+                                    Thread.sleep(50);
+                                    trayTimeout += 50;
+                                    if (trayTimeout > 500) {
+                                        break;
+                                    }
+                                } catch (InterruptedException e) {
+                                    log.error("TrayIcon has timed out, you may encounter some strange and scary things...");
+                                }
+                            }
+                            //Send notification
+                            if (resumedPlaylists.size() > 0 && TrayIcon.isTrayWorking()) {
+                                TrayIcon
+                                        .getInstance()
+                                        .displayNotification("JYpm - resuming downloads", "Resuming " + resumedPlaylists.size() + " playlist downloads");
+                            }
+                            log.debug("Initializer thread has completed initialization...");
+                            break;
+                        } else {
+                            try {
+                                Thread.sleep(1000); //1 seconds
+                            } catch (InterruptedException e) {
+                                log.error(e);
+                            }
+                        }
+                    }
+                }), TASK_TYPE.DOWNLOAD);
+    }
+
+    private void parseOutputWhileProcessIsAlive(Playlist playlist, Process process, InputStream inputStream) throws IOException, InterruptedException {
+        //Create BufferedReader and read all output of the process until it dies
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+        String line;
+        while (process.isAlive() && PlaylistManager
+                .getInstance()
+                .getPlaylistByLink(playlist.getPlaylistLink()) != null && ThreadManager.getExecutionPermission()) {
+            if (!threadLock) {
+                if ((line = bufferedReader.readLine()) != null || line != null) {
+                    detailsString.append(line).append("\n");
+                    //Trim the StringBuilder to reduce memory usage
+                    if (detailsString.length() > 16000) {
+                        detailsString.trimToSize();
+                        detailsString = new StringBuilder(detailsString.toString().substring(detailsString.length() - 16000));
+                    }
+                    Thread.sleep(250);
+                }
+            }
+        }
+    }
+
 }
 

@@ -1,9 +1,9 @@
 package com.github.open96.fxml;
 
 import com.github.open96.download.DownloadManager;
+import com.github.open96.internetconnection.ConnectionChecker;
 import com.github.open96.playlist.PlaylistManager;
 import com.github.open96.playlist.pojo.Playlist;
-import com.github.open96.settings.SettingsManager;
 import com.github.open96.thread.TASK_TYPE;
 import com.github.open96.thread.ThreadManager;
 import com.github.open96.youtubedl.EXECUTABLE_STATE;
@@ -56,44 +56,7 @@ public class NotificationBarController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         //Start a thread that handles displaying messages on bottom bar of main application window
-        ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
-            while (ThreadManager.getExecutionPermission()) {
-                try {
-                    Platform.runLater(() -> notificationText.setText(""));
-                    if (!SettingsManager.getInstance().checkInternetConnection()) {
-                        Platform.runLater(() -> notificationText.setText("Waiting for internet connection..."));
-                    }
-                    if (YoutubeDlManager.getInstance().getExecutableState() == EXECUTABLE_STATE.NOT_READY) {
-                        Platform.runLater(() -> notificationText.setText("Looking for youtube-dl executable..."));
-                    }
-                    int queued = 0;
-                    boolean isDownloadInProgress = false;
-                    for (Playlist p : PlaylistManager.getInstance().getPlaylists()) {
-                        switch (p.getStatus()) {
-                            case DOWNLOADING:
-                                isDownloadInProgress = true;
-                                break;
-                            case QUEUED:
-                                queued++;
-                                break;
-                        }
-                    }
-                    if (isDownloadInProgress) {
-                        if (queued == 0) {
-                            Platform.runLater(() -> notificationText.setText("Downloading"));
-                        } else {
-                            int finalQueued = queued;
-                            Platform.runLater(() -> notificationText.setText("Downloading (" + finalQueued + " in queue)"));
-                        }
-                    }
-                    Thread.sleep(1000 * 5);
-                } catch (RejectedExecutionException e) {
-                    break;
-                } catch (InterruptedException e) {
-                    log.error("Thread has been interrupted", e);
-                }
-            }
-        }), TASK_TYPE.UI);
+        startNotifierThread();
     }
 
 
@@ -215,7 +178,61 @@ public class NotificationBarController implements Initializable {
      * Forces all playlists to be redownloaded.
      */
     public void onSyncButtonClick(ActionEvent actionEvent) {
-        PlaylistManager.getInstance().getPlaylists().forEach(playlist -> DownloadManager.getInstance().download(playlist));
+        PlaylistManager
+                .getInstance()
+                .getPlaylists()
+                .forEach(playlist -> DownloadManager
+                        .getInstance()
+                        .download(playlist));
+    }
+
+    private void startNotifierThread() {
+        ThreadManager
+                .getInstance()
+                .sendVoidTask(new Thread(() -> {
+                    while (ThreadManager.getExecutionPermission()) {
+                        try {
+                            Platform.runLater(() -> notificationText.setText(""));
+                            if (!ConnectionChecker
+                                    .getInstance()
+                                    .checkInternetConnection()) {
+                                Platform.runLater(() -> notificationText.setText("Waiting for internet connection..."));
+                            }
+                            if (YoutubeDlManager
+                                    .getInstance()
+                                    .getExecutableState() == EXECUTABLE_STATE.NOT_READY) {
+                                Platform.runLater(() -> notificationText.setText("Looking for youtube-dl executable..."));
+                            }
+                            int queued = 0;
+                            boolean isDownloadInProgress = false;
+                            for (Playlist p : PlaylistManager
+                                    .getInstance()
+                                    .getPlaylists()) {
+                                switch (p.getStatus()) {
+                                    case DOWNLOADING:
+                                        isDownloadInProgress = true;
+                                        break;
+                                    case QUEUED:
+                                        queued++;
+                                        break;
+                                }
+                            }
+                            if (isDownloadInProgress) {
+                                if (queued == 0) {
+                                    Platform.runLater(() -> notificationText.setText("Downloading"));
+                                } else {
+                                    int finalQueued = queued;
+                                    Platform.runLater(() -> notificationText.setText("Downloading (" + finalQueued + " in queue)"));
+                                }
+                            }
+                            Thread.sleep(1000 * 5);
+                        } catch (RejectedExecutionException e) {
+                            break;
+                        } catch (InterruptedException e) {
+                            log.error("Thread has been interrupted", e);
+                        }
+                    }
+                }), TASK_TYPE.UI);
     }
 
 }
