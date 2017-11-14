@@ -81,7 +81,9 @@ public class ConnectionChecker {
                         }
                         return true;
                     };
-                    futures.add(ThreadManager.getInstance().sendTask(pingCallable, TASK_TYPE.OTHER));
+                    futures.add(ThreadManager
+                            .getInstance()
+                            .sendTask(pingCallable, TASK_TYPE.OTHER));
                 }
                 for (Future<Boolean> future : futures) {
                     if (!future.get()) {
@@ -94,7 +96,9 @@ public class ConnectionChecker {
             }
             return false;
         };
-        Future<Boolean> internetFuture = ThreadManager.getInstance().sendTask(internetCallable, TASK_TYPE.SETTING);
+        Future<Boolean> internetFuture = ThreadManager
+                .getInstance()
+                .sendTask(internetCallable, TASK_TYPE.SETTING);
         try {
             return internetFuture.get();
         } catch (InterruptedException e) {

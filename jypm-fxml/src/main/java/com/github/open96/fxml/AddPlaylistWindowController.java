@@ -65,7 +65,9 @@ public class AddPlaylistWindowController implements Initializable {
 
         //Check if link is valid, if directory was chosen and if user has write/read access to it.
         boolean validation = validateLink(playlistLink) && isDirectoryChosen
-                && selectedDirectory.canRead() && selectedDirectory.canWrite() && ConnectionChecker.getInstance().checkInternetConnection();
+                && selectedDirectory.canRead() && selectedDirectory.canWrite() && ConnectionChecker
+                .getInstance()
+                .checkInternetConnection();
 
         //Trim link for easier operations on it later
         try {
@@ -82,7 +84,9 @@ public class AddPlaylistWindowController implements Initializable {
                 "\nValidation: " + validation);
 
         if (validation) {
-            if (!PlaylistManager.getInstance().add(new Playlist(playlistLink, selectedDirectory.getAbsolutePath()))) {
+            if (!PlaylistManager
+                    .getInstance()
+                    .add(new Playlist(playlistLink, selectedDirectory.getAbsolutePath()))) {
                 //If playlist wasn't accepted by PlaylistManager it means it has a duplicate link or directory.
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setHeaderText(null);
@@ -90,9 +94,15 @@ public class AddPlaylistWindowController implements Initializable {
                 alert.setContentText("Playlist or directory is already in use.");
                 alert.showAndWait();
             } else {
-                if (!SettingsManager.getInstance().getYoutubeDlExecutable().equals("")) {
+                if (!SettingsManager
+                        .getInstance()
+                        .getYoutubeDlExecutable().equals("")) {
                     //After validating playlist, download it
-                    DownloadManager.getInstance().download(PlaylistManager.getInstance().getPlaylistByLink(playlistLink));
+                    DownloadManager
+                            .getInstance()
+                            .download(PlaylistManager
+                                    .getInstance()
+                                    .getPlaylistByLink(playlistLink));
                 }
                 //If it was, job is done and window should close
                 rootPane.getScene().getWindow().hide();

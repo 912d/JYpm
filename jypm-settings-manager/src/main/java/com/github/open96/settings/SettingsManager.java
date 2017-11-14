@@ -27,7 +27,7 @@ public class SettingsManager {
     private static Logger log = LogManager.getLogger(SettingsManager.class.getName());
     //Pojo object where settings are stored during the runtime
     private Settings settings;
-    
+
 
     private SettingsManager() {
         init();
@@ -96,7 +96,9 @@ public class SettingsManager {
     public String getYoutubeDlExecutable() {
 
         Callable<String> settingsGetterThread = () -> settings.getYoutubeDlExecutable();
-        Future<String> settingsFuture = ThreadManager.getInstance().sendTask(settingsGetterThread, TASK_TYPE.SETTING);
+        Future<String> settingsFuture = ThreadManager
+                .getInstance()
+                .sendTask(settingsGetterThread, TASK_TYPE.SETTING);
 
         try {
             return settingsFuture.get();
@@ -114,12 +116,14 @@ public class SettingsManager {
     public void setYoutubeDlExecutable(String executableLocation) {
 
         //Create a Runnable thread that will download needed playlist and video data
-        ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
-            settings.setYoutubeDlExecutable(executableLocation);
-            if (ThreadManager.getExecutionPermission()) {
-                saveToJson();
-            }
-        }), TASK_TYPE.SETTING);
+        ThreadManager
+                .getInstance()
+                .sendVoidTask(new Thread(() -> {
+                    settings.setYoutubeDlExecutable(executableLocation);
+                    if (ThreadManager.getExecutionPermission()) {
+                        saveToJson();
+                    }
+                }), TASK_TYPE.SETTING);
     }
 
     /**
@@ -136,7 +140,9 @@ public class SettingsManager {
     public String getFileManagerCommand() {
 
         Callable<String> settingsGetterThread = () -> settings.getFileManagerCommand();
-        Future<String> settingsFuture = ThreadManager.getInstance().sendTask(settingsGetterThread, TASK_TYPE.SETTING);
+        Future<String> settingsFuture = ThreadManager
+                .getInstance()
+                .sendTask(settingsGetterThread, TASK_TYPE.SETTING);
 
         try {
             return settingsFuture.get();
@@ -154,10 +160,12 @@ public class SettingsManager {
     public void setFileManagerCommand(String fileManagerCommand) {
 
         //Create a Runnable thread that will download needed playlist and video data
-        ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
-            settings.setFileManagerCommand(fileManagerCommand);
-            saveToJson();
-        }), TASK_TYPE.SETTING);
+        ThreadManager
+                .getInstance()
+                .sendVoidTask(new Thread(() -> {
+                    settings.setFileManagerCommand(fileManagerCommand);
+                    saveToJson();
+                }), TASK_TYPE.SETTING);
     }
 
 
@@ -167,7 +175,9 @@ public class SettingsManager {
     public Boolean getNotificationPolicy() {
 
         Callable<Boolean> settingsGetterThread = () -> settings.getNotificationPolicy();
-        Future<Boolean> settingsFuture = ThreadManager.getInstance().sendTask(settingsGetterThread, TASK_TYPE.SETTING);
+        Future<Boolean> settingsFuture = ThreadManager
+                .getInstance()
+                .sendTask(settingsGetterThread, TASK_TYPE.SETTING);
 
         try {
             return settingsFuture.get();
@@ -185,12 +195,14 @@ public class SettingsManager {
     public void setNotificationPolicy(Boolean isEnabled) {
 
         //Create a Runnable thread that will download needed playlist and video data
-        ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
-            settings.setNotificationPolicy(isEnabled);
-            if (ThreadManager.getExecutionPermission()) {
-                saveToJson();
-            }
-        }), TASK_TYPE.SETTING);
+        ThreadManager
+                .getInstance()
+                .sendVoidTask(new Thread(() -> {
+                    settings.setNotificationPolicy(isEnabled);
+                    if (ThreadManager.getExecutionPermission()) {
+                        saveToJson();
+                    }
+                }), TASK_TYPE.SETTING);
     }
 
     /**
@@ -199,7 +211,9 @@ public class SettingsManager {
     public String getYoutubeDlVersion() {
 
         Callable<String> settingsGetterThread = () -> settings.getYoutubeDlVersion();
-        Future<String> settingsFuture = ThreadManager.getInstance().sendTask(settingsGetterThread, TASK_TYPE.SETTING);
+        Future<String> settingsFuture = ThreadManager
+                .getInstance()
+                .sendTask(settingsGetterThread, TASK_TYPE.SETTING);
 
         try {
             return settingsFuture.get();
@@ -217,12 +231,14 @@ public class SettingsManager {
     public void setYoutubeDlVersion(String version) {
 
         //Create a Runnable thread that will download needed playlist and video data
-        ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
-            settings.setYoutubeDlVersion(version);
-            if (ThreadManager.getExecutionPermission()) {
-                saveToJson();
-            }
-        }), TASK_TYPE.SETTING);
+        ThreadManager
+                .getInstance()
+                .sendVoidTask(new Thread(() -> {
+                    settings.setYoutubeDlVersion(version);
+                    if (ThreadManager.getExecutionPermission()) {
+                        saveToJson();
+                    }
+                }), TASK_TYPE.SETTING);
     }
 
 
@@ -232,7 +248,9 @@ public class SettingsManager {
     public String getRuntimeVersion() {
 
         Callable<String> settingsGetterThread = () -> settings.getRuntimeVersion();
-        Future<String> settingsFuture = ThreadManager.getInstance().sendTask(settingsGetterThread, TASK_TYPE.SETTING);
+        Future<String> settingsFuture = ThreadManager
+                .getInstance()
+                .sendTask(settingsGetterThread, TASK_TYPE.SETTING);
 
         try {
             return settingsFuture.get();
@@ -250,12 +268,14 @@ public class SettingsManager {
     public void setRuntimeVersion(String version) {
 
         //Create a Runnable thread that will download needed playlist and video data
-        ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
-            settings.setRuntimeVersion(version);
-            if (ThreadManager.getExecutionPermission()) {
-                saveToJson();
-            }
-        }), TASK_TYPE.SETTING);
+        ThreadManager
+                .getInstance()
+                .sendVoidTask(new Thread(() -> {
+                    settings.setRuntimeVersion(version);
+                    if (ThreadManager.getExecutionPermission()) {
+                        saveToJson();
+                    }
+                }), TASK_TYPE.SETTING);
     }
 
 

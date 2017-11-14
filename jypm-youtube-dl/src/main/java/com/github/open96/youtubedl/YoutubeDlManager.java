@@ -148,7 +148,9 @@ public class YoutubeDlManager {
     public void downloadYoutubeDl() {
         ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
             //Wait for internet connection
-            while (!ConnectionChecker.getInstance().checkInternetConnection()) {
+            while (!ConnectionChecker
+                    .getInstance()
+                    .checkInternetConnection()) {
                 try {
                     Thread.sleep(250);
                 } catch (InterruptedException e) {
@@ -157,7 +159,9 @@ public class YoutubeDlManager {
             }
 
             getAPIResponse();
-            boolean isVersionOutOfDate = (!SettingsManager.getInstance().getYoutubeDlVersion().equals(onlineVersion));
+            boolean isVersionOutOfDate = (!SettingsManager
+                    .getInstance()
+                    .getYoutubeDlVersion().equals(onlineVersion));
             boolean doesFileIntegritySeemOk = !new File(YOUTUBE_DL_DIRECTORY).exists() || (new File(YOUTUBE_DL_DIRECTORY).exists() && new File(YOUTUBE_DL_DIRECTORY).listFiles().length != 1);
             if ((isVersionOutOfDate || doesFileIntegritySeemOk) && ThreadManager.getExecutionPermission()) {
                 log.debug("New youtube-dl version available, downloading...");
@@ -165,7 +169,9 @@ public class YoutubeDlManager {
                     //Create URL based on OS type
                     URL downloadLink;
                     Asset asset;
-                    if (SettingsManager.getInstance().getOS() == OS_TYPE.WINDOWS) {
+                    if (SettingsManager
+                            .getInstance()
+                            .getOS() == OS_TYPE.WINDOWS) {
                         asset = assets.get(OS_TYPE.WINDOWS);
                     } else {
                         asset = assets.get(OS_TYPE.OPEN_SOURCE_UNIX);
@@ -184,13 +190,19 @@ public class YoutubeDlManager {
                     readableByteChannel.close();
 
                     //Make file executable
-                    if (SettingsManager.getInstance().getOS() != OS_TYPE.WINDOWS) {
+                    if (SettingsManager
+                            .getInstance()
+                            .getOS() != OS_TYPE.WINDOWS) {
                         String[] command = new String[]{"chmod", "+x", pathToExecutable};
                         Runtime.getRuntime().exec(command);
                     }
 
-                    SettingsManager.getInstance().setYoutubeDlVersion(onlineVersion);
-                    SettingsManager.getInstance().setYoutubeDlExecutable(new File(pathToExecutable).getAbsolutePath());
+                    SettingsManager
+                            .getInstance()
+                            .setYoutubeDlVersion(onlineVersion);
+                    SettingsManager
+                            .getInstance()
+                            .setYoutubeDlExecutable(new File(pathToExecutable).getAbsolutePath());
                     log.debug("Download finished");
                 } catch (MalformedURLException e) {
                     log.error("Invalid GitHub url", e);
