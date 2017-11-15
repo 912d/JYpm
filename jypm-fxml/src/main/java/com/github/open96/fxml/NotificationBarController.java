@@ -225,7 +225,7 @@ public class NotificationBarController implements Initializable {
                                     Platform.runLater(() -> notificationText.setText("Downloading (" + finalQueued + " in queue)"));
                                 }
                             }
-                            Thread.sleep(1000 * 5);
+                            Thread.sleep(1000);
                         } catch (RejectedExecutionException e) {
                             break;
                         } catch (InterruptedException e) {

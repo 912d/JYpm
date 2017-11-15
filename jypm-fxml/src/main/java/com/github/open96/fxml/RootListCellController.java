@@ -104,7 +104,7 @@ public class RootListCellController extends ListCell<Playlist> {
                             if (!playlistNameLabel.getText().equals(playlist.getPlaylistName())) {
                                 break;
                             }
-                            //Update status label on our ListCell every 1 second
+                            //Based on status of playlist show appropriate label
                             try {
                                 switch (PlaylistManager
                                         .getInstance()
@@ -142,7 +142,7 @@ public class RootListCellController extends ListCell<Playlist> {
                                         break;
                                 }
                                 try {
-                                    Thread.sleep(1000);
+                                    Thread.sleep(250);
                                 } catch (InterruptedException e) {
                                     LOG.error("Thread has been interrupted", e);
                                 }
