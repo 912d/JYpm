@@ -39,8 +39,14 @@ Button classes
 }
 
 .menu-button {
-    -fx-background-color: transparent;
-    -fx-text-fill: inherit;
+    -fx-background-color: #2B3034;
+    -fx-text-fill: #EFF0F1;
+    -fx-border-radius: 10 10 10 10;
+    -fx-background-radius: 10 10 10 10;
+}
+
+.menu-button > .arrow-button > .arrow {
+    -fx-background-color: #EFF0F1;
 }
 
 .context-menu {
