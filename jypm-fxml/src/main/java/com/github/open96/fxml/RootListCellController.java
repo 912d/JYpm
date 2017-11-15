@@ -223,24 +223,24 @@ public class RootListCellController extends ListCell<Playlist> {
                 }
             });
 
-            updateItem.setOnAction(actionEvent -> {
-                DownloadManager
-                        .getInstance()
-                        .download(playlist);
-            });
+            updateItem.setOnAction(actionEvent -> ThreadManager
+                    .getInstance()
+                    .sendVoidTask(new Thread(() ->
+                            DownloadManager
+                                    .getInstance()
+                                    .download(playlist)), TASK_TYPE.OTHER));
 
-            openItem.setOnAction(actionEvent -> {
-                Thread locationOpener = new Thread(() -> {
-                    try {
-                        Runtime.getRuntime().exec(SettingsManager
-                                .getInstance()
-                                .getFileManagerCommand() + " .", null, new File(playlist.getPlaylistLocation()));
-                    } catch (IOException e) {
-                        log.error("Invalid file manager, check your settings", e);
-                    }
-                });
-                locationOpener.start();
-            });
+            openItem.setOnAction(actionEvent -> ThreadManager
+                    .getInstance()
+                    .sendVoidTask(new Thread(() -> {
+                        try {
+                            Runtime.getRuntime().exec(SettingsManager
+                                    .getInstance()
+                                    .getFileManagerCommand() + " .", null, new File(playlist.getPlaylistLocation()));
+                        } catch (IOException e) {
+                            log.error("Invalid file manager, check your settings", e);
+                        }
+                    }), TASK_TYPE.OTHER));
 
             setGraphic(rootHBox);
         }
