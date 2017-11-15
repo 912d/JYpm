@@ -32,14 +32,15 @@ public class YoutubeDlManagerTest {
                 File executable = new File(fileName);
                 //Wait for download to finish
                 int sleepTime = 0;
+                final int threadSleepTimeout = 1000 * 60 * 10;
                 while (YoutubeDlManager.getInstance().getExecutableState() != EXECUTABLE_STATE.READY) {
                     try {
-                        Thread.sleep(100);
-                        sleepTime += 100;
-                        if (sleepTime > 120000) {
+                        Thread.sleep(1000);
+                        sleepTime += 1000;
+                        if (sleepTime > threadSleepTimeout) {
                             executable.delete();
                             new File(dirName).delete();
-                            assertTrue(sleepTime <= 120000);
+                            assertTrue(sleepTime <= threadSleepTimeout);
                         }
                     } catch (InterruptedException e) {
                         e.printStackTrace();
