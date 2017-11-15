@@ -58,10 +58,8 @@ public class ConnectionChecker {
 
     /**
      * Checks internet connection to sites application uses
-     * NOTE: This operation is fairly memory expensive as it uses finalizers which reside in heap for a long time.
-     * Only use it when necessary.
      *
-     * @return true if connection is up and running, false otherwise
+     * @return true if connection to specified links is up and running, false otherwise
      */
     public boolean checkInternetConnection() {
         Callable<Boolean> internetCallable = () -> {
@@ -70,6 +68,7 @@ public class ConnectionChecker {
                 if (new Date().getTime() - isInternetAvailableWithTimeout.getValue().getTime() <= 1000 * 30 && isInternetAvailableWithTimeout.getKey()) {
                     return isInternetAvailableWithTimeout.getKey();
                 }
+                //For each link create new thread that will check if address is reachable
                 List<Future<Boolean>> futures = new ArrayList<>();
                 for (String address : criticalLinksArray) {
                     Callable<Boolean> pingCallable = () -> {
@@ -85,6 +84,7 @@ public class ConnectionChecker {
                             .getInstance()
                             .sendTask(pingCallable, TASK_TYPE.OTHER));
                 }
+                //Start all threads that should check for internet connectivity
                 for (Future<Boolean> future : futures) {
                     if (!future.get()) {
                         isInternetAvailableWithTimeout = new Pair<>(Boolean.TRUE, new Date());
@@ -96,6 +96,7 @@ public class ConnectionChecker {
             }
             return false;
         };
+        //Now start whole thread that is written above this line of code and return it's result
         Future<Boolean> internetFuture = ThreadManager
                 .getInstance()
                 .sendTask(internetCallable, TASK_TYPE.SETTING);
