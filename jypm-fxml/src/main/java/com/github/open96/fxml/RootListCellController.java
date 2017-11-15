@@ -88,8 +88,9 @@ public class RootListCellController extends ListCell<Playlist> {
             ThreadManager
                     .getInstance()
                     .sendVoidTask(new Thread(() -> {
-                        Image thumbnailImage = new Image(playlist.getPlaylistThumbnailUrl());
-                        if (ThreadManager.getExecutionPermission()) {
+                        if (playlistNameLabel.getText().equals(playlist.getPlaylistName())
+                                && ThreadManager.getExecutionPermission()) {
+                            Image thumbnailImage = new Image(playlist.getPlaylistThumbnailUrl());
                             Platform.runLater(() -> thumbnailImageView.setImage(thumbnailImage));
                         }
                     }), TASK_TYPE.UI);
