@@ -32,14 +32,14 @@ Button classes
  */
 
 .button {
-    -fx-background-color: #2B3034;
+    -fx-background-color: #24292d;
     -fx-text-fill: #EFF0F1;
     -fx-border-radius: 10 10 10 10;
     -fx-background-radius: 10 10 10 10;
 }
 
 .menu-button {
-    -fx-background-color: #2B3034;
+    -fx-background-color: #24292d;
     -fx-text-fill: #EFF0F1;
     -fx-border-radius: 10 10 10 10;
     -fx-background-radius: 10 10 10 10;
