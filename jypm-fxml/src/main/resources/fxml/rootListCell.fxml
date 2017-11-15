@@ -37,7 +37,7 @@
                                 <MenuItem fx:id="deleteItem" mnemonicParsing="false" text="Delete"/>
                             </items>
                             <GridPane.margin>
-                                <Insets left="50.0"/>
+                                <Insets left="49.0"/>
                             </GridPane.margin>
                         </MenuButton>
                         <Label fx:id="playlistNameLabel" text="Playlist's name" GridPane.halignment="LEFT"
