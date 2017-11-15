@@ -32,14 +32,14 @@ public class YoutubeDlManagerTest {
                 File executable = new File(fileName);
                 //Wait for download to finish
                 int sleepTime = 0;
-                while (!executable.exists() || YoutubeDlManager.getInstance().getExecutableState() != EXECUTABLE_STATE.READY) {
+                while (YoutubeDlManager.getInstance().getExecutableState() != EXECUTABLE_STATE.READY) {
                     try {
                         Thread.sleep(100);
                         sleepTime += 100;
-                        if (sleepTime > 30000) {
+                        if (sleepTime > 120000) {
                             executable.delete();
                             new File(dirName).delete();
-                            assertTrue(sleepTime <= 30000);
+                            assertTrue(sleepTime <= 120000);
                         }
                     } catch (InterruptedException e) {
                         e.printStackTrace();
