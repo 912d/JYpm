@@ -32,7 +32,7 @@ public class YoutubeDlManagerTest {
                 File executable = new File(fileName);
                 //Wait for download to finish
                 int sleepTime = 0;
-                while (!executable.exists() || YoutubeDlManager.getInstance().getExecutableState() != EXECUTABLE_STATE.READY) {
+                while (YoutubeDlManager.getInstance().getExecutableState() != EXECUTABLE_STATE.READY) {
                     try {
                         Thread.sleep(100);
                         sleepTime += 100;
