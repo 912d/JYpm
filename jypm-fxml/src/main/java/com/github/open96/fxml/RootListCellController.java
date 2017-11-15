@@ -88,8 +88,9 @@ public class RootListCellController extends ListCell<Playlist> {
             ThreadManager
                     .getInstance()
                     .sendVoidTask(new Thread(() -> {
-                        Image thumbnailImage = new Image(playlist.getPlaylistThumbnailUrl());
-                        if (ThreadManager.getExecutionPermission()) {
+                        if (playlistNameLabel.getText().equals(playlist.getPlaylistName())
+                                && ThreadManager.getExecutionPermission()) {
+                            Image thumbnailImage = new Image(playlist.getPlaylistThumbnailUrl());
                             Platform.runLater(() -> thumbnailImageView.setImage(thumbnailImage));
                         }
                     }), TASK_TYPE.UI);
@@ -113,6 +114,7 @@ public class RootListCellController extends ListCell<Playlist> {
                                             Platform.runLater(() -> currentStatusLabel.setText("In queue"));
                                             lastKnownState = QUEUE_STATUS.QUEUED;
                                         }
+                                        Platform.runLater(() -> updateItem.setDisable(true));
                                         break;
                                     case DOWNLOADING:
                                         Integer currentCount = DownloadManager
@@ -122,18 +124,21 @@ public class RootListCellController extends ListCell<Playlist> {
                                             Platform.runLater(() -> currentStatusLabel.setText("Downloading (" + currentCount + "/" + playlist.getVideoCount() + ")"));
                                         }
                                         lastKnownState = QUEUE_STATUS.DOWNLOADING;
+                                        Platform.runLater(() -> updateItem.setDisable(true));
                                         break;
                                     case DOWNLOADED:
                                         if (lastKnownState != QUEUE_STATUS.DOWNLOADED) {
                                             Platform.runLater(() -> currentStatusLabel.setText("Downloaded"));
                                             lastKnownState = QUEUE_STATUS.DOWNLOADED;
                                         }
+                                        Platform.runLater(() -> updateItem.setDisable(false));
                                         break;
                                     case FAILED:
                                         if (lastKnownState != QUEUE_STATUS.FAILED) {
                                             Platform.runLater(() -> currentStatusLabel.setText("Error during downloading"));
                                             lastKnownState = QUEUE_STATUS.FAILED;
                                         }
+                                        Platform.runLater(() -> updateItem.setDisable(false));
                                         break;
                                 }
                                 try {
@@ -162,41 +167,54 @@ public class RootListCellController extends ListCell<Playlist> {
                     String message = "Do you want to delete all files linked to playlist or just a playlist entry?";
                     String positiveButtonText = "Delete all files";
                     String negativeButtonText = "Only delete entry in JYpm";
-                    EventHandler<ActionEvent> positiveButtonEventHandler = event -> {
-                        PlaylistManager
-                                .getInstance()
-                                .getPlaylists().stream()
-                                .filter(playlist1 -> playlist1.getPlaylistLink().equals(playlist.getPlaylistLink()))
-                                .forEach(playlist1 -> {
-                                    PlaylistManager
-                                            .getInstance()
-                                            .getObservablePlaylists()
-                                            .remove(playlist1);
-                                    PlaylistManager
-                                            .getInstance()
-                                            .remove(playlist1, true);
-                                });
-                        subStage.close();
-                    };
+                    EventHandler<ActionEvent> positiveButtonEventHandler = event ->
+                            ThreadManager
+                                    .getInstance()
+                                    .sendVoidTask(new Thread(() -> {
+                                        PlaylistManager
+                                                .getInstance()
+                                                .getPlaylists().stream()
+                                                .filter(playlist1 -> playlist1.getPlaylistLink().equals(playlist.getPlaylistLink()))
+                                                .forEach(playlist1 -> {
+                                                    Platform.runLater(() ->
+                                                            PlaylistManager
+                                                                    .getInstance()
+                                                                    .getObservablePlaylists()
+                                                                    .remove(playlist1));
+                                                    ThreadManager
+                                                            .getInstance()
+                                                            .sendVoidTask(new Thread(() ->
+                                                                    PlaylistManager
+                                                                            .getInstance()
+                                                                            .remove(playlist1, true)), TASK_TYPE.PLAYLIST);
+                                                });
+                                        Platform.runLater(() -> subStage.close());
+                                    }), TASK_TYPE.UI);
 
 
-                    EventHandler<ActionEvent> negativeButtonEventHandler = event -> {
-                        PlaylistManager
-                                .getInstance()
-                                .getPlaylists()
-                                .stream()
-                                .filter(playlist1 -> playlist1.getPlaylistLink().equals(playlist.getPlaylistLink()))
-                                .forEach(playlist1 -> {
-                                    PlaylistManager
-                                            .getInstance()
-                                            .getObservablePlaylists()
-                                            .remove(playlist1);
-                                    PlaylistManager
-                                            .getInstance()
-                                            .remove(playlist1, false);
-                                });
-                        subStage.close();
-                    };
+                    EventHandler<ActionEvent> negativeButtonEventHandler = event ->
+                            ThreadManager
+                                    .getInstance()
+                                    .sendVoidTask(new Thread(() -> {
+                                        PlaylistManager
+                                                .getInstance()
+                                                .getPlaylists().stream()
+                                                .filter(playlist1 -> playlist1.getPlaylistLink().equals(playlist.getPlaylistLink()))
+                                                .forEach(playlist1 -> {
+                                                    Platform.runLater(() ->
+                                                            PlaylistManager
+                                                                    .getInstance()
+                                                                    .getObservablePlaylists()
+                                                                    .remove(playlist1));
+                                                    ThreadManager
+                                                            .getInstance()
+                                                            .sendVoidTask(new Thread(() ->
+                                                                    PlaylistManager
+                                                                            .getInstance()
+                                                                            .remove(playlist1, false)), TASK_TYPE.PLAYLIST);
+                                                });
+                                        Platform.runLater(() -> subStage.close());
+                                    }), TASK_TYPE.UI);
 
 
                     controller.setData(message, positiveButtonText, negativeButtonText, positiveButtonEventHandler, negativeButtonEventHandler);
@@ -210,24 +228,24 @@ public class RootListCellController extends ListCell<Playlist> {
                 }
             });
 
-            updateItem.setOnAction(actionEvent -> {
-                DownloadManager
-                        .getInstance()
-                        .download(playlist);
-            });
+            updateItem.setOnAction(actionEvent -> ThreadManager
+                    .getInstance()
+                    .sendVoidTask(new Thread(() ->
+                            DownloadManager
+                                    .getInstance()
+                                    .download(playlist)), TASK_TYPE.OTHER));
 
-            openItem.setOnAction(actionEvent -> {
-                Thread locationOpener = new Thread(() -> {
-                    try {
-                        Runtime.getRuntime().exec(SettingsManager
-                                .getInstance()
-                                .getFileManagerCommand() + " .", null, new File(playlist.getPlaylistLocation()));
-                    } catch (IOException e) {
-                        log.error("Invalid file manager, check your settings", e);
-                    }
-                });
-                locationOpener.start();
-            });
+            openItem.setOnAction(actionEvent -> ThreadManager
+                    .getInstance()
+                    .sendVoidTask(new Thread(() -> {
+                        try {
+                            Runtime.getRuntime().exec(SettingsManager
+                                    .getInstance()
+                                    .getFileManagerCommand() + " .", null, new File(playlist.getPlaylistLocation()));
+                        } catch (IOException e) {
+                            log.error("Invalid file manager, check your settings", e);
+                        }
+                    }), TASK_TYPE.OTHER));
 
             setGraphic(rootHBox);
         }
