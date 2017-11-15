@@ -113,6 +113,7 @@ public class RootListCellController extends ListCell<Playlist> {
                                             Platform.runLater(() -> currentStatusLabel.setText("In queue"));
                                             lastKnownState = QUEUE_STATUS.QUEUED;
                                         }
+                                        Platform.runLater(() -> updateItem.setDisable(true));
                                         break;
                                     case DOWNLOADING:
                                         Integer currentCount = DownloadManager
@@ -122,18 +123,21 @@ public class RootListCellController extends ListCell<Playlist> {
                                             Platform.runLater(() -> currentStatusLabel.setText("Downloading (" + currentCount + "/" + playlist.getVideoCount() + ")"));
                                         }
                                         lastKnownState = QUEUE_STATUS.DOWNLOADING;
+                                        Platform.runLater(() -> updateItem.setDisable(true));
                                         break;
                                     case DOWNLOADED:
                                         if (lastKnownState != QUEUE_STATUS.DOWNLOADED) {
                                             Platform.runLater(() -> currentStatusLabel.setText("Downloaded"));
                                             lastKnownState = QUEUE_STATUS.DOWNLOADED;
                                         }
+                                        Platform.runLater(() -> updateItem.setDisable(false));
                                         break;
                                     case FAILED:
                                         if (lastKnownState != QUEUE_STATUS.FAILED) {
                                             Platform.runLater(() -> currentStatusLabel.setText("Error during downloading"));
                                             lastKnownState = QUEUE_STATUS.FAILED;
                                         }
+                                        Platform.runLater(() -> updateItem.setDisable(false));
                                         break;
                                 }
                                 try {
