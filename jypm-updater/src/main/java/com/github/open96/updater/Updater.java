@@ -16,7 +16,7 @@ public class Updater {
     //This object is a singleton thus storing instance of it is needed
     private static Updater singletonInstance;
     //Initialize log4j logger for later use in this class
-    private static Logger log = LogManager.getLogger(Updater.class.getName());
+    private static final Logger LOG = LogManager.getLogger(Updater.class.getName());
     //Field to store ready for querying retrofit client
     private GitHubApiEndpointInterface apiService;
     private String runtimeVersion;
@@ -34,7 +34,7 @@ public class Updater {
      */
     public static Updater getInstance() {
         if (singletonInstance == null) {
-            log.debug("Instance is null, initializing...");
+            LOG.debug("Instance is null, initializing...");
             singletonInstance = new Updater();
         }
         return singletonInstance;
@@ -44,7 +44,7 @@ public class Updater {
      * Initialize subcomponents on first instance creation.
      */
     private void init() {
-        log.trace("Initializing Updater");
+        LOG.trace("Initializing Updater");
 
         //Get runtime version
         try {
@@ -52,7 +52,7 @@ public class Updater {
             properties.load(Updater.class.getClassLoader().getResourceAsStream("version.properties"));
             runtimeVersion = properties.getProperty("runtime.version");
         } catch (IOException e) {
-            log.error("Missing or corrupt version.properties file!", e);
+            LOG.error("Missing or corrupt version.properties file!", e);
         }
 
         SettingsManager
@@ -68,7 +68,7 @@ public class Updater {
         //Query API for releases
         refresh();
 
-        log.debug("Updater has been successfully initialized.");
+        LOG.debug("Updater has been successfully initialized.");
     }
 
     /**
@@ -79,11 +79,11 @@ public class Updater {
     public String checkForUpdate() {
         if (releaseJSON != null) {
             if (!releaseJSON.getTagName().equals(runtimeVersion)) {
-                log.trace("New update available\nCURRENT VERSION: " + runtimeVersion + "\nNEW VERSION: " + releaseJSON.getTagName());
+                LOG.trace("New update available\nCURRENT VERSION: " + runtimeVersion + "\nNEW VERSION: " + releaseJSON.getTagName());
                 return releaseJSON.getTagName();
             }
         } else {
-            log.error("API object is empty!", new IllegalStateException("API object is empty!"));
+            LOG.error("API object is empty!", new IllegalStateException("API object is empty!"));
         }
         return null;
     }
@@ -104,7 +104,7 @@ public class Updater {
                     releaseJSON = repeatedJSONCall.execute().body();
                     retryCount++;
                     if (retryCount > 10) {
-                        log.fatal("Could not get API object...");
+                        LOG.fatal("Could not get API object...");
                         throw new IllegalStateException("Empty API response");
                     }
                 } else {
@@ -112,7 +112,7 @@ public class Updater {
                 }
             }
         } catch (IOException e) {
-            log.error("There was an IO error during GitHub API call", e);
+            LOG.error("There was an IO error during GitHub API call", e);
         }
     }
 

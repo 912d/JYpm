@@ -33,7 +33,7 @@ import java.util.ResourceBundle;
 public class SettingsWindowController implements Initializable {
 
     //Initialize log4j logger for later use in this class
-    private static Logger log = LogManager.getLogger(SettingsWindowController.class.getName());
+    private static final Logger LOG = LogManager.getLogger(SettingsWindowController.class.getName());
     @FXML
     GridPane rootPane;
     @FXML
@@ -105,7 +105,7 @@ public class SettingsWindowController implements Initializable {
                         try {
                             Thread.sleep(500);
                         } catch (InterruptedException e) {
-                            log.error("Thread has been interrupted.", e);
+                            LOG.error("Thread has been interrupted.", e);
                         }
                     }
                 }), TASK_TYPE.UI);
@@ -115,7 +115,7 @@ public class SettingsWindowController implements Initializable {
      * Save data permanently and hide the window.
      */
     public void onSaveSettingsButtonClick(ActionEvent actionEvent) {
-        log.debug("User changed settings from UI");
+        LOG.debug("User changed settings from UI");
         SettingsManager
                 .getInstance()
                 .setFileManagerCommand(fileManagerCommandTextField.getText());
@@ -159,9 +159,9 @@ public class SettingsWindowController implements Initializable {
                 }
 
             } catch (IOException | URISyntaxException e) {
-                log.error(e);
+                LOG.error(e);
             } catch (UnsupportedOperationException e) {
-                log.error("Browsing is not supported on this system");
+                LOG.error("Browsing is not supported on this system");
             }
         }
     }
@@ -191,7 +191,7 @@ public class SettingsWindowController implements Initializable {
                         try {
                             Thread.sleep(100);
                         } catch (InterruptedException e) {
-                            log.error("Thread has been interrupted.", e);
+                            LOG.error("Thread has been interrupted.", e);
                         }
                     }
                     if (executableVersionLabel != null && executableVersionLabel.getText() != null) {

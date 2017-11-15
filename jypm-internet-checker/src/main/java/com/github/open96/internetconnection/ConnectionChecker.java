@@ -21,7 +21,7 @@ public class ConnectionChecker {
     //Singleton instance of this class
     private static ConnectionChecker singletonInstance;
     //Initialize log4j logger for later use in this class
-    private static Logger log = LogManager.getLogger(ConnectionChecker.class.getName());
+    private static final Logger LOG = LogManager.getLogger(ConnectionChecker.class.getName());
 
     private ConnectionChecker() {
         init();
@@ -30,7 +30,7 @@ public class ConnectionChecker {
     //Singleton pattern
     public static ConnectionChecker getInstance() {
         if (singletonInstance == null) {
-            log.debug("Instance is null, initializing...");
+            LOG.debug("Instance is null, initializing...");
             singletonInstance = new ConnectionChecker();
         }
         return singletonInstance;
@@ -42,7 +42,7 @@ public class ConnectionChecker {
      * and possibly cause desync between what is stored in RAM and what is stored in JSON.
      */
     private void init() {
-        log.trace("Initializing ConnectionChecker");
+        LOG.trace("Initializing ConnectionChecker");
         //Define list of links that should be tested for availability
         criticalLinksArray = new ArrayList<>();
         criticalLinksArray.add("localhost");
@@ -52,7 +52,7 @@ public class ConnectionChecker {
         isInternetAvailableWithTimeout = new Pair<>(Boolean.FALSE, new Date());
         //Finally check internet connection
         checkInternetConnection();
-        log.debug("ConnectionChecker has been successfully initialized");
+        LOG.debug("ConnectionChecker has been successfully initialized");
     }
 
 
@@ -103,9 +103,9 @@ public class ConnectionChecker {
         try {
             return internetFuture.get();
         } catch (InterruptedException e) {
-            log.error("Thread has been interrupted", e);
+            LOG.error("Thread has been interrupted", e);
         } catch (ExecutionException e) {
-            log.error("There was an error during execution", e);
+            LOG.error("There was an error during execution", e);
         }
         return false;
     }

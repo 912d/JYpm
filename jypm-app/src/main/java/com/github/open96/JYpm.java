@@ -3,6 +3,7 @@ package com.github.open96;
 import com.github.open96.download.DownloadManager;
 import com.github.open96.playlist.PlaylistManager;
 import com.github.open96.settings.SettingsManager;
+import com.github.open96.thread.TASK_TYPE;
 import com.github.open96.thread.ThreadManager;
 import com.github.open96.tray.TrayIcon;
 import com.github.open96.updater.Updater;
@@ -19,7 +20,7 @@ import org.apache.logging.log4j.Logger;
 public class JYpm extends Application {
 
     //Initialize log4j logger for later use in this class
-    private static Logger log = LogManager.getLogger(JYpm.class.getName());
+    private static final Logger LOG = LogManager.getLogger(JYpm.class.getName());
 
     public static void main(String[] args) {
         launch(args);
@@ -31,7 +32,7 @@ public class JYpm extends Application {
     @Override
     public void init() {
         //Log the point where JavaFX thread will be started
-        log.info("Starting JYpm...");
+        LOG.info("Starting JYpm...");
 
         //Enable hardware acceleration
         System.setProperty("sun.java2d.opengl", "true");
@@ -40,7 +41,6 @@ public class JYpm extends Application {
         ThreadManager.getInstance();
         SettingsManager.getInstance();
         PlaylistManager.getInstance();
-        DownloadManager.getInstance();
     }
 
     /**
@@ -79,8 +79,13 @@ public class JYpm extends Application {
         try {
             Updater.getInstance().checkForUpdate();
         } catch (IllegalStateException e) {
-            log.warn("You have probably exceeded your GitHub API call limit. You won't be able to check for updates in 1 hour. Also, don't abuse GitHub API if you can :)");
+            LOG.warn("You have probably exceeded your GitHub API call limit. You won't be able to check for updates in 1 hour. Also, don't abuse GitHub API if you can :)");
         }
+
+        //After UI is up, initialize DownloadManager on separate thread and check if there are any tasks pending from last runtime
+        ThreadManager
+                .getInstance()
+                .sendVoidTask(new Thread(DownloadManager::getInstance), TASK_TYPE.OTHER);
     }
 
     /**
@@ -90,12 +95,12 @@ public class JYpm extends Application {
     @Override
     public void stop() {
         //Tell executor service it should shut down
-        log.debug("Stopping all threads on application shutdown");
+        LOG.debug("Stopping all threads on application shutdown");
         ThreadManager.getInstance().stopAllThreads();
 
         TrayIcon.getInstance().removeTrayIcon();
 
-        log.info("Closing JYpm...");
+        LOG.info("Closing JYpm...");
         Platform.exit();
     }
 
@@ -109,7 +114,7 @@ public class JYpm extends Application {
         //Override minimize button behaviour
         stage.iconifiedProperty().addListener((observable, oldValue, iconified) -> {
             if (iconified) {
-                log.debug("Minimizing to tray.");
+                LOG.debug("Minimizing to tray.");
                 //Make JavaFX thread not close on calling stage.hide()
                 Platform.setImplicitExit(false);
                 //Move window to background and minimize it to tray

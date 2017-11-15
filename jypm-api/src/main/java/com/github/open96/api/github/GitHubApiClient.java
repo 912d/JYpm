@@ -10,7 +10,7 @@ public class GitHubApiClient {
     //Hardcoded base url for api calls
     private static final String GITHUB_API_BASE_URL = "https://api.github.com/";
     //Initialize log4j logger for later use in this class
-    private static Logger log = LogManager.getLogger(GitHubApiClient.class.getName());
+    private static final Logger LOG = LogManager.getLogger(GitHubApiClient.class.getName());
     //Variable that stores reference to Retrofit object.
     private Retrofit retrofit;
     //Singleton instance that stores instance of this class
@@ -32,9 +32,9 @@ public class GitHubApiClient {
      * @return Singleton instance of GitHubApiClient.
      */
     public static GitHubApiClient getInstance() {
-        log.debug("Instance of GitHubApiClient has been requested.");
+        LOG.debug("Instance of GitHubApiClient has been requested.");
         if (singletonInstance == null) {
-            log.debug("Instance is null, initializing...");
+            LOG.debug("Instance is null, initializing...");
             singletonInstance = new GitHubApiClient();
         }
         return singletonInstance;

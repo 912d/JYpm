@@ -28,7 +28,7 @@ public class DownloadManager {
     //This object is a singleton thus storing instance of it is needed
     private static DownloadManager singletonInstance;
     //Initialize log4j logger for later use in this class
-    private static Logger log = LogManager.getLogger(DownloadManager.class.getName());
+    private static final Logger LOG = LogManager.getLogger(DownloadManager.class.getName());
     //Store the wrapper in variable as it is critical component of this class
     private ExecutableWrapper executableWrapper;
     //Variable where output of commands issued by executableWrapper will be stored
@@ -47,7 +47,7 @@ public class DownloadManager {
      */
     public static DownloadManager getInstance() {
         if (singletonInstance == null) {
-            log.debug("Instance is null, initializing...");
+            LOG.debug("Instance is null, initializing...");
             singletonInstance = new DownloadManager();
         }
         return singletonInstance;
@@ -58,7 +58,7 @@ public class DownloadManager {
      */
     private void init() {
         YoutubeDlManager.getInstance();
-        log.trace("Initializing DownloadManager");
+        LOG.trace("Initializing DownloadManager");
         executableWrapper = ExecutableWrapper.getInstance();
         threadLock = false;
         //Create a header for details to avoid "Details" window from looking empty
@@ -66,7 +66,7 @@ public class DownloadManager {
         detailsString.append("JYPM ").append(SettingsManager.getInstance().getRuntimeVersion()).append("\n");
         //Resume all interrupted tasks
         resumeInterruptedPlaylists();
-        log.debug("DownloadManager has been initialized");
+        LOG.debug("DownloadManager has been initialized");
     }
 
     /**
@@ -79,7 +79,7 @@ public class DownloadManager {
         //Assing queued status to playlist and put it in queue in ThreadManagers singleThreadExecutor.
         PlaylistManager.getInstance().updatePlaylistStatus(playlist, QUEUE_STATUS.QUEUED);
 
-        log.trace("Downloading playlist \"" + playlist.getPlaylistName() + "\" " + "specified by link " + playlist.getPlaylistLink() + " to location " + playlist.getPlaylistLocation());
+        LOG.trace("Downloading playlist \"" + playlist.getPlaylistName() + "\" " + "specified by link " + playlist.getPlaylistLink() + " to location " + playlist.getPlaylistLocation());
         detailsString.append("Downloading playlist \"").append(playlist.getPlaylistName()).append("\" ").append("specified by link ").append(playlist.getPlaylistLink()).append(" to location ").append(playlist.getPlaylistLocation()).append("\n");
 
         //Download playlist
@@ -100,12 +100,12 @@ public class DownloadManager {
                                 .getInstance()
                                 .updatePlaylistStatus(playlist, QUEUE_STATUS.DOWNLOADED);
                         detailsString.append("\n").append("-----------Task completed-----------").append("\n");
-                        log.trace("Playlist " + playlist.getPlaylistName() + " has finished downloading");
+                        LOG.trace("Playlist " + playlist.getPlaylistName() + " has finished downloading");
                     } catch (InterruptedException | IOException | NullPointerException e) {
-                        log.warn("Missing executable, start the download again after executable is finished downloading.");
+                        LOG.warn("Missing executable, start the download again after executable is finished downloading.");
                         ExecutableWrapper.getInstance().triggerExecutableRedownload();
                         detailsString.append("\n").append("-----------Task failed-----------").append("\n").append(e.toString());
-                        log.error("Download failed", e);
+                        LOG.error("Download failed", e);
                         PlaylistManager.getInstance().updatePlaylistStatus(playlist, QUEUE_STATUS.FAILED);
                     }
                 }), TASK_TYPE.DOWNLOAD);
@@ -129,7 +129,7 @@ public class DownloadManager {
         try {
             return stringGetterFuture.get();
         } catch (InterruptedException | ExecutionException e) {
-            log.error("Failed to retrieve output", e);
+            LOG.error("Failed to retrieve output", e);
         }
         //In case of failure empty list will be displayed
         return null;
@@ -159,7 +159,7 @@ public class DownloadManager {
         try {
             return countGetterFuture.get();
         } catch (InterruptedException e) {
-            log.error("Failed to retrieve output", e);
+            LOG.error("Failed to retrieve output", e);
         } catch (ExecutionException e) {
             return null;
         }
@@ -181,7 +181,7 @@ public class DownloadManager {
             output = detailsString.toString();
             threadLock = false;
         } catch (InterruptedException e) {
-            log.error("Thread has been interrupted");
+            LOG.error("Thread has been interrupted");
         }
         return output;
     }
@@ -201,7 +201,7 @@ public class DownloadManager {
                             try {
                                 Thread.sleep(10);
                             } catch (InterruptedException e) {
-                                log.error("Thread sleep has been interrupted", e);
+                                LOG.error("Thread sleep has been interrupted", e);
                             }
                         }
                         if (ConnectionChecker
@@ -225,32 +225,19 @@ public class DownloadManager {
                                     }
                                 }
                             }
-                            //Wait for TrayIcon initialization
-                            int trayTimeout = 0;
-                            while (!TrayIcon.isTrayWorking()) {
-                                try {
-                                    Thread.sleep(50);
-                                    trayTimeout += 50;
-                                    if (trayTimeout > 500) {
-                                        break;
-                                    }
-                                } catch (InterruptedException e) {
-                                    log.error("TrayIcon has timed out, you may encounter some strange and scary things...");
-                                }
-                            }
                             //Send notification
                             if (resumedPlaylists.size() > 0 && TrayIcon.isTrayWorking()) {
                                 TrayIcon
                                         .getInstance()
                                         .displayNotification("JYpm - resuming downloads", "Resuming " + resumedPlaylists.size() + " playlist downloads");
                             }
-                            log.debug("Initializer thread has completed initialization...");
+                            LOG.debug("Initializer thread has completed initialization...");
                             break;
                         } else {
                             try {
                                 Thread.sleep(1000); //1 seconds
                             } catch (InterruptedException e) {
-                                log.error(e);
+                                LOG.error(e);
                             }
                         }
                     }

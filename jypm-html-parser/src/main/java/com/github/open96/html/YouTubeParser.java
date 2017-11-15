@@ -14,7 +14,7 @@ public class YouTubeParser {
     //Storage for downloaded html that will be parsed
     private Document document;
     //Initialize log4j logger for later use in this class
-    private static Logger log = LogManager.getLogger(YouTubeParser.class.getName());
+    private static final Logger LOG = LogManager.getLogger(YouTubeParser.class.getName());
 
     /**
      * @param playlistToken Suffix of youtube playlist address
@@ -22,13 +22,13 @@ public class YouTubeParser {
     public YouTubeParser(String playlistToken) {
         try {
             String htmlLink = BASE_YOUTUBE_URL + playlistToken;
-            log.trace("Attempting to connect and save " + htmlLink);
+            LOG.trace("Attempting to connect and save " + htmlLink);
             Connection connection = Jsoup.connect(htmlLink).userAgent("Mozilla/5.0");
             document = connection.get();
-            log.trace("Connection successful");
+            LOG.trace("Connection successful");
         } catch (IOException e) {
             document = null;
-            log.error("Connection failed", e);
+            LOG.error("Connection failed", e);
         }
     }
 
@@ -38,7 +38,7 @@ public class YouTubeParser {
     public String getPlaylistName() {
         if (document != null) {
             Elements element = document.select("[class*=\"-header\"] > [class*=\"header-title\"]");
-            log.debug("Got playlist name: " + element.get(1).text());
+            LOG.debug("Got playlist name: " + element.get(1).text());
             return element.get(1).text();
         }
         return "";
@@ -53,7 +53,7 @@ public class YouTubeParser {
             String videoCount = element.get(0).text();
             videoCount = videoCount.replaceAll("[^0-9]", "");
             videoCount = videoCount.replaceAll(" ", "");
-            log.debug("Got playlist video count: " + videoCount);
+            LOG.debug("Got playlist video count: " + videoCount);
             return videoCount;
         }
         return "";
@@ -65,7 +65,7 @@ public class YouTubeParser {
     public String getThumbnailLink() {
         if (document != null) {
             Elements element = document.select("[class*=\"-header\"] > img");
-            log.debug("Got playlist thumbnail: " + element.get(1).absUrl("src"));
+            LOG.debug("Got playlist thumbnail: " + element.get(1).absUrl("src"));
             return element.get(1).absUrl("src");
         }
         return "";

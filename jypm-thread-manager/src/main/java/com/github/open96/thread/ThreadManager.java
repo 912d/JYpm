@@ -15,7 +15,7 @@ public class ThreadManager {
     //This object is a singleton thus storing instance of it is needed
     private static ThreadManager singletonInstance;
     //Initialize log4j logger for later use in this class
-    private static Logger log = LogManager.getLogger(ThreadManager.class.getName());
+    private static final Logger LOG = LogManager.getLogger(ThreadManager.class.getName());
 
     private static boolean executionPermission = false;
     private Map<TASK_TYPE, ExecutorService> executorServiceMap;
@@ -32,7 +32,7 @@ public class ThreadManager {
      */
     public static ThreadManager getInstance() {
         if (singletonInstance == null) {
-            log.debug("Instance is null, initializing...");
+            LOG.debug("Instance is null, initializing...");
             singletonInstance = new ThreadManager();
         }
         return singletonInstance;
@@ -49,7 +49,7 @@ public class ThreadManager {
      * Initialize subcomponents on first instance creation.
      */
     private void init() {
-        log.trace("Initializing ThreadManager");
+        LOG.trace("Initializing ThreadManager");
         //Allow thread execution
         executionPermission = true;
         //Initialize HashMap and populate it
@@ -66,7 +66,7 @@ public class ThreadManager {
                     executorServiceMap.put(taskType, Executors.newSingleThreadExecutor());
             }
         }
-        log.debug("ThreadManager has been successfully initialized.");
+        LOG.debug("ThreadManager has been successfully initialized.");
     }
 
     /**
