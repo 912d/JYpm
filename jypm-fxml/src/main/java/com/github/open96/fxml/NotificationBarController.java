@@ -31,7 +31,7 @@ import java.util.concurrent.RejectedExecutionException;
 public class NotificationBarController implements Initializable {
 
     //Initialize log4j logger for later use in this class
-    private static Logger log = LogManager.getLogger(NotificationBarController.class.getName());
+    private static final Logger LOG = LogManager.getLogger(NotificationBarController.class.getName());
     //Launcher icon
     private static final Image LAUNCHER_ICON = new Image("/icon/launcher-128-128.png");
 
@@ -83,7 +83,7 @@ public class NotificationBarController implements Initializable {
             //Finally, show the window to user.
             subStage.setScene(scene);
         } catch (IOException e) {
-            log.error("Some .fxml files are corrupt or could not be loaded", e);
+            LOG.error("Some .fxml files are corrupt or could not be loaded", e);
         }
 
         subStage.show();
@@ -117,7 +117,7 @@ public class NotificationBarController implements Initializable {
             //Finally, show the window to user.
             subStage.setScene(scene);
         } catch (IOException e) {
-            log.error("Some .fxml files are corrupt or could not be loaded", e);
+            LOG.error("Some .fxml files are corrupt or could not be loaded", e);
         }
 
         subStage.show();
@@ -164,7 +164,7 @@ public class NotificationBarController implements Initializable {
             //Finally, show the window to user.
             subStage.setScene(scene);
         } catch (IOException e) {
-            log.error("Some .fxml files are corrupt or could not be loaded", e);
+            LOG.error("Some .fxml files are corrupt or could not be loaded", e);
         }
 
         subStage.show();
@@ -229,7 +229,7 @@ public class NotificationBarController implements Initializable {
                         } catch (RejectedExecutionException e) {
                             break;
                         } catch (InterruptedException e) {
-                            log.error("Thread has been interrupted", e);
+                            LOG.error("Thread has been interrupted", e);
                         }
                     }
                 }), TASK_TYPE.UI);

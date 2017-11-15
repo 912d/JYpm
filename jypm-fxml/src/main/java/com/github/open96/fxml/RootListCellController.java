@@ -33,7 +33,7 @@ import java.io.IOException;
  */
 public class RootListCellController extends ListCell<Playlist> {
 
-    private static Logger log = LogManager.getLogger(RootListCellController.class.getName());
+    private static final Logger LOG = LogManager.getLogger(RootListCellController.class.getName());
 
     //Load elements from fxml file that have id and cast them to objects of their respective types
 
@@ -73,11 +73,11 @@ public class RootListCellController extends ListCell<Playlist> {
                 try {
                     fxmlLoader.load();
                 } catch (IOException e) {
-                    log.error("Could not find .fxml file for RootListCellController. Make sure your project/application isn't corrupted", e);
+                    LOG.error("Could not find .fxml file for RootListCellController. Make sure your project/application isn't corrupted", e);
                 }
 
             }
-            log.debug("Loading playlist " + playlist.getPlaylistName());
+            LOG.debug("Loading playlist " + playlist.getPlaylistName());
 
             //Now it's time to load values into their respective fields
             playlistNameLabel.setText(playlist.getPlaylistName());
@@ -144,7 +144,7 @@ public class RootListCellController extends ListCell<Playlist> {
                                 try {
                                     Thread.sleep(1000);
                                 } catch (InterruptedException e) {
-                                    log.error("Thread has been interrupted", e);
+                                    LOG.error("Thread has been interrupted", e);
                                 }
                             } catch (NullPointerException e) {
                                 //For same reason as cheat on top of this method - we have to catch NullPointerException
@@ -224,7 +224,7 @@ public class RootListCellController extends ListCell<Playlist> {
                     subStage.setAlwaysOnTop(true);
                     subStage.requestFocus();
                 } catch (IOException e) {
-                    log.error(e);
+                    LOG.error(e);
                 }
             });
 
@@ -243,7 +243,7 @@ public class RootListCellController extends ListCell<Playlist> {
                                     .getInstance()
                                     .getFileManagerCommand() + " .", null, new File(playlist.getPlaylistLocation()));
                         } catch (IOException e) {
-                            log.error("Invalid file manager, check your settings", e);
+                            LOG.error("Invalid file manager, check your settings", e);
                         }
                     }), TASK_TYPE.OTHER));
 

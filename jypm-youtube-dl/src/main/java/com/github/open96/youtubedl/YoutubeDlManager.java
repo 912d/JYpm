@@ -28,7 +28,7 @@ public class YoutubeDlManager {
     //This object is a singleton thus storing instance of it is needed
     private static YoutubeDlManager singletonInstance;
     //Initialize log4j logger for later use in this class
-    private static Logger log = LogManager.getLogger(YoutubeDlManager.class.getName());
+    private static final Logger LOG = LogManager.getLogger(YoutubeDlManager.class.getName());
     //Field to store ready for querying retrofit client
     private GitHubApiEndpointInterface apiService;
     //Field to store online version of youtube-dl
@@ -52,7 +52,7 @@ public class YoutubeDlManager {
      */
     public static YoutubeDlManager getInstance() {
         if (singletonInstance == null) {
-            log.debug("Instance is null, initializing...");
+            LOG.debug("Instance is null, initializing...");
             singletonInstance = new YoutubeDlManager();
         }
         return singletonInstance;
@@ -62,14 +62,14 @@ public class YoutubeDlManager {
      * Initialize subcomponents on first instance creation.
      */
     private void init() {
-        log.trace("Initializing YoutubeDlManager");
+        LOG.trace("Initializing YoutubeDlManager");
 
         executableState = EXECUTABLE_STATE.NOT_READY;
         Retrofit retrofit = GitHubApiClient.getInstance().getClient();
         apiService = retrofit.create(GitHubApiEndpointInterface.class);
         downloadYoutubeDl();
 
-        log.debug("YoutubeDlManager has been successfully initialized.");
+        LOG.debug("YoutubeDlManager has been successfully initialized.");
     }
 
     /**
@@ -80,7 +80,7 @@ public class YoutubeDlManager {
         Map<OS_TYPE, Asset> assets = new HashMap<>();
         //Now parse data to object that contains only needed data
         if (releaseJSON != null) {
-            log.debug("Parsing GitHub api response");
+            LOG.debug("Parsing GitHub api response");
             //From all those assets we get we only need  windows and linux executables
             for (Asset asset : releaseJSON.getAssets()) {
                 if (asset.getName().equals("youtube-dl")) {
@@ -91,10 +91,10 @@ public class YoutubeDlManager {
                 }
             }
         } else {
-            log.error("API object is empty!", new IllegalStateException("API object is empty!"));
+            LOG.error("API object is empty!", new IllegalStateException("API object is empty!"));
         }
         if (assets.size() != 2) {
-            log.fatal(new IllegalStateException("Unexpected number of assets!"));
+            LOG.fatal(new IllegalStateException("Unexpected number of assets!"));
         }
         return assets;
     }
@@ -107,7 +107,7 @@ public class YoutubeDlManager {
         if (releaseJSON != null) {
             return releaseJSON.getTagName();
         } else {
-            log.error("API object is empty!", new IllegalStateException("API object is empty!"));
+            LOG.error("API object is empty!", new IllegalStateException("API object is empty!"));
         }
         return null;
     }
@@ -123,7 +123,7 @@ public class YoutubeDlManager {
             onlineVersion = getOnlineVersion(releaseJSON);
             assets = getExecutablesAssets(releaseJSON);
         } catch (IOException e) {
-            log.error("There was an IO error during GitHub api call", e);
+            LOG.error("There was an IO error during GitHub api call", e);
         }
     }
 
@@ -154,7 +154,7 @@ public class YoutubeDlManager {
                 try {
                     Thread.sleep(250);
                 } catch (InterruptedException e) {
-                    log.error("Thread sleep has been interrupted", e);
+                    LOG.error("Thread sleep has been interrupted", e);
                 }
             }
 
@@ -164,7 +164,7 @@ public class YoutubeDlManager {
                     .getYoutubeDlVersion().equals(onlineVersion));
             boolean doesFileIntegritySeemOk = !new File(YOUTUBE_DL_DIRECTORY).exists() || (new File(YOUTUBE_DL_DIRECTORY).exists() && new File(YOUTUBE_DL_DIRECTORY).listFiles().length != 1);
             if ((isVersionOutOfDate || doesFileIntegritySeemOk) && ThreadManager.getExecutionPermission()) {
-                log.debug("New youtube-dl version available, downloading...");
+                LOG.debug("New youtube-dl version available, downloading...");
                 try {
                     //Create URL based on OS type
                     URL downloadLink;
@@ -203,11 +203,11 @@ public class YoutubeDlManager {
                     SettingsManager
                             .getInstance()
                             .setYoutubeDlExecutable(new File(pathToExecutable).getAbsolutePath());
-                    log.debug("Download finished");
+                    LOG.debug("Download finished");
                 } catch (MalformedURLException e) {
-                    log.error("Invalid GitHub url", e);
+                    LOG.error("Invalid GitHub url", e);
                 } catch (IOException e) {
-                    log.error("Error during opening stream", e);
+                    LOG.error("Error during opening stream", e);
                 }
             }
             executableState = EXECUTABLE_STATE.READY;

@@ -29,7 +29,7 @@ import java.net.URISyntaxException;
 public class UpdateWindow {
 
     //Initialize log4j logger for later use in this class
-    private static Logger log = LogManager.getLogger(UpdateWindow.class.getName());
+    private static final Logger LOG = LogManager.getLogger(UpdateWindow.class.getName());
 
     /**
      * Runs Updater class from jypm-updater and based on it's response it shows user that update is available.
@@ -61,9 +61,9 @@ public class UpdateWindow {
                             }
 
                         } catch (IOException | URISyntaxException e) {
-                            log.error(e);
+                            LOG.error(e);
                         } catch (UnsupportedOperationException e) {
-                            log.error("Browsing is not supported on this system");
+                            LOG.error("Browsing is not supported on this system");
                         }
                     }
                 };
@@ -84,7 +84,7 @@ public class UpdateWindow {
                             subStage.setAlwaysOnTop(true);
                             subStage.requestFocus();
                         } catch (IOException e) {
-                            log.error("Failed to load dialogWindow.fxml", e);
+                            LOG.error("Failed to load dialogWindow.fxml", e);
                         }
                     });
                 }), TASK_TYPE.UI);

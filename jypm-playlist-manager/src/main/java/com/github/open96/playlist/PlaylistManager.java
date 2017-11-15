@@ -34,7 +34,7 @@ public class PlaylistManager {
     //This object is a singleton thus storing instance of it is needed
     private static PlaylistManager singletonInstance;
     //Initialize log4j logger for later use in this class
-    private static Logger log = LogManager.getLogger(PlaylistManager.class.getName());
+    private static final Logger LOG = LogManager.getLogger(PlaylistManager.class.getName());
     //Variable that points to array responsible for displaying playlists in UI Thread
     private static ObservableList<Playlist> observablePlaylists;
     //Variable where all managed playlists are stored
@@ -52,7 +52,7 @@ public class PlaylistManager {
      */
     public static PlaylistManager getInstance() {
         if (singletonInstance == null) {
-            log.debug("Instance is null, initializing...");
+            LOG.debug("Instance is null, initializing...");
             singletonInstance = new PlaylistManager();
         }
         return singletonInstance;
@@ -64,7 +64,7 @@ public class PlaylistManager {
      * and possibly cause desync between what is stored in RAM and what is stored in JSON.
      */
     private void init() {
-        log.trace("Initializing PlaylistManager");
+        LOG.trace("Initializing PlaylistManager");
         playlists = new ArrayList<>();
         observablePlaylists = FXCollections.observableArrayList();
         try (FileReader fileReader = new FileReader(JSON_FILE_NAME)) {
@@ -79,11 +79,11 @@ public class PlaylistManager {
                 observablePlaylists.addAll(playlists);
             }
         } catch (FileNotFoundException e) {
-            log.info(JSON_FILE_NAME + " has not been found, assuming it's a first run of application...");
+            LOG.info(JSON_FILE_NAME + " has not been found, assuming it's a first run of application...");
         } catch (IOException e) {
-            log.error("Unable to initialize FileReader...", e);
+            LOG.error("Unable to initialize FileReader...", e);
         }
-        log.debug("PlaylistManager has been successfully initialized.");
+        LOG.debug("PlaylistManager has been successfully initialized.");
     }
 
     /**
@@ -96,7 +96,7 @@ public class PlaylistManager {
             fileWriter.write(gson.toJson(playlists));
             fileWriter.flush();
         } catch (IOException e) {
-            log.error("Could not save playlist to " + JSON_FILE_NAME, e);
+            LOG.error("Could not save playlist to " + JSON_FILE_NAME, e);
         }
     }
 
@@ -109,12 +109,12 @@ public class PlaylistManager {
     public boolean add(Playlist playlist) {
         if (playlists.stream()
                 .anyMatch(playlist1 -> playlist1.getPlaylistLink().equals(playlist.getPlaylistLink()))) {
-            log.warn("Adding two playlists with the same link is unsupported.");
+            LOG.warn("Adding two playlists with the same link is unsupported.");
             return false;
         }
         if (playlists.stream()
                 .anyMatch(playlist1 -> playlist1.getPlaylistLocation().equals(playlist.getPlaylistLocation()))) {
-            log.warn("Adding two playlists in the same directory/folder is not permitted.");
+            LOG.warn("Adding two playlists in the same directory/folder is not permitted.");
             return false;
         }
 
@@ -129,7 +129,7 @@ public class PlaylistManager {
                     playlist.setPlaylistName(youTubeParser.getPlaylistName());
                     playlist.setVideoCount(Integer.parseInt(youTubeParser.getVideoCount()));
                     playlist.setPlaylistThumbnailUrl(youTubeParser.getThumbnailLink());
-                    log.trace("Playlist data successfully parsed.");
+                    LOG.trace("Playlist data successfully parsed.");
                     if (ThreadManager.getExecutionPermission() && ConnectionChecker
                             .getInstance()
                             .checkInternetConnection()) {
@@ -158,7 +158,7 @@ public class PlaylistManager {
                             .filter(playlist1 -> playlist1.getPlaylistLink()
                                     .equals(playlist.getPlaylistLink()))
                             .forEach(playlist1 -> {
-                                log.trace("Removing " + playlist1.getPlaylistName());
+                                LOG.trace("Removing " + playlist1.getPlaylistName());
                                 playlists.remove(playlist1);
                                 saveToJson();
                             });
@@ -202,7 +202,7 @@ public class PlaylistManager {
         try {
             return observablePlaylistFuture.get();
         } catch (InterruptedException | ExecutionException e) {
-            log.error("Failed to retrieve observable playlists", e);
+            LOG.error("Failed to retrieve observable playlists", e);
         }
         //In case of failure empty list will be displayed
         return FXCollections.observableArrayList();
@@ -222,7 +222,7 @@ public class PlaylistManager {
         try {
             return playlistFuture.get();
         } catch (InterruptedException | ExecutionException e) {
-            log.error("Failed to retrieve playlists", e);
+            LOG.error("Failed to retrieve playlists", e);
         }
         //In case of failure empty list will be displayed
         return new ArrayList<>();
@@ -246,7 +246,7 @@ public class PlaylistManager {
         } catch (InterruptedException | ExecutionException e) {
             //If stream threw IndexOutOfBoundsException the playlist with specified link has not been found
             if (!(e.getCause() instanceof IndexOutOfBoundsException)) {
-                log.error("Failed to retrieve playlists", e);
+                LOG.error("Failed to retrieve playlists", e);
             }
             return null;
         } catch (RejectedExecutionException e) {

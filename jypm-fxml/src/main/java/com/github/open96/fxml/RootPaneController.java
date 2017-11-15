@@ -16,7 +16,7 @@ import java.util.ResourceBundle;
 public class RootPaneController implements Initializable {
 
     //Initialize log4j logger for later use in this class
-    private static Logger log = LogManager.getLogger(RootPaneController.class.getName());
+    private static final Logger LOG = LogManager.getLogger(RootPaneController.class.getName());
 
     @FXML
     private BorderPane rootPane;
@@ -30,7 +30,7 @@ public class RootPaneController implements Initializable {
             //Display update window if update is available
             new UpdateWindow().runUpdater();
         } catch (IOException e) {
-            log.error("Some .fxml files are corrupt or could not be loaded", e);
+            LOG.error("Some .fxml files are corrupt or could not be loaded", e);
         }
     }
 

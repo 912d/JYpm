@@ -27,7 +27,7 @@ public class AddPlaylistWindowController implements Initializable {
     private File selectedDirectory;
     private boolean isDirectoryChosen = false;
     //Initialize log4j logger for later use in this class
-    private static Logger log = LogManager.getLogger(AddPlaylistWindowController.class.getName());
+    private static final Logger LOG = LogManager.getLogger(AddPlaylistWindowController.class.getName());
     @FXML
     GridPane rootPane;
 
@@ -73,12 +73,12 @@ public class AddPlaylistWindowController implements Initializable {
         try {
             playlistLink = playlistLink.substring(BASE_YOUTUBE_URL.length());
         } catch (StringIndexOutOfBoundsException e) {
-            log.warn("Link is too short to be a valid link", e);
+            LOG.warn("Link is too short to be a valid link", e);
             validation = false;
         }
 
 
-        log.debug("\nUser tried to add a new playlist:" +
+        LOG.debug("\nUser tried to add a new playlist:" +
                 "\nPlaylist link: " + playlistLink +
                 "\nDirectory: " + isDirectoryChosen +
                 "\nValidation: " + validation);

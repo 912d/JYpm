@@ -24,7 +24,7 @@ public class SettingsManager {
     //This object is a singleton thus storing instance of it is needed
     private static SettingsManager singletonInstance;
     //Initialize log4j logger for later use in this class
-    private static Logger log = LogManager.getLogger(SettingsManager.class.getName());
+    private static final Logger LOG = LogManager.getLogger(SettingsManager.class.getName());
     //Pojo object where settings are stored during the runtime
     private Settings settings;
 
@@ -41,7 +41,7 @@ public class SettingsManager {
      */
     public static SettingsManager getInstance() {
         if (singletonInstance == null) {
-            log.debug("Instance is null, initializing...");
+            LOG.debug("Instance is null, initializing...");
             singletonInstance = new SettingsManager();
         }
         return singletonInstance;
@@ -53,7 +53,7 @@ public class SettingsManager {
      * and possibly cause desync between what is stored in RAM and what is stored in JSON.
      */
     private void init() {
-        log.trace("Initializing SettingsManager");
+        LOG.trace("Initializing SettingsManager");
         settings = new Settings();
         //Read data from file, if it exists.
         try (FileReader fileReader = new FileReader(JSON_FILE_NAME)) {
@@ -66,14 +66,14 @@ public class SettingsManager {
                 settings = loadedSettings;
             }
         } catch (FileNotFoundException e) {
-            log.info(JSON_FILE_NAME + " has not been found, assuming it's a first run of application...");
+            LOG.info(JSON_FILE_NAME + " has not been found, assuming it's a first run of application...");
         } catch (IOException e) {
-            log.error("Unable to initialize FileReader...", e);
+            LOG.error("Unable to initialize FileReader...", e);
         }
         determineHostOS();
         setDefaultFileManagerIfNotSet();
         saveToJson();
-        log.debug("SettingsManager has been successfully initialized");
+        LOG.debug("SettingsManager has been successfully initialized");
     }
 
     /**
@@ -86,7 +86,7 @@ public class SettingsManager {
             fileWriter.write(gson.toJson(settings));
             fileWriter.flush();
         } catch (IOException e) {
-            log.error("Could not save settings to " + JSON_FILE_NAME, e);
+            LOG.error("Could not save settings to " + JSON_FILE_NAME, e);
         }
     }
 
@@ -103,7 +103,7 @@ public class SettingsManager {
         try {
             return settingsFuture.get();
         } catch (InterruptedException | ExecutionException e) {
-            log.error("Failed to retrieve setting", e);
+            LOG.error("Failed to retrieve setting", e);
         }
         return null;
     }
@@ -147,7 +147,7 @@ public class SettingsManager {
         try {
             return settingsFuture.get();
         } catch (InterruptedException | ExecutionException e) {
-            log.error("Failed to retrieve setting", e);
+            LOG.error("Failed to retrieve setting", e);
         }
         return null;
     }
@@ -182,7 +182,7 @@ public class SettingsManager {
         try {
             return settingsFuture.get();
         } catch (InterruptedException | ExecutionException e) {
-            log.error("Failed to retrieve setting", e);
+            LOG.error("Failed to retrieve setting", e);
         }
         return null;
     }
@@ -218,7 +218,7 @@ public class SettingsManager {
         try {
             return settingsFuture.get();
         } catch (InterruptedException | ExecutionException e) {
-            log.error("Failed to retrieve setting", e);
+            LOG.error("Failed to retrieve setting", e);
         }
         return null;
     }
@@ -255,7 +255,7 @@ public class SettingsManager {
         try {
             return settingsFuture.get();
         } catch (InterruptedException | ExecutionException e) {
-            log.error("Failed to retrieve setting", e);
+            LOG.error("Failed to retrieve setting", e);
         }
         return null;
     }
@@ -288,7 +288,7 @@ public class SettingsManager {
             settings.setOsType(OS_TYPE.MAC_OS);
         } else {
             settings.setOsType(OS_TYPE.UNKNOWN);
-            log.warn("Unsupported OS, you are on your own...");
+            LOG.warn("Unsupported OS, you are on your own...");
         }
     }
 

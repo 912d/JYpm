@@ -18,7 +18,7 @@ public class DetailsWindowController implements Initializable {
 
     public static boolean threadKiller = false;
     //Initialize log4j logger for later use in this class
-    private static Logger log = LogManager.getLogger(DetailsWindowController.class.getName());
+    private static final Logger LOG = LogManager.getLogger(DetailsWindowController.class.getName());
     @FXML
     ScrollPane scrollPane;
 
@@ -49,7 +49,7 @@ public class DetailsWindowController implements Initializable {
                                 break;
                             }
                         } catch (InterruptedException | NullPointerException | ArrayIndexOutOfBoundsException | NegativeArraySizeException e) {
-                            log.error("There was a problem during initialization", e);
+                            LOG.error("There was a problem during initialization", e);
                         }
                     }
                 }), TASK_TYPE.UI);

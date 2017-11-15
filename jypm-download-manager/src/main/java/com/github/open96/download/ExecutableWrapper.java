@@ -18,7 +18,7 @@ public class ExecutableWrapper {
     //This object is a singleton thus storing instance of it is needed
     private static ExecutableWrapper singletonInstance;
     //Initialize log4j logger for later use in this class
-    private static Logger log = LogManager.getLogger(ExecutableWrapper.class.getName());
+    private static final Logger LOG = LogManager.getLogger(ExecutableWrapper.class.getName());
     //Store SettingsManager for easier usage
     private SettingsManager settingsManager;
     //Create variable for runtime where commands will be issued
@@ -35,7 +35,7 @@ public class ExecutableWrapper {
      */
     public static ExecutableWrapper getInstance() {
         if (singletonInstance == null) {
-            log.debug("Instance is null, initializing...");
+            LOG.debug("Instance is null, initializing...");
             singletonInstance = new ExecutableWrapper();
         }
         return singletonInstance;
@@ -45,12 +45,12 @@ public class ExecutableWrapper {
      * Initialize subcomponents on first instance creation
      */
     private void init() {
-        log.trace("Initializing ExecutableWrapper");
+        LOG.trace("Initializing ExecutableWrapper");
 
         settingsManager = SettingsManager.getInstance();
         runtime = Runtime.getRuntime();
 
-        log.debug("ExecutableWrapper has been successfully initialized.");
+        LOG.debug("ExecutableWrapper has been successfully initialized.");
     }
 
     /**
@@ -64,11 +64,11 @@ public class ExecutableWrapper {
             Process process = runtime.exec(command);
             return getProcessOutput(process);
         } catch (IOException e) {
-            log.error("There was an error when querying executable for version", e);
+            LOG.error("There was an error when querying executable for version", e);
             triggerExecutableRedownload();
             return "";
         } catch (InterruptedException e) {
-            log.error(e);
+            LOG.error(e);
             return "";
         }
     }
@@ -115,7 +115,7 @@ public class ExecutableWrapper {
     }
 
     void triggerExecutableRedownload() {
-        log.info("Executable redownload triggered");
+        LOG.info("Executable redownload triggered");
         ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
             SettingsManager.getInstance().setYoutubeDlVersion("");
             while (!SettingsManager.getInstance().getYoutubeDlVersion().equals("")) {
