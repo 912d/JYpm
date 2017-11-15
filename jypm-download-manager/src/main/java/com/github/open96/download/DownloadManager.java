@@ -95,6 +95,11 @@ public class DownloadManager {
                         try (InputStream inputStream = process.getInputStream()) {
                             parseOutputWhileProcessIsAlive(playlist, process, inputStream);
                         }
+                        //Mark playlist as downloaded
+                        PlaylistManager
+                                .getInstance()
+                                .updatePlaylistStatus(playlist, QUEUE_STATUS.DOWNLOADED);
+                        detailsString.append("\n").append("-----------Task completed-----------").append("\n");
                     } catch (InterruptedException | IOException | NullPointerException e) {
                         log.warn("Missing executable, start the download again after executable is finished downloading.");
                         ExecutableWrapper.getInstance().triggerExecutableRedownload();
