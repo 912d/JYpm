@@ -162,41 +162,54 @@ public class RootListCellController extends ListCell<Playlist> {
                     String message = "Do you want to delete all files linked to playlist or just a playlist entry?";
                     String positiveButtonText = "Delete all files";
                     String negativeButtonText = "Only delete entry in JYpm";
-                    EventHandler<ActionEvent> positiveButtonEventHandler = event -> {
-                        PlaylistManager
-                                .getInstance()
-                                .getPlaylists().stream()
-                                .filter(playlist1 -> playlist1.getPlaylistLink().equals(playlist.getPlaylistLink()))
-                                .forEach(playlist1 -> {
-                                    PlaylistManager
-                                            .getInstance()
-                                            .getObservablePlaylists()
-                                            .remove(playlist1);
-                                    PlaylistManager
-                                            .getInstance()
-                                            .remove(playlist1, true);
-                                });
-                        subStage.close();
-                    };
+                    EventHandler<ActionEvent> positiveButtonEventHandler = event ->
+                            ThreadManager
+                                    .getInstance()
+                                    .sendVoidTask(new Thread(() -> {
+                                        PlaylistManager
+                                                .getInstance()
+                                                .getPlaylists().stream()
+                                                .filter(playlist1 -> playlist1.getPlaylistLink().equals(playlist.getPlaylistLink()))
+                                                .forEach(playlist1 -> {
+                                                    Platform.runLater(() ->
+                                                            PlaylistManager
+                                                                    .getInstance()
+                                                                    .getObservablePlaylists()
+                                                                    .remove(playlist1));
+                                                    ThreadManager
+                                                            .getInstance()
+                                                            .sendVoidTask(new Thread(() ->
+                                                                    PlaylistManager
+                                                                            .getInstance()
+                                                                            .remove(playlist1, true)), TASK_TYPE.PLAYLIST);
+                                                });
+                                        Platform.runLater(() -> subStage.close());
+                                    }), TASK_TYPE.UI);
 
 
-                    EventHandler<ActionEvent> negativeButtonEventHandler = event -> {
-                        PlaylistManager
-                                .getInstance()
-                                .getPlaylists()
-                                .stream()
-                                .filter(playlist1 -> playlist1.getPlaylistLink().equals(playlist.getPlaylistLink()))
-                                .forEach(playlist1 -> {
-                                    PlaylistManager
-                                            .getInstance()
-                                            .getObservablePlaylists()
-                                            .remove(playlist1);
-                                    PlaylistManager
-                                            .getInstance()
-                                            .remove(playlist1, false);
-                                });
-                        subStage.close();
-                    };
+                    EventHandler<ActionEvent> negativeButtonEventHandler = event ->
+                            ThreadManager
+                                    .getInstance()
+                                    .sendVoidTask(new Thread(() -> {
+                                        PlaylistManager
+                                                .getInstance()
+                                                .getPlaylists().stream()
+                                                .filter(playlist1 -> playlist1.getPlaylistLink().equals(playlist.getPlaylistLink()))
+                                                .forEach(playlist1 -> {
+                                                    Platform.runLater(() ->
+                                                            PlaylistManager
+                                                                    .getInstance()
+                                                                    .getObservablePlaylists()
+                                                                    .remove(playlist1));
+                                                    ThreadManager
+                                                            .getInstance()
+                                                            .sendVoidTask(new Thread(() ->
+                                                                    PlaylistManager
+                                                                            .getInstance()
+                                                                            .remove(playlist1, false)), TASK_TYPE.PLAYLIST);
+                                                });
+                                        Platform.runLater(() -> subStage.close());
+                                    }), TASK_TYPE.UI);
 
 
                     controller.setData(message, positiveButtonText, negativeButtonText, positiveButtonEventHandler, negativeButtonEventHandler);
