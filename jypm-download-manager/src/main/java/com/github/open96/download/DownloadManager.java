@@ -225,19 +225,6 @@ public class DownloadManager {
                                     }
                                 }
                             }
-                            //Wait for TrayIcon initialization
-                            int trayTimeout = 0;
-                            while (!TrayIcon.isTrayWorking()) {
-                                try {
-                                    Thread.sleep(50);
-                                    trayTimeout += 50;
-                                    if (trayTimeout > 500) {
-                                        break;
-                                    }
-                                } catch (InterruptedException e) {
-                                    log.error("TrayIcon has timed out, you may encounter some strange and scary things...");
-                                }
-                            }
                             //Send notification
                             if (resumedPlaylists.size() > 0 && TrayIcon.isTrayWorking()) {
                                 TrayIcon

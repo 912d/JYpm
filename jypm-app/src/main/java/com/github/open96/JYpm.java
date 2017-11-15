@@ -3,6 +3,7 @@ package com.github.open96;
 import com.github.open96.download.DownloadManager;
 import com.github.open96.playlist.PlaylistManager;
 import com.github.open96.settings.SettingsManager;
+import com.github.open96.thread.TASK_TYPE;
 import com.github.open96.thread.ThreadManager;
 import com.github.open96.tray.TrayIcon;
 import com.github.open96.updater.Updater;
@@ -40,7 +41,6 @@ public class JYpm extends Application {
         ThreadManager.getInstance();
         SettingsManager.getInstance();
         PlaylistManager.getInstance();
-        DownloadManager.getInstance();
     }
 
     /**
@@ -81,6 +81,11 @@ public class JYpm extends Application {
         } catch (IllegalStateException e) {
             log.warn("You have probably exceeded your GitHub API call limit. You won't be able to check for updates in 1 hour. Also, don't abuse GitHub API if you can :)");
         }
+
+        //After UI is up, initialize DownloadManager on separate thread and check if there are any tasks pending from last runtime
+        ThreadManager
+                .getInstance()
+                .sendVoidTask(new Thread(DownloadManager::getInstance), TASK_TYPE.OTHER);
     }
 
     /**
