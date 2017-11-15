@@ -188,11 +188,13 @@ public class YoutubeDlManager {
                     fileOutputStream.getChannel().transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
                     fileOutputStream.close();
                     readableByteChannel.close();
+                    LOG.debug("youtube-dl " + onlineVersion + " has been downloaded");
 
                     //Make file executable
                     if (SettingsManager
                             .getInstance()
                             .getOS() != OS_TYPE.WINDOWS) {
+                        LOG.debug("Making youtube-dl executable");
                         String[] command = new String[]{"chmod", "+x", pathToExecutable};
                         Runtime.getRuntime().exec(command);
                     }
