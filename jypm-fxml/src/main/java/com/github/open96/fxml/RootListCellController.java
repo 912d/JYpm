@@ -88,11 +88,13 @@ public class RootListCellController extends ListCell<Playlist> {
             videoCountLabel.setText(playlist.getVideoCount() + " videos");
 
             //Load thumbnail asynchronously from main JavaFX thread
-            thumbnailImageView.setImage(null);
             ThreadManager
                     .getInstance()
                     .sendVoidTask(new Thread(() -> {
-                        if (playlistNameLabel.getText().equals(playlist.getPlaylistName())
+                        if (thumbnailImageView.getImage() == null) {
+                            Image thumbnailImage = new Image(playlist.getPlaylistThumbnailUrl());
+                            Platform.runLater(() -> thumbnailImageView.setImage(thumbnailImage));
+                        } else if (!thumbnailImageView.getImage().getUrl().equals(playlist.getPlaylistThumbnailUrl())
                                 && ThreadManager.getExecutionPermission()) {
                             Image thumbnailImage = new Image(playlist.getPlaylistThumbnailUrl());
                             Platform.runLater(() -> thumbnailImageView.setImage(thumbnailImage));
