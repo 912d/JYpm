@@ -58,8 +58,8 @@ public class RootListViewController implements Initializable {
                         });
                         lastKnownObservableListSize = playlistObservableList.size();
                     }
+                    Thread.sleep(500);
                 }
-                Thread.sleep(500);
             } catch (InterruptedException e) {
                 LOG.error("Thread sleep has been interrupted");
             }
