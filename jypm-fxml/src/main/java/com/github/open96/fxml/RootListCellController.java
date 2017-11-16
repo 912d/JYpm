@@ -27,6 +27,8 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Class that represents single playlist entry in ListView that is displayed in main window of application.
@@ -57,6 +59,8 @@ public class RootListCellController extends ListCell<Playlist> {
     private ImageView thumbnailImageView;
     //In this FXMLLoader our listCell layout will be stored
     private FXMLLoader fxmlLoader;
+    //Always allow only one instance of status label updating thread per playlist
+    private static Map<String, Thread> threadHashMap = new HashMap<>();
 
     @Override
     protected void updateItem(Playlist playlist, boolean empty) {
@@ -95,64 +99,7 @@ public class RootListCellController extends ListCell<Playlist> {
                         }
                     }), TASK_TYPE.UI);
 
-            ThreadManager
-                    .getInstance()
-                    .sendVoidTask(new Thread(() -> {
-                        QUEUE_STATUS lastKnownState = QUEUE_STATUS.UNKNOWN;
-                        while (ThreadManager.getExecutionPermission()) {
-                            //Dirty cheat because JavaFX changes references to objects on listview update, so it is obligatory to make sure we are still operating on same object.
-                            if (!playlistNameLabel.getText().equals(playlist.getPlaylistName())) {
-                                break;
-                            }
-                            //Based on status of playlist show appropriate label
-                            try {
-                                switch (PlaylistManager
-                                        .getInstance()
-                                        .getPlaylistByLink(playlist.getPlaylistLink()).getStatus()) {
-                                    case QUEUED:
-                                        if (lastKnownState != QUEUE_STATUS.QUEUED) {
-                                            Platform.runLater(() -> currentStatusLabel.setText("In queue"));
-                                            lastKnownState = QUEUE_STATUS.QUEUED;
-                                        }
-                                        Platform.runLater(() -> updateItem.setDisable(true));
-                                        break;
-                                    case DOWNLOADING:
-                                        Integer currentCount = DownloadManager
-                                                .getInstance()
-                                                .getDownloadProgress();
-                                        if (currentCount != null) {
-                                            Platform.runLater(() -> currentStatusLabel.setText("Downloading (" + currentCount + "/" + playlist.getVideoCount() + ")"));
-                                        }
-                                        lastKnownState = QUEUE_STATUS.DOWNLOADING;
-                                        Platform.runLater(() -> updateItem.setDisable(true));
-                                        break;
-                                    case DOWNLOADED:
-                                        if (lastKnownState != QUEUE_STATUS.DOWNLOADED) {
-                                            Platform.runLater(() -> currentStatusLabel.setText("Downloaded"));
-                                            lastKnownState = QUEUE_STATUS.DOWNLOADED;
-                                        }
-                                        Platform.runLater(() -> updateItem.setDisable(false));
-                                        break;
-                                    case FAILED:
-                                        if (lastKnownState != QUEUE_STATUS.FAILED) {
-                                            Platform.runLater(() -> currentStatusLabel.setText("Error during downloading"));
-                                            lastKnownState = QUEUE_STATUS.FAILED;
-                                        }
-                                        Platform.runLater(() -> updateItem.setDisable(false));
-                                        break;
-                                }
-                                try {
-                                    Thread.sleep(250);
-                                } catch (InterruptedException e) {
-                                    LOG.error("Thread has been interrupted", e);
-                                }
-                            } catch (NullPointerException e) {
-                                //For same reason as cheat on top of this method - we have to catch NullPointerException
-                                //in case when user deletes a list and terminate that thread
-                                break;
-                            }
-                        }
-                    }), TASK_TYPE.UI);
+            createStatusUpdaterThread(playlist);
 
             //Set button behaviours
             deleteItem.setOnAction(actionEvent -> {
@@ -250,5 +197,70 @@ public class RootListCellController extends ListCell<Playlist> {
             setGraphic(rootHBox);
         }
 
+    }
+
+    private void createStatusUpdaterThread(Playlist playlist) {
+        ThreadManager
+                .getInstance()
+                .sendVoidTask(new Thread(() -> {
+                    threadHashMap.put(playlist.getPlaylistLink(), Thread.currentThread());
+                    QUEUE_STATUS lastKnownState = QUEUE_STATUS.UNKNOWN;
+                    while (ThreadManager.getExecutionPermission()) {
+                        //Dirty cheat because JavaFX changes references to objects on listview update, so it is obligatory to make sure we are still operating on same object.
+                        if (!playlistNameLabel.getText().equals(playlist.getPlaylistName())) {
+                            break;
+                        }
+                        if (threadHashMap.get(playlist.getPlaylistLink()) != Thread.currentThread()) {
+                            break;
+                        }
+                        //Based on status of playlist show appropriate label
+                        try {
+                            switch (PlaylistManager
+                                    .getInstance()
+                                    .getPlaylistByLink(playlist.getPlaylistLink()).getStatus()) {
+                                case QUEUED:
+                                    if (lastKnownState != QUEUE_STATUS.QUEUED) {
+                                        Platform.runLater(() -> currentStatusLabel.setText("In queue"));
+                                        lastKnownState = QUEUE_STATUS.QUEUED;
+                                    }
+                                    Platform.runLater(() -> updateItem.setDisable(true));
+                                    break;
+                                case DOWNLOADING:
+                                    Integer currentCount = DownloadManager
+                                            .getInstance()
+                                            .getDownloadProgress();
+                                    if (currentCount != null) {
+                                        Platform.runLater(() -> currentStatusLabel.setText("Downloading (" + currentCount + "/" + playlist.getVideoCount() + ")"));
+                                    }
+                                    lastKnownState = QUEUE_STATUS.DOWNLOADING;
+                                    Platform.runLater(() -> updateItem.setDisable(true));
+                                    break;
+                                case DOWNLOADED:
+                                    if (lastKnownState != QUEUE_STATUS.DOWNLOADED) {
+                                        Platform.runLater(() -> currentStatusLabel.setText("Downloaded"));
+                                        lastKnownState = QUEUE_STATUS.DOWNLOADED;
+                                    }
+                                    Platform.runLater(() -> updateItem.setDisable(false));
+                                    break;
+                                case FAILED:
+                                    if (lastKnownState != QUEUE_STATUS.FAILED) {
+                                        Platform.runLater(() -> currentStatusLabel.setText("Error during downloading"));
+                                        lastKnownState = QUEUE_STATUS.FAILED;
+                                    }
+                                    Platform.runLater(() -> updateItem.setDisable(false));
+                                    break;
+                            }
+                            try {
+                                Thread.sleep(250);
+                            } catch (InterruptedException e) {
+                                LOG.error("Thread has been interrupted", e);
+                            }
+                        } catch (NullPointerException e) {
+                            //For same reason as cheat on top of this method - we have to catch NullPointerException
+                            //in case when user deletes a list and terminate that thread
+                            break;
+                        }
+                    }
+                }), TASK_TYPE.UI);
     }
 }
