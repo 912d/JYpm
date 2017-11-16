@@ -4,7 +4,7 @@ This Java application lets you download YouTube playlists to your local storage 
 
 Works on Windows and Linux. On MacOS some features are disabled, if you have access to MacOS and want to contribute - you are more than welcome.
 
-![Example screenshot](https://i.imgur.com/xkJYMmB.png)
+![Example screenshot](https://i.imgur.com/dNd7WFz.png)
 
 # Requirements
 
@@ -54,7 +54,7 @@ Instructions below are for linux system. For other systems process is probably s
 
 If you want to contribute it might be useful.
 
-![Dependency graph](https://i.imgur.com/9YKIlBj.png)
+![Dependency graph](https://i.imgur.com/F9MXNOC.png)
 
 # Licensing
 
