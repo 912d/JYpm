@@ -84,6 +84,11 @@ public class RootListCellController extends ListCell<Playlist> {
             }
             LOG.debug("Loading playlist " + playlist.getPlaylistName());
 
+            //If playlist displayed by this object has changed, it's thread pool should be restarted back to 0
+            if (playlistNameLabel.getText().equals(playlist.getPlaylistName())) {
+                statusThreadCount = 0;
+            }
+
             //Now it's time to load values into their respective fields
             playlistNameLabel.setText(playlist.getPlaylistName());
             videoCountLabel.setText(playlist.getVideoCount() + " videos");
