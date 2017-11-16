@@ -210,21 +210,20 @@ public class DownloadManager {
                             ArrayList<Playlist> playlists = PlaylistManager.getInstance().getPlaylists();
                             Queue<Playlist> resumedPlaylists = new LinkedBlockingQueue<>();
                             //Redownload playlist if its download was interrupted during last shutdown
-                            for (Playlist p : playlists) {
-                                if (p.getStatus() == QUEUE_STATUS.DOWNLOADING) {
-                                    download(p);
-                                    resumedPlaylists.add(p);
-                                }
-                            }
+                            playlists.stream()
+                                    .filter(playlist -> playlist.getStatus() == QUEUE_STATUS.DOWNLOADING)
+                                    .forEach(playlist -> {
+                                        download(playlist);
+                                        resumedPlaylists.add(playlist);
+                                    });
                             //Resume all queued tasks
-                            for (Playlist p : playlists) {
-                                if (p.getStatus() == QUEUE_STATUS.QUEUED) {
-                                    if (!resumedPlaylists.contains(p)) {
-                                        download(p);
-                                        resumedPlaylists.add(p);
-                                    }
-                                }
-                            }
+                            playlists.stream()
+                                    .filter(playlist -> playlist.getStatus() == QUEUE_STATUS.QUEUED)
+                                    .filter(playlist -> !resumedPlaylists.contains(playlist))
+                                    .forEach(playlist -> {
+                                        download(playlist);
+                                        resumedPlaylists.add(playlist);
+                                    });
                             //Send notification
                             if (resumedPlaylists.size() > 0 && TrayIcon.isTrayWorking()) {
                                 TrayIcon
