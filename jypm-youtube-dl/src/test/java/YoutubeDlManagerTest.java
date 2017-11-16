@@ -9,7 +9,6 @@ import org.junit.Test;
 import java.io.File;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class YoutubeDlManagerTest {
 
@@ -32,7 +31,7 @@ public class YoutubeDlManagerTest {
                 File executable = new File(fileName);
                 //Wait for download to finish
                 int sleepTime = 0;
-                final int threadSleepTimeout = 1000 * 60 * 10;
+                final int threadSleepTimeout = 1000 * 60 * 4;
                 while (YoutubeDlManager.getInstance().getExecutableState() != EXECUTABLE_STATE.READY) {
                     try {
                         Thread.sleep(1000);
