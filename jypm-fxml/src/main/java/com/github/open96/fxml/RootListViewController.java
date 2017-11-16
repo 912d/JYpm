@@ -4,6 +4,7 @@ import com.github.open96.playlist.PlaylistManager;
 import com.github.open96.playlist.pojo.Playlist;
 import com.github.open96.thread.TASK_TYPE;
 import com.github.open96.thread.ThreadManager;
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -51,8 +52,10 @@ public class RootListViewController implements Initializable {
                 int lastKnownObservableListSize = playlistObservableList.size();
                 while (ThreadManager.getExecutionPermission()) {
                     if (playlistObservableList.size() != lastKnownObservableListSize) {
-                        listView.setItems(null);
-                        listView.setItems(playlistObservableList);
+                        Platform.runLater(() -> {
+                            listView.setItems(null);
+                            listView.setItems(playlistObservableList);
+                        });
                         lastKnownObservableListSize = playlistObservableList.size();
                     }
                 }
