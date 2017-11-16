@@ -67,6 +67,11 @@ public class RootListCellController extends ListCell<Playlist> {
     protected void updateItem(Playlist playlist, boolean empty) {
         super.updateItem(playlist, empty);
 
+        //If playlist displayed by this object has changed, it's thread pool should be restarted back to 0
+        if (playlistNameLabel.getText().equals(playlist.getPlaylistName())) {
+            statusThreadCount = 0;
+        }
+
         //In case of empty object listCell should remain empty too
         if (empty || playlist == null) {
             setText(null);
