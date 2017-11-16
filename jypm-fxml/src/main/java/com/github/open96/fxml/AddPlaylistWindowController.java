@@ -1,6 +1,7 @@
 package com.github.open96.fxml;
 
 import com.github.open96.download.DownloadManager;
+import com.github.open96.internetconnection.ConnectionChecker;
 import com.github.open96.playlist.PlaylistManager;
 import com.github.open96.playlist.pojo.Playlist;
 import com.github.open96.settings.SettingsManager;
@@ -23,10 +24,10 @@ import java.util.ResourceBundle;
 public class AddPlaylistWindowController implements Initializable {
 
     private final static String BASE_YOUTUBE_URL = "https://www.youtube.com/playlist?list=";
-    private static File selectedDirectory;
-    private static boolean isDirectoryChosen = false;
+    private File selectedDirectory;
+    private boolean isDirectoryChosen = false;
     //Initialize log4j logger for later use in this class
-    private static Logger log = LogManager.getLogger(AddPlaylistWindowController.class.getName());
+    private static final Logger LOG = LogManager.getLogger(AddPlaylistWindowController.class.getName());
     @FXML
     GridPane rootPane;
 
@@ -51,10 +52,7 @@ public class AddPlaylistWindowController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        //As isDirectoryChosen is static along with selectedDirectory it is a good idea to reuse previously
-        //provided directory if possible.
-        if (isDirectoryChosen)
-            directoryLabel.setText(selectedDirectory.getAbsolutePath());
+
     }
 
     /**
@@ -67,24 +65,28 @@ public class AddPlaylistWindowController implements Initializable {
 
         //Check if link is valid, if directory was chosen and if user has write/read access to it.
         boolean validation = validateLink(playlistLink) && isDirectoryChosen
-                && selectedDirectory.canRead() && selectedDirectory.canWrite() && SettingsManager.getInstance().checkInternetConnection();
+                && selectedDirectory.canRead() && selectedDirectory.canWrite() && ConnectionChecker
+                .getInstance()
+                .checkInternetConnection();
 
         //Trim link for easier operations on it later
         try {
             playlistLink = playlistLink.substring(BASE_YOUTUBE_URL.length());
         } catch (StringIndexOutOfBoundsException e) {
-            log.warn("Link is too short to be a valid link", e);
+            LOG.warn("Link is too short to be a valid link", e);
             validation = false;
         }
 
 
-        log.debug("\nUser tried to add a new playlist:" +
+        LOG.debug("\nUser tried to add a new playlist:" +
                 "\nPlaylist link: " + playlistLink +
                 "\nDirectory: " + isDirectoryChosen +
                 "\nValidation: " + validation);
 
         if (validation) {
-            if (!PlaylistManager.getInstance().add(new Playlist(playlistLink, selectedDirectory.getAbsolutePath()))) {
+            if (!PlaylistManager
+                    .getInstance()
+                    .add(new Playlist(playlistLink, selectedDirectory.getAbsolutePath()))) {
                 //If playlist wasn't accepted by PlaylistManager it means it has a duplicate link or directory.
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setHeaderText(null);
@@ -92,9 +94,15 @@ public class AddPlaylistWindowController implements Initializable {
                 alert.setContentText("Playlist or directory is already in use.");
                 alert.showAndWait();
             } else {
-                if (!SettingsManager.getInstance().getYoutubeDlExecutable().equals("")) {
+                if (!SettingsManager
+                        .getInstance()
+                        .getYoutubeDlExecutable().equals("")) {
                     //After validating playlist, download it
-                    DownloadManager.getInstance().download(PlaylistManager.getInstance().getPlaylistByLink(playlistLink));
+                    DownloadManager
+                            .getInstance()
+                            .download(PlaylistManager
+                                    .getInstance()
+                                    .getPlaylistByLink(playlistLink));
                 }
                 //If it was, job is done and window should close
                 rootPane.getScene().getWindow().hide();

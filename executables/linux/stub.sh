@@ -5,5 +5,5 @@ java=java
 if test -n "$JAVA_HOME"; then
     java="$JAVA_HOME/bin/java"
 fi
-exec "$java" -Xms64m -Xmx128m -jar "$MYSELF" "$@"
+exec "$java" -Xms64m -Xmx200m -jar "$MYSELF" "$@"
 exit 1

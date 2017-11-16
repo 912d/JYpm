@@ -15,7 +15,7 @@ public class TrayIcon {
     //Variable that stores object of this class
     private static TrayIcon singletonInstance;
     //Initialize log4j logger for later use in this class
-    private static Logger log = LogManager.getLogger(TrayIcon.class.getName());
+    private static final Logger LOG = LogManager.getLogger(TrayIcon.class.getName());
     //Stage to which tray icon should be linked, preferably the main one
     private static Stage mainWindowStage;
     private static boolean isTrayWorking = false;
@@ -35,7 +35,7 @@ public class TrayIcon {
      */
     public static TrayIcon getInstance() {
         if (singletonInstance == null) {
-            log.debug("Instance is null, initializing...");
+            LOG.debug("Instance is null, initializing...");
             singletonInstance = new TrayIcon();
         }
         return singletonInstance;
@@ -59,12 +59,12 @@ public class TrayIcon {
      * Initialize subcomponents on first instance creation.
      */
     private boolean init() {
-        log.trace("Initializing TrayIcon");
+        LOG.trace("Initializing TrayIcon");
         if (mainWindowStage != null) {
-            log.debug("TrayIcon has been successfully initialized.");
+            LOG.debug("TrayIcon has been successfully initialized.");
             return createSystemTrayIcon(mainWindowStage);
         } else {
-            log.error("No stage has been set, invoke setMainWindowStage() before calling the constructor");
+            LOG.error("No stage has been set, invoke setMainWindowStage() before calling the constructor");
         }
         return false;
     }
@@ -84,7 +84,7 @@ public class TrayIcon {
 
                 //This action will be linked to more than one button, so it is better to cast it to a variable
                 ActionListener maximize = e -> {
-                    log.info("Maximizing from tray.");
+                    LOG.info("Maximizing from tray.");
                     //Show window to user
                     Platform.runLater(() -> {
                         stage.show();
@@ -121,14 +121,14 @@ public class TrayIcon {
 
                 //Add tray icon to system tray
                 systemTray.add(trayIcon);
-                log.debug("Tray icon has been successfully created!");
+                LOG.debug("Tray icon has been successfully created!");
                 return true;
             } catch (AWTException e) {
-                log.error("Something went wrong during system tray icon creation.", e);
+                LOG.error("Something went wrong during system tray icon creation.", e);
                 Platform.exit();
             }
         } else {
-            log.warn("No system tray detected, disabling some features...");
+            LOG.warn("No system tray detected, disabling some features...");
         }
         return false;
     }
@@ -141,8 +141,12 @@ public class TrayIcon {
      * @return true if notification was displayed, false otherwise.
      */
     public boolean displayNotification(String title, String description) {
-        if (SettingsManager.getInstance().getNotificationPolicy()) {
-            switch (SettingsManager.getInstance().getOS()) {
+        if (SettingsManager
+                .getInstance()
+                .getNotificationPolicy()) {
+            switch (SettingsManager
+                    .getInstance()
+                    .getOS()) {
                 case WINDOWS:
                     trayIcon.displayMessage(title, description, java.awt.TrayIcon.MessageType.INFO);
                     return true;
@@ -153,7 +157,7 @@ public class TrayIcon {
                         processBuilder.start();
                         return true;
                     } catch (IOException e) {
-                        log.error("There was an error while displaying notification", e);
+                        LOG.error("There was an error while displaying notification", e);
                         return false;
                     }
                 case MAC_OS:

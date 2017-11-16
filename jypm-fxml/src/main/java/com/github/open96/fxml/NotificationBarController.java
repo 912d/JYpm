@@ -1,9 +1,9 @@
 package com.github.open96.fxml;
 
 import com.github.open96.download.DownloadManager;
+import com.github.open96.internetconnection.ConnectionChecker;
 import com.github.open96.playlist.PlaylistManager;
 import com.github.open96.playlist.pojo.Playlist;
-import com.github.open96.settings.SettingsManager;
 import com.github.open96.thread.TASK_TYPE;
 import com.github.open96.thread.ThreadManager;
 import com.github.open96.youtubedl.EXECUTABLE_STATE;
@@ -31,7 +31,7 @@ import java.util.concurrent.RejectedExecutionException;
 public class NotificationBarController implements Initializable {
 
     //Initialize log4j logger for later use in this class
-    private static Logger log = LogManager.getLogger(NotificationBarController.class.getName());
+    private static final Logger LOG = LogManager.getLogger(NotificationBarController.class.getName());
     //Launcher icon
     private static final Image LAUNCHER_ICON = new Image("/icon/launcher-128-128.png");
 
@@ -56,44 +56,7 @@ public class NotificationBarController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         //Start a thread that handles displaying messages on bottom bar of main application window
-        ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
-            while (ThreadManager.getExecutionPermission()) {
-                try {
-                    Platform.runLater(() -> notificationText.setText(""));
-                    if (!SettingsManager.getInstance().checkInternetConnection()) {
-                        Platform.runLater(() -> notificationText.setText("Waiting for internet connection..."));
-                    }
-                    if (YoutubeDlManager.getInstance().getExecutableState() == EXECUTABLE_STATE.NOT_READY) {
-                        Platform.runLater(() -> notificationText.setText("Locating youtube-dl executable..."));
-                    }
-                    int queued = 0;
-                    boolean isDownloadInProgress = false;
-                    for (Playlist p : PlaylistManager.getInstance().getPlaylists()) {
-                        switch (p.getStatus()) {
-                            case DOWNLOADING:
-                                isDownloadInProgress = true;
-                                break;
-                            case QUEUED:
-                                queued++;
-                                break;
-                        }
-                    }
-                    if (isDownloadInProgress) {
-                        if (queued == 0) {
-                            Platform.runLater(() -> notificationText.setText("Downloading"));
-                        } else {
-                            int finalQueued = queued;
-                            Platform.runLater(() -> notificationText.setText("Downloading (" + finalQueued + " in queue)"));
-                        }
-                    }
-                    Thread.sleep(1000 * 5);
-                } catch (RejectedExecutionException e) {
-                    break;
-                } catch (InterruptedException e) {
-                    log.error("Thread has been interrupted", e);
-                }
-            }
-        }), TASK_TYPE.UI);
+        startNotifierThread();
     }
 
 
@@ -120,7 +83,7 @@ public class NotificationBarController implements Initializable {
             //Finally, show the window to user.
             subStage.setScene(scene);
         } catch (IOException e) {
-            log.error("Some .fxml files are corrupt or could not be loaded", e);
+            LOG.error("Some .fxml files are corrupt or could not be loaded", e);
         }
 
         subStage.show();
@@ -154,7 +117,7 @@ public class NotificationBarController implements Initializable {
             //Finally, show the window to user.
             subStage.setScene(scene);
         } catch (IOException e) {
-            log.error("Some .fxml files are corrupt or could not be loaded", e);
+            LOG.error("Some .fxml files are corrupt or could not be loaded", e);
         }
 
         subStage.show();
@@ -201,7 +164,7 @@ public class NotificationBarController implements Initializable {
             //Finally, show the window to user.
             subStage.setScene(scene);
         } catch (IOException e) {
-            log.error("Some .fxml files are corrupt or could not be loaded", e);
+            LOG.error("Some .fxml files are corrupt or could not be loaded", e);
         }
 
         subStage.show();
@@ -215,7 +178,61 @@ public class NotificationBarController implements Initializable {
      * Forces all playlists to be redownloaded.
      */
     public void onSyncButtonClick(ActionEvent actionEvent) {
-        PlaylistManager.getInstance().getPlaylists().forEach(playlist -> DownloadManager.getInstance().download(playlist));
+        PlaylistManager
+                .getInstance()
+                .getPlaylists()
+                .forEach(playlist -> DownloadManager
+                        .getInstance()
+                        .download(playlist));
+    }
+
+    private void startNotifierThread() {
+        ThreadManager
+                .getInstance()
+                .sendVoidTask(new Thread(() -> {
+                    while (ThreadManager.getExecutionPermission()) {
+                        try {
+                            Platform.runLater(() -> notificationText.setText(""));
+                            if (!ConnectionChecker
+                                    .getInstance()
+                                    .checkInternetConnection()) {
+                                Platform.runLater(() -> notificationText.setText("Waiting for internet connection..."));
+                            }
+                            if (YoutubeDlManager
+                                    .getInstance()
+                                    .getExecutableState() == EXECUTABLE_STATE.NOT_READY) {
+                                Platform.runLater(() -> notificationText.setText("Looking for youtube-dl executable..."));
+                            }
+                            int queued = 0;
+                            boolean isDownloadInProgress = false;
+                            for (Playlist p : PlaylistManager
+                                    .getInstance()
+                                    .getPlaylists()) {
+                                switch (p.getStatus()) {
+                                    case DOWNLOADING:
+                                        isDownloadInProgress = true;
+                                        break;
+                                    case QUEUED:
+                                        queued++;
+                                        break;
+                                }
+                            }
+                            if (isDownloadInProgress) {
+                                if (queued == 0) {
+                                    Platform.runLater(() -> notificationText.setText("Downloading"));
+                                } else {
+                                    int finalQueued = queued;
+                                    Platform.runLater(() -> notificationText.setText("Downloading (" + finalQueued + " in queue)"));
+                                }
+                            }
+                            Thread.sleep(1000);
+                        } catch (RejectedExecutionException e) {
+                            break;
+                        } catch (InterruptedException e) {
+                            LOG.error("Thread has been interrupted", e);
+                        }
+                    }
+                }), TASK_TYPE.UI);
     }
 
 }

@@ -8,33 +8,15 @@
         <version>1.2.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <url>https://github.com/Open96/jypm</url>
 
-    <artifactId>jypm-youtube-dl</artifactId>
+    <artifactId>jypm-internet-checker</artifactId>
+    <url>https://github.com/Open96/jypm</url>
 
     <dependencies>
 
         <dependency>
             <groupId>com.github.open96</groupId>
-            <artifactId>jypm-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.github.open96</groupId>
             <artifactId>jypm-thread-manager</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.github.open96</groupId>
-            <artifactId>jypm-settings-manager</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.github.open96</groupId>
-            <artifactId>jypm-internet-checker</artifactId>
             <version>${project.version}</version>
         </dependency>
 

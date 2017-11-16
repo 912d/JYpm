@@ -18,17 +18,19 @@ import java.util.ResourceBundle;
 public class RootListViewController implements Initializable {
 
     private static ObservableList<Playlist> playlistObservableList;
-    private static Logger log = LogManager.getLogger(RootListViewController.class.getName());
+    private static final Logger LOG = LogManager.getLogger(RootListViewController.class.getName());
     @FXML
     private ListView<Playlist> listView;
 
     public RootListViewController() {
-        log.debug("Loading playlists in controller...");
+        LOG.debug("Loading playlists in controller...");
 
         //Fill ObservableList with playlists that should be displayed for user in UI
-        playlistObservableList = PlaylistManager.getInstance().getObservablePlaylists();
+        playlistObservableList = PlaylistManager
+                .getInstance()
+                .getObservablePlaylists();
 
-        log.debug("Finished loading playlists in controller, succesfully loaded " + playlistObservableList.size() + " playlists into the ListView");
+        LOG.debug("Finished loading playlists in controller, succesfully loaded " + playlistObservableList.size() + " playlists into the ListView");
     }
 
 

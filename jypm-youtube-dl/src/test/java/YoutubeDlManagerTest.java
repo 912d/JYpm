@@ -1,3 +1,4 @@
+import com.github.open96.internetconnection.ConnectionChecker;
 import com.github.open96.settings.OS_TYPE;
 import com.github.open96.settings.SettingsManager;
 import com.github.open96.thread.ThreadManager;
@@ -8,14 +9,13 @@ import org.junit.Test;
 import java.io.File;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class YoutubeDlManagerTest {
 
 
     @Test
     public void testDownloadYoutubeDl() {
-        if (SettingsManager.getInstance().checkInternetConnection()) {
+        if (ConnectionChecker.getInstance().checkInternetConnection()) {
             try {
                 ThreadManager.getInstance();
                 YoutubeDlManager.getInstance();
@@ -31,14 +31,16 @@ public class YoutubeDlManagerTest {
                 File executable = new File(fileName);
                 //Wait for download to finish
                 int sleepTime = 0;
-                while (!executable.exists() || YoutubeDlManager.getInstance().getExecutableState() != EXECUTABLE_STATE.READY) {
+                final int threadSleepTimeout = 1000 * 60 * 4;
+                while (YoutubeDlManager.getInstance().getExecutableState() != EXECUTABLE_STATE.READY) {
                     try {
-                        Thread.sleep(100);
-                        sleepTime += 100;
-                        if (sleepTime > 30000) {
+                        Thread.sleep(1000);
+                        sleepTime += 1000;
+                        if (sleepTime > threadSleepTimeout) {
                             executable.delete();
                             new File(dirName).delete();
-                            assertTrue(sleepTime <= 30000);
+                            System.out.println("youtube-dl could not be downloaded in span of 10 minutes, check your internet connection");
+                            break;
                         }
                     } catch (InterruptedException e) {
                         e.printStackTrace();
