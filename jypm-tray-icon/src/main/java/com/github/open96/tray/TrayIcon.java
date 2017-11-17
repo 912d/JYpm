@@ -84,7 +84,7 @@ public class TrayIcon {
 
                 //This action will be linked to more than one button, so it is better to cast it to a variable
                 ActionListener maximize = e -> {
-                    LOG.info("Maximizing from tray.");
+                    LOG.trace("Maximizing from tray.");
                     //Show window to user
                     Platform.runLater(() -> {
                         stage.show();

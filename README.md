@@ -47,7 +47,6 @@ Instructions below are for linux system. For other systems process is probably s
 
 * Video format conversion
 * Ditch Google's GSON in favor of Jackson library
-* Reuse thumbnails to reduce internet usage
 * If any macOS user wants to have this application usable in macOS please contact me as I don't have macOS system to test it myself
 
 # Maven dependency graph

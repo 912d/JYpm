@@ -73,8 +73,8 @@ public class JYpm extends Application {
         //Draw the window and show it
         stage.setScene(scene);
         stage.show();
-        stage.requestFocus();
         stage.toFront();
+        stage.requestFocus();
 
         try {
             Updater.getInstance().checkForUpdate();
