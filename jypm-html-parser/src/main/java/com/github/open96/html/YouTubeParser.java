@@ -1,4 +1,4 @@
-package com.github.open96.html;
+package com.github.open96.jypm.html;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

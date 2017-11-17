@@ -1,7 +1,7 @@
-package com.github.open96.settings;
+package com.github.open96.jypm.settings;
 
-import com.github.open96.thread.TASK_TYPE;
-import com.github.open96.thread.ThreadManager;
+import com.github.open96.jypm.thread.TASK_TYPE;
+import com.github.open96.jypm.thread.ThreadManager;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;

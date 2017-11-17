@@ -1,6 +1,6 @@
-package com.github.open96.fxml;
+package com.github.open96.jypm.fxml;
 
-import com.github.open96.fxml.util.UpdateWindow;
+import com.github.open96.jypm.fxml.util.UpdateWindow;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;

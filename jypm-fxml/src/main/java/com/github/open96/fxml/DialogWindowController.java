@@ -1,4 +1,4 @@
-package com.github.open96.fxml;
+package com.github.open96.jypm.fxml;
 
 import javafx.application.Platform;
 import javafx.event.ActionEvent;

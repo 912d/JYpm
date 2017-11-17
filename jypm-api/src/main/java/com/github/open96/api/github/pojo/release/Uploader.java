@@ -1,5 +1,5 @@
 
-package com.github.open96.api.github.pojo.release;
+package com.github.open96.jypm.api.github.pojo.release;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

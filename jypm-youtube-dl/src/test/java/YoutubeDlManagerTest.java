@@ -1,9 +1,9 @@
-import com.github.open96.internetconnection.ConnectionChecker;
-import com.github.open96.settings.OS_TYPE;
-import com.github.open96.settings.SettingsManager;
-import com.github.open96.thread.ThreadManager;
-import com.github.open96.youtubedl.EXECUTABLE_STATE;
-import com.github.open96.youtubedl.YoutubeDlManager;
+import com.github.open96.jypm.internetconnection.ConnectionChecker;
+import com.github.open96.jypm.settings.OS_TYPE;
+import com.github.open96.jypm.settings.SettingsManager;
+import com.github.open96.jypm.thread.ThreadManager;
+import com.github.open96.jypm.youtubedl.EXECUTABLE_STATE;
+import com.github.open96.jypm.youtubedl.YoutubeDlManager;
 import org.junit.Test;
 
 import java.io.File;

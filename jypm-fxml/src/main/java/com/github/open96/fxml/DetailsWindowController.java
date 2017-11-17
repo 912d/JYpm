@@ -1,8 +1,8 @@
-package com.github.open96.fxml;
+package com.github.open96.jypm.fxml;
 
-import com.github.open96.download.DownloadManager;
-import com.github.open96.thread.TASK_TYPE;
-import com.github.open96.thread.ThreadManager;
+import com.github.open96.jypm.download.DownloadManager;
+import com.github.open96.jypm.thread.TASK_TYPE;
+import com.github.open96.jypm.thread.ThreadManager;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;

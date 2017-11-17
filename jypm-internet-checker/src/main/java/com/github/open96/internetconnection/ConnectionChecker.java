@@ -1,7 +1,7 @@
-package com.github.open96.internetconnection;
+package com.github.open96.jypm.internetconnection;
 
-import com.github.open96.thread.TASK_TYPE;
-import com.github.open96.thread.ThreadManager;
+import com.github.open96.jypm.thread.TASK_TYPE;
+import com.github.open96.jypm.thread.ThreadManager;
 import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

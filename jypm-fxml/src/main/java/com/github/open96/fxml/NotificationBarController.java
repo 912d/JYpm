@@ -1,13 +1,13 @@
-package com.github.open96.fxml;
+package com.github.open96.jypm.fxml;
 
-import com.github.open96.download.DownloadManager;
-import com.github.open96.internetconnection.ConnectionChecker;
-import com.github.open96.playlist.PlaylistManager;
-import com.github.open96.playlist.pojo.Playlist;
-import com.github.open96.thread.TASK_TYPE;
-import com.github.open96.thread.ThreadManager;
-import com.github.open96.youtubedl.EXECUTABLE_STATE;
-import com.github.open96.youtubedl.YoutubeDlManager;
+import com.github.open96.jypm.download.DownloadManager;
+import com.github.open96.jypm.internetconnection.ConnectionChecker;
+import com.github.open96.jypm.playlist.PlaylistManager;
+import com.github.open96.jypm.playlist.pojo.Playlist;
+import com.github.open96.jypm.thread.TASK_TYPE;
+import com.github.open96.jypm.thread.ThreadManager;
+import com.github.open96.jypm.youtubedl.EXECUTABLE_STATE;
+import com.github.open96.jypm.youtubedl.YoutubeDlManager;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;

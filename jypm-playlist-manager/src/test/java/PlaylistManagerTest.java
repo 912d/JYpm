@@ -1,7 +1,7 @@
-import com.github.open96.playlist.PlaylistManager;
-import com.github.open96.playlist.QUEUE_STATUS;
-import com.github.open96.playlist.pojo.Playlist;
-import com.github.open96.settings.SettingsManager;
+import com.github.open96.jypm.playlist.PlaylistManager;
+import com.github.open96.jypm.playlist.QUEUE_STATUS;
+import com.github.open96.jypm.playlist.pojo.Playlist;
+import com.github.open96.jypm.settings.SettingsManager;
 import org.junit.Test;
 
 import java.io.File;

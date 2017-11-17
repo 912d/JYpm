@@ -1,5 +1,5 @@
-import com.github.open96.thread.TASK_TYPE;
-import com.github.open96.thread.ThreadManager;
+import com.github.open96.jypm.thread.TASK_TYPE;
+import com.github.open96.jypm.thread.ThreadManager;
 import org.junit.Test;
 
 import java.lang.reflect.Field;

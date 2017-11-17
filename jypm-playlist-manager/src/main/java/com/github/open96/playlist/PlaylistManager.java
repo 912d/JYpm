@@ -1,10 +1,10 @@
-package com.github.open96.playlist;
+package com.github.open96.jypm.playlist;
 
-import com.github.open96.html.YouTubeParser;
-import com.github.open96.internetconnection.ConnectionChecker;
-import com.github.open96.playlist.pojo.Playlist;
-import com.github.open96.thread.TASK_TYPE;
-import com.github.open96.thread.ThreadManager;
+import com.github.open96.jypm.html.YouTubeParser;
+import com.github.open96.jypm.internetconnection.ConnectionChecker;
+import com.github.open96.jypm.playlist.pojo.Playlist;
+import com.github.open96.jypm.thread.TASK_TYPE;
+import com.github.open96.jypm.thread.ThreadManager;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;

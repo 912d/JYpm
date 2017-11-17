@@ -1,10 +1,10 @@
-package com.github.open96.fxml;
+package com.github.open96.jypm.fxml;
 
-import com.github.open96.download.DownloadManager;
-import com.github.open96.internetconnection.ConnectionChecker;
-import com.github.open96.playlist.PlaylistManager;
-import com.github.open96.playlist.pojo.Playlist;
-import com.github.open96.settings.SettingsManager;
+import com.github.open96.jypm.download.DownloadManager;
+import com.github.open96.jypm.internetconnection.ConnectionChecker;
+import com.github.open96.jypm.playlist.PlaylistManager;
+import com.github.open96.jypm.playlist.pojo.Playlist;
+import com.github.open96.jypm.settings.SettingsManager;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;

@@ -1,6 +1,6 @@
-package com.github.open96.tray;
+package com.github.open96.jypm.tray;
 
-import com.github.open96.settings.SettingsManager;
+import com.github.open96.jypm.settings.SettingsManager;
 import javafx.application.Platform;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;

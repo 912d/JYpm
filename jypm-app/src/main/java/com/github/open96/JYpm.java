@@ -1,12 +1,12 @@
-package com.github.open96;
+package com.github.open96.jypm;
 
-import com.github.open96.download.DownloadManager;
-import com.github.open96.playlist.PlaylistManager;
-import com.github.open96.settings.SettingsManager;
-import com.github.open96.thread.TASK_TYPE;
-import com.github.open96.thread.ThreadManager;
-import com.github.open96.tray.TrayIcon;
-import com.github.open96.updater.Updater;
+import com.github.open96.jypm.download.DownloadManager;
+import com.github.open96.jypm.playlist.PlaylistManager;
+import com.github.open96.jypm.settings.SettingsManager;
+import com.github.open96.jypm.thread.TASK_TYPE;
+import com.github.open96.jypm.thread.ThreadManager;
+import com.github.open96.jypm.tray.TrayIcon;
+import com.github.open96.jypm.updater.Updater;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;

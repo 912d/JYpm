@@ -1,12 +1,12 @@
-package com.github.open96.fxml.util;
+package com.github.open96.jypm.fxml.util;
 
-import com.github.open96.api.github.pojo.release.ReleaseJSON;
-import com.github.open96.fxml.DialogWindowController;
-import com.github.open96.settings.OS_TYPE;
-import com.github.open96.settings.SettingsManager;
-import com.github.open96.thread.TASK_TYPE;
-import com.github.open96.thread.ThreadManager;
-import com.github.open96.updater.Updater;
+import com.github.open96.jypm.api.github.pojo.release.ReleaseJSON;
+import com.github.open96.jypm.fxml.DialogWindowController;
+import com.github.open96.jypm.settings.OS_TYPE;
+import com.github.open96.jypm.settings.SettingsManager;
+import com.github.open96.jypm.thread.TASK_TYPE;
+import com.github.open96.jypm.thread.ThreadManager;
+import com.github.open96.jypm.updater.Updater;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;

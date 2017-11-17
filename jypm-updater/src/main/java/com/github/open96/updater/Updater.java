@@ -1,9 +1,9 @@
-package com.github.open96.updater;
+package com.github.open96.jypm.updater;
 
-import com.github.open96.api.github.GitHubApiClient;
-import com.github.open96.api.github.GitHubApiEndpointInterface;
-import com.github.open96.api.github.pojo.release.ReleaseJSON;
-import com.github.open96.settings.SettingsManager;
+import com.github.open96.jypm.api.github.GitHubApiClient;
+import com.github.open96.jypm.api.github.GitHubApiEndpointInterface;
+import com.github.open96.jypm.api.github.pojo.release.ReleaseJSON;
+import com.github.open96.jypm.settings.SettingsManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import retrofit2.Call;

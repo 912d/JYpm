@@ -1,14 +1,14 @@
-package com.github.open96.youtubedl;
+package com.github.open96.jypm.youtubedl;
 
-import com.github.open96.api.github.GitHubApiClient;
-import com.github.open96.api.github.GitHubApiEndpointInterface;
-import com.github.open96.api.github.pojo.release.Asset;
-import com.github.open96.api.github.pojo.release.ReleaseJSON;
-import com.github.open96.internetconnection.ConnectionChecker;
-import com.github.open96.settings.OS_TYPE;
-import com.github.open96.settings.SettingsManager;
-import com.github.open96.thread.TASK_TYPE;
-import com.github.open96.thread.ThreadManager;
+import com.github.open96.jypm.api.github.GitHubApiClient;
+import com.github.open96.jypm.api.github.GitHubApiEndpointInterface;
+import com.github.open96.jypm.api.github.pojo.release.Asset;
+import com.github.open96.jypm.api.github.pojo.release.ReleaseJSON;
+import com.github.open96.jypm.internetconnection.ConnectionChecker;
+import com.github.open96.jypm.settings.OS_TYPE;
+import com.github.open96.jypm.settings.SettingsManager;
+import com.github.open96.jypm.thread.TASK_TYPE;
+import com.github.open96.jypm.thread.ThreadManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import retrofit2.Call;

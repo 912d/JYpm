@@ -1,6 +1,6 @@
-package com.github.open96.playlist.pojo;
+package com.github.open96.jypm.playlist.pojo;
 
-import com.github.open96.playlist.QUEUE_STATUS;
+import com.github.open96.jypm.playlist.QUEUE_STATUS;
 
 public class Playlist {
     private String playlistName;

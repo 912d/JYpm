@@ -1,15 +1,15 @@
-package com.github.open96.download;
+package com.github.open96.jypm.download;
 
-import com.github.open96.internetconnection.ConnectionChecker;
-import com.github.open96.playlist.PlaylistManager;
-import com.github.open96.playlist.QUEUE_STATUS;
-import com.github.open96.playlist.pojo.Playlist;
-import com.github.open96.settings.SettingsManager;
-import com.github.open96.thread.TASK_TYPE;
-import com.github.open96.thread.ThreadManager;
-import com.github.open96.tray.TrayIcon;
-import com.github.open96.youtubedl.EXECUTABLE_STATE;
-import com.github.open96.youtubedl.YoutubeDlManager;
+import com.github.open96.jypm.internetconnection.ConnectionChecker;
+import com.github.open96.jypm.playlist.PlaylistManager;
+import com.github.open96.jypm.playlist.QUEUE_STATUS;
+import com.github.open96.jypm.playlist.pojo.Playlist;
+import com.github.open96.jypm.settings.SettingsManager;
+import com.github.open96.jypm.thread.TASK_TYPE;
+import com.github.open96.jypm.thread.ThreadManager;
+import com.github.open96.jypm.tray.TrayIcon;
+import com.github.open96.jypm.youtubedl.EXECUTABLE_STATE;
+import com.github.open96.jypm.youtubedl.YoutubeDlManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

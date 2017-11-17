@@ -1,4 +1,4 @@
-package com.github.open96.settings;
+package com.github.open96.jypm.settings;
 
 class Settings {
     private String youtubeDlExecutable;
