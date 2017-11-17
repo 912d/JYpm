@@ -2,6 +2,9 @@ package com.github.open96.fxml;
 
 import com.github.open96.playlist.PlaylistManager;
 import com.github.open96.playlist.pojo.Playlist;
+import com.github.open96.thread.TASK_TYPE;
+import com.github.open96.thread.ThreadManager;
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -40,5 +43,26 @@ public class RootListViewController implements Initializable {
         listView.setItems(playlistObservableList);
         //Make sure ListView will display them in from now objects from RootListCellController class
         listView.setCellFactory(playlistListView -> new RootListCellController());
+        startUIUpdaterThread();
+    }
+
+    private void startUIUpdaterThread() {
+        ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
+            try {
+                int lastKnownObservableListSize = playlistObservableList.size();
+                while (ThreadManager.getExecutionPermission()) {
+                    if (playlistObservableList.size() != lastKnownObservableListSize) {
+                        Platform.runLater(() -> {
+                            listView.setItems(null);
+                            listView.setItems(playlistObservableList);
+                        });
+                        lastKnownObservableListSize = playlistObservableList.size();
+                    }
+                    Thread.sleep(255);
+                }
+            } catch (InterruptedException e) {
+                LOG.error("Thread sleep has been interrupted");
+            }
+        }), TASK_TYPE.UI);
     }
 }
