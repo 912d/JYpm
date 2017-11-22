@@ -1,5 +1,5 @@
 
-package com.github.open96.jymp.api.github.pojo.release;
+package com.github.open96.jypm.api.github.pojo.release;
 
 import java.util.List;
 import com.google.gson.annotations.Expose;

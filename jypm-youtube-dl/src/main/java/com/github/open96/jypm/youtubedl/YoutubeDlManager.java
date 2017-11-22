@@ -1,9 +1,9 @@
 package com.github.open96.jypm.youtubedl;
 
-import com.github.open96.jymp.api.github.GitHubApiClient;
-import com.github.open96.jymp.api.github.GitHubApiEndpointInterface;
-import com.github.open96.jymp.api.github.pojo.release.Asset;
-import com.github.open96.jymp.api.github.pojo.release.ReleaseJSON;
+import com.github.open96.jypm.api.github.GitHubApiClient;
+import com.github.open96.jypm.api.github.GitHubApiEndpointInterface;
+import com.github.open96.jypm.api.github.pojo.release.Asset;
+import com.github.open96.jypm.api.github.pojo.release.ReleaseJSON;
 import com.github.open96.jypm.internetconnection.ConnectionChecker;
 import com.github.open96.jypm.settings.OS_TYPE;
 import com.github.open96.jypm.settings.SettingsManager;
