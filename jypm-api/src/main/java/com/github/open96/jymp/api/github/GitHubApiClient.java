@@ -1,4 +1,4 @@
-package com.github.open96.jypm.api.github;
+package com.github.open96.jymp.api.github;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

@@ -1,6 +1,6 @@
 package com.github.open96.jypm.fxml.util;
 
-import com.github.open96.jypm.api.github.pojo.release.ReleaseJSON;
+import com.github.open96.jymp.api.github.pojo.release.ReleaseJSON;
 import com.github.open96.jypm.fxml.DialogWindowController;
 import com.github.open96.jypm.settings.OS_TYPE;
 import com.github.open96.jypm.settings.SettingsManager;

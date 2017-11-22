@@ -1,6 +1,6 @@
-package com.github.open96.jypm.api.github;
+package com.github.open96.jymp.api.github;
 
-import com.github.open96.jypm.api.github.pojo.release.ReleaseJSON;
+import com.github.open96.jymp.api.github.pojo.release.ReleaseJSON;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
