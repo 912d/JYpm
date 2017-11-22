@@ -50,7 +50,6 @@ Instructions below are only for linux users. Windows users can probably do the s
 ### Future development plans
 
 * Video format conversion
-* Ditch Google's GSON in favor of Jackson library
 * If any macOS user wants to have this application usable in macOS please contact me as I don't have macOS system to test it myself
 
 # Maven dependency graph
