@@ -75,28 +75,26 @@ public class UpdateWindow {
                 //Display update window
                 ThreadManager
                         .getInstance()
-                        .sendVoidTask(new Thread(() -> {
-                            Platform.runLater(() -> {
-                                try {
-                                    Stage subStage = new Stage();
-                                    subStage.setTitle("Update available");
-                                    subStage.getIcons().add(new Image("/icon/launcher-128-128.png"));
-                                    FXMLLoader fxmlLoader = new FXMLLoader(getClass()
-                                            .getResource("/fxml/dialogWindow.fxml"));
-                                    Parent root = fxmlLoader.load();
-                                    DialogWindowController controller = fxmlLoader.getController();
-                                    controller.setData(messageBuilder.toString(), positiveButtonText
-                                            , negativeButtonText, positiveButtonEventHandler);
-                                    Scene scene = new Scene(root);
-                                    subStage.setScene(scene);
-                                    subStage.show();
-                                    subStage.setAlwaysOnTop(true);
-                                    subStage.requestFocus();
-                                } catch (IOException e) {
-                                    LOG.error("Failed to load dialogWindow.fxml", e);
-                                }
-                            });
-                        }), TASK_TYPE.UI);
+                        .sendVoidTask(new Thread(() -> Platform.runLater(() -> {
+                            try {
+                                Stage subStage = new Stage();
+                                subStage.setTitle("Update available");
+                                subStage.getIcons().add(new Image("/icon/launcher-128-128.png"));
+                                FXMLLoader fxmlLoader = new FXMLLoader(getClass()
+                                        .getResource("/fxml/dialogWindow.fxml"));
+                                Parent root = fxmlLoader.load();
+                                DialogWindowController controller = fxmlLoader.getController();
+                                controller.setData(messageBuilder.toString(), positiveButtonText
+                                        , negativeButtonText, positiveButtonEventHandler);
+                                Scene scene = new Scene(root);
+                                subStage.setScene(scene);
+                                subStage.show();
+                                subStage.setAlwaysOnTop(true);
+                                subStage.requestFocus();
+                            } catch (IOException e) {
+                                LOG.error("Failed to load dialogWindow.fxml", e);
+                            }
+                        })), TASK_TYPE.UI);
             }), TASK_TYPE.OTHER);
         }
     }
