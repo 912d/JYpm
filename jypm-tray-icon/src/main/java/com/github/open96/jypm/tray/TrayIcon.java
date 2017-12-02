@@ -109,7 +109,8 @@ public class TrayIcon {
                 popupMenu.add(exitApplication);
 
                 //Create tray icon
-                trayIcon = new java.awt.TrayIcon(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/icon/launcher-128-128.png")),
+                trayIcon = new java.awt.TrayIcon(Toolkit.getDefaultToolkit()
+                        .getImage(getClass().getResource("/icon/launcher-128-128.png")),
                         "JYpm",
                         popupMenu);
 
@@ -153,7 +154,8 @@ public class TrayIcon {
                 case UNKNOWN:
                 case OPEN_SOURCE_UNIX:
                     try {
-                        ProcessBuilder processBuilder = new ProcessBuilder("notify-send", "-u", "normal", "-c", "im", title, description);
+                        ProcessBuilder processBuilder = new ProcessBuilder("notify-send", "-u", "normal"
+                                , "-c", "im", title, description);
                         processBuilder.start();
                         return true;
                     } catch (IOException e) {
