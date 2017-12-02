@@ -65,7 +65,8 @@ public class ConnectionChecker {
         Callable<Boolean> internetCallable = () -> {
             if (ThreadManager.getExecutionPermission()) {
                 //If there was less than 30 seconds since last successful check just return previous value
-                if (new Date().getTime() - isInternetAvailableWithTimeout.getValue().getTime() <= 1000 * 30 && isInternetAvailableWithTimeout.getKey()) {
+                if (new Date().getTime() - isInternetAvailableWithTimeout.getValue().getTime() <= 1000 * 30
+                        && isInternetAvailableWithTimeout.getKey()) {
                     return isInternetAvailableWithTimeout.getKey();
                 }
                 //For each link create new thread that will check if address is reachable
