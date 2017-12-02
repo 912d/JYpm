@@ -76,7 +76,7 @@ public class DownloadManager {
      * @param playlist Playlist that should be downloaded
      */
     public void download(Playlist playlist) {
-        //Assing queued status to playlist and put it in queue in ThreadManagers singleThreadExecutor.
+        //Assign queued status to playlist and put it in queue in ThreadManagers singleThreadExecutor.
         PlaylistManager.getInstance().updatePlaylistStatus(playlist, QUEUE_STATUS.QUEUED);
 
         LOG.trace("Downloading playlist \"" + playlist.getPlaylistName() + "\" " + "specified by link " + playlist.getPlaylistLink() + " to location " + playlist.getPlaylistLocation());
