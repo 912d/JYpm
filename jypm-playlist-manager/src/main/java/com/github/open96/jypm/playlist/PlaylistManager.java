@@ -135,7 +135,8 @@ public class PlaylistManager {
                             .checkInternetConnection()) {
                         ThreadManager
                                 .getInstance()
-                                .sendVoidTask(new Thread(() -> Platform.runLater(() -> observablePlaylists.add(playlist))), TASK_TYPE.UI);
+                                .sendVoidTask(new Thread(() -> Platform.runLater(() ->
+                                        observablePlaylists.add(playlist))), TASK_TYPE.UI);
                         saveToJson();
                     } else {
                         playlists.remove(playlist);
