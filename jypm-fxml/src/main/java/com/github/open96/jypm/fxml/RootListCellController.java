@@ -132,7 +132,7 @@ public class RootListCellController extends ListCell<Playlist> {
                                                     Platform.runLater(() ->
                                                             PlaylistManager
                                                                     .getInstance()
-                                                                    .getObservablePlaylists()
+                                                                    .getPlaylists()
                                                                     .remove(playlist1));
                                                     ThreadManager
                                                             .getInstance()
@@ -159,7 +159,7 @@ public class RootListCellController extends ListCell<Playlist> {
                                                     Platform.runLater(() ->
                                                             PlaylistManager
                                                                     .getInstance()
-                                                                    .getObservablePlaylists()
+                                                                    .getPlaylists()
                                                                     .remove(playlist1));
                                                     ThreadManager
                                                             .getInstance()

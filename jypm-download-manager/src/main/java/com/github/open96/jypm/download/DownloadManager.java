@@ -10,6 +10,7 @@ import com.github.open96.jypm.thread.ThreadManager;
 import com.github.open96.jypm.tray.TrayIcon;
 import com.github.open96.jypm.youtubedl.EXECUTABLE_STATE;
 import com.github.open96.jypm.youtubedl.YoutubeDlManager;
+import javafx.collections.ObservableList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -228,7 +229,7 @@ public class DownloadManager {
                         if (ConnectionChecker
                                 .getInstance()
                                 .checkInternetConnection()) {
-                            ArrayList<Playlist> playlists = PlaylistManager.getInstance().getPlaylists();
+                            ObservableList<Playlist> playlists = PlaylistManager.getInstance().getPlaylists();
                             Queue<Playlist> resumedPlaylists = new LinkedBlockingQueue<>();
                             //Redownload playlist if its download was interrupted during last shutdown
                             playlists.stream()

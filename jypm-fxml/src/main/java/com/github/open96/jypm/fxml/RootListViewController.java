@@ -31,7 +31,7 @@ public class RootListViewController implements Initializable {
         //Fill ObservableList with playlists that should be displayed for user in UI
         playlistObservableList = PlaylistManager
                 .getInstance()
-                .getObservablePlaylists();
+                .getPlaylists();
 
         LOG.debug("Finished loading playlists in controller, succesfully loaded " +
                 playlistObservableList.size() + " playlists into the ListView");

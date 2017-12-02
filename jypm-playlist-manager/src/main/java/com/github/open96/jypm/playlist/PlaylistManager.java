@@ -8,7 +8,6 @@ import com.github.open96.jypm.thread.ThreadManager;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.apache.logging.log4j.LogManager;
@@ -35,10 +34,8 @@ public class PlaylistManager {
     private static PlaylistManager singletonInstance;
     //Initialize log4j logger for later use in this class
     private static final Logger LOG = LogManager.getLogger(PlaylistManager.class.getName());
-    //Variable that points to array responsible for displaying playlists in UI Thread
-    private static ObservableList<Playlist> observablePlaylists;
     //Variable where all managed playlists are stored
-    private static ArrayList<Playlist> playlists;
+    private static ObservableList<Playlist> playlists;
 
     private PlaylistManager() {
         init();
@@ -65,8 +62,7 @@ public class PlaylistManager {
      */
     private void init() {
         LOG.trace("Initializing PlaylistManager");
-        playlists = new ArrayList<>();
-        observablePlaylists = FXCollections.observableArrayList();
+        playlists = FXCollections.observableArrayList();
         try (FileReader fileReader = new FileReader(JSON_FILE_NAME)) {
             GsonBuilder gsonBuilder = new GsonBuilder();
             Gson gson = gsonBuilder.create();
@@ -76,7 +72,6 @@ public class PlaylistManager {
             ArrayList<Playlist> gsonResponse = gson.fromJson(fileReader, type);
             if (gsonResponse != null) {
                 playlists.addAll(gsonResponse);
-                observablePlaylists.addAll(playlists);
             }
         } catch (FileNotFoundException e) {
             LOG.info(JSON_FILE_NAME + " has not been found, assuming it's a first run of application...");
@@ -133,10 +128,6 @@ public class PlaylistManager {
                     if (ThreadManager.getExecutionPermission() && ConnectionChecker
                             .getInstance()
                             .checkInternetConnection()) {
-                        ThreadManager
-                                .getInstance()
-                                .sendVoidTask(new Thread(() -> Platform.runLater(() ->
-                                        observablePlaylists.add(playlist))), TASK_TYPE.UI);
                         saveToJson();
                     } else {
                         playlists.remove(playlist);
@@ -188,35 +179,14 @@ public class PlaylistManager {
 
     }
 
-
-    /**
-     * @return All playlists as ObservableList object.
-     */
-    public ObservableList<Playlist> getObservablePlaylists() {
-
-        //Get playlist asynchronously via executorService, this ensures playlists object is in readable state
-        Callable<ObservableList<Playlist>> observablePlaylistGetterThread = () -> observablePlaylists;
-        Future<ObservableList<Playlist>> observablePlaylistFuture = ThreadManager
-                .getInstance()
-                .sendTask(observablePlaylistGetterThread, TASK_TYPE.PLAYLIST);
-
-        try {
-            return observablePlaylistFuture.get();
-        } catch (InterruptedException | ExecutionException e) {
-            LOG.error("Failed to retrieve observable playlists", e);
-        }
-        //In case of failure empty list will be displayed
-        return FXCollections.observableArrayList();
-    }
-
     /**
      * @return All playlists as ArrayList object.
      */
-    public ArrayList<Playlist> getPlaylists() {
+    public ObservableList<Playlist> getPlaylists() {
 
         //Get playlist asynchronously via executorService, this ensures playlists object is in readable state
-        Callable<ArrayList<Playlist>> playlistGetterThread = () -> playlists;
-        Future<ArrayList<Playlist>> playlistFuture = ThreadManager
+        Callable<ObservableList<Playlist>> playlistGetterThread = () -> playlists;
+        Future<ObservableList<Playlist>> playlistFuture = ThreadManager
                 .getInstance()
                 .sendTask(playlistGetterThread, TASK_TYPE.PLAYLIST);
 
@@ -226,7 +196,7 @@ public class PlaylistManager {
             LOG.error("Failed to retrieve playlists", e);
         }
         //In case of failure empty list will be displayed
-        return new ArrayList<>();
+        return FXCollections.observableArrayList();
     }
 
     /**

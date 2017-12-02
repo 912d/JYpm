@@ -2,6 +2,7 @@ import com.github.open96.jypm.playlist.PlaylistManager;
 import com.github.open96.jypm.playlist.QUEUE_STATUS;
 import com.github.open96.jypm.playlist.pojo.Playlist;
 import com.github.open96.jypm.settings.SettingsManager;
+import javafx.collections.ObservableList;
 import org.junit.Test;
 
 import java.io.File;
@@ -11,7 +12,6 @@ import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.util.ArrayList;
 
 import static org.junit.Assert.*;
 
@@ -92,7 +92,7 @@ public class PlaylistManagerTest {
             PlaylistManager.getInstance().add(samplePlaylist);
             Thread.sleep(1000);
             assertFalse(PlaylistManager.getInstance().add(samplePlaylist));
-            ArrayList<Playlist> playlists = PlaylistManager.getInstance().getPlaylists();
+            ObservableList<Playlist> playlists = PlaylistManager.getInstance().getPlaylists();
             assertEquals(1, playlists.size());
             assertNotNull(PlaylistManager.getInstance().getPlaylistByLink(samplePlaylist.getPlaylistLink()));
             PlaylistManager.getInstance().remove(samplePlaylist, false);
