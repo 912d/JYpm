@@ -39,7 +39,8 @@ public class DetailsWindowController implements Initializable {
                                     .getDetailsString();
                             if (details != null) {
                                 if (!detailsText.getText().equals(details) && details.toCharArray().length >= 0) {
-                                    //If details String is different from what is being displayed to user - change it and scroll to its bottom
+                                    //If details String is different from what is being displayed
+                                    //to user - change it and scroll to its bottom
                                     Platform.runLater(() -> detailsText.setText(details));
                                     scrollPane.setVvalue(1.0);
                                 }
@@ -48,7 +49,8 @@ public class DetailsWindowController implements Initializable {
                             if (threadKiller) {
                                 break;
                             }
-                        } catch (InterruptedException | NullPointerException | ArrayIndexOutOfBoundsException | NegativeArraySizeException e) {
+                        } catch (InterruptedException | NullPointerException |
+                                ArrayIndexOutOfBoundsException | NegativeArraySizeException e) {
                             LOG.error("There was a problem during initialization", e);
                         }
                     }

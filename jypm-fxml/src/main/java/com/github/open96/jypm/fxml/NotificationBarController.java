@@ -196,12 +196,14 @@ public class NotificationBarController implements Initializable {
                             if (!ConnectionChecker
                                     .getInstance()
                                     .checkInternetConnection()) {
-                                Platform.runLater(() -> notificationText.setText("Waiting for internet connection..."));
+                                Platform.runLater(() -> notificationText
+                                        .setText("Waiting for internet connection..."));
                             }
                             if (YoutubeDlManager
                                     .getInstance()
                                     .getExecutableState() == EXECUTABLE_STATE.NOT_READY) {
-                                Platform.runLater(() -> notificationText.setText("Looking for youtube-dl executable..."));
+                                Platform.runLater(() -> notificationText
+                                        .setText("Looking for youtube-dl executable..."));
                             }
                             int queued = 0;
                             boolean isDownloadInProgress = false;
@@ -222,7 +224,8 @@ public class NotificationBarController implements Initializable {
                                     Platform.runLater(() -> notificationText.setText("Downloading"));
                                 } else {
                                     int finalQueued = queued;
-                                    Platform.runLater(() -> notificationText.setText("Downloading (" + finalQueued + " in queue)"));
+                                    Platform.runLater(() -> notificationText
+                                            .setText("Downloading (" + finalQueued + " in queue)"));
                                 }
                             }
                             Thread.sleep(1000);

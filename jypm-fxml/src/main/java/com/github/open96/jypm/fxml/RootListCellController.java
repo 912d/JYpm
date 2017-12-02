@@ -70,14 +70,17 @@ public class RootListCellController extends ListCell<Playlist> {
         if (empty || playlist == null) {
             setText(null);
             setGraphic(null);
-        } else {    //Else listCell should be populated with data from Playlist object
-            if (fxmlLoader == null) {   //First, check if layout from .fxml has been loaded already and load it if it hasn't
+        } else {
+            //Else listCell should be populated with data from Playlist object
+            //First, check if layout from .fxml has been loaded already and load it if it hasn't
+            if (fxmlLoader == null) {
                 fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/rootListCell.fxml"));
                 fxmlLoader.setController(this);
                 try {
                     fxmlLoader.load();
                 } catch (IOException e) {
-                    LOG.error("Could not find .fxml file for RootListCellController. Make sure your project/application isn't corrupted", e);
+                    LOG.error("Could not find .fxml file for RootListCellController. " +
+                            "Make sure your project/application isn't corrupted", e);
                 }
 
             }
@@ -123,7 +126,8 @@ public class RootListCellController extends ListCell<Playlist> {
                                         PlaylistManager
                                                 .getInstance()
                                                 .getPlaylists().stream()
-                                                .filter(playlist1 -> playlist1.getPlaylistLink().equals(playlist.getPlaylistLink()))
+                                                .filter(playlist1 -> playlist1.getPlaylistLink().equals(playlist
+                                                        .getPlaylistLink()))
                                                 .forEach(playlist1 -> {
                                                     Platform.runLater(() ->
                                                             PlaylistManager
@@ -133,9 +137,10 @@ public class RootListCellController extends ListCell<Playlist> {
                                                     ThreadManager
                                                             .getInstance()
                                                             .sendVoidTask(new Thread(() ->
-                                                                    PlaylistManager
-                                                                            .getInstance()
-                                                                            .remove(playlist1, true)), TASK_TYPE.PLAYLIST);
+                                                                            PlaylistManager
+                                                                                    .getInstance()
+                                                                                    .remove(playlist1, true))
+                                                                    , TASK_TYPE.PLAYLIST);
                                                 });
                                         Platform.runLater(() -> subStage.close());
                                     }), TASK_TYPE.UI);
@@ -148,7 +153,8 @@ public class RootListCellController extends ListCell<Playlist> {
                                         PlaylistManager
                                                 .getInstance()
                                                 .getPlaylists().stream()
-                                                .filter(playlist1 -> playlist1.getPlaylistLink().equals(playlist.getPlaylistLink()))
+                                                .filter(playlist1 -> playlist1.getPlaylistLink().equals(playlist
+                                                        .getPlaylistLink()))
                                                 .forEach(playlist1 -> {
                                                     Platform.runLater(() ->
                                                             PlaylistManager
@@ -158,15 +164,17 @@ public class RootListCellController extends ListCell<Playlist> {
                                                     ThreadManager
                                                             .getInstance()
                                                             .sendVoidTask(new Thread(() ->
-                                                                    PlaylistManager
-                                                                            .getInstance()
-                                                                            .remove(playlist1, false)), TASK_TYPE.PLAYLIST);
+                                                                            PlaylistManager
+                                                                                    .getInstance()
+                                                                                    .remove(playlist1, false))
+                                                                    , TASK_TYPE.PLAYLIST);
                                                 });
                                         Platform.runLater(() -> subStage.close());
                                     }), TASK_TYPE.UI);
 
 
-                    controller.setData(message, positiveButtonText, negativeButtonText, positiveButtonEventHandler, negativeButtonEventHandler);
+                    controller.setData(message, positiveButtonText, negativeButtonText
+                            , positiveButtonEventHandler, negativeButtonEventHandler);
                     Scene scene = new Scene(root);
                     subStage.setScene(scene);
                     subStage.show();
@@ -189,8 +197,9 @@ public class RootListCellController extends ListCell<Playlist> {
                     .sendVoidTask(new Thread(() -> {
                         try {
                             Runtime.getRuntime().exec(SettingsManager
-                                    .getInstance()
-                                    .getFileManagerCommand() + " .", null, new File(playlist.getPlaylistLocation()));
+                                            .getInstance()
+                                            .getFileManagerCommand() + " .", null
+                                    , new File(playlist.getPlaylistLocation()));
                         } catch (IOException e) {
                             LOG.error("Invalid file manager, check your settings", e);
                         }
@@ -208,7 +217,8 @@ public class RootListCellController extends ListCell<Playlist> {
                     threadHashMap.put(playlist.getPlaylistLink(), Thread.currentThread());
                     QUEUE_STATUS lastKnownState = QUEUE_STATUS.UNKNOWN;
                     while (ThreadManager.getExecutionPermission()) {
-                        //Dirty cheat because JavaFX changes references to objects on listview update, so it is obligatory to make sure we are still operating on same object.
+                        //Dirty cheat because JavaFX changes references to objects on listview update,
+                        //so it is obligatory to make sure we are still operating on same object.
                         if (!playlistNameLabel.getText().equals(playlist.getPlaylistName())) {
                             break;
                         }
@@ -232,7 +242,9 @@ public class RootListCellController extends ListCell<Playlist> {
                                             .getInstance()
                                             .getDownloadProgress();
                                     if (currentCount != null) {
-                                        Platform.runLater(() -> currentStatusLabel.setText("Downloading (" + currentCount + "/" + playlist.getVideoCount() + ")"));
+                                        Platform.runLater(() -> currentStatusLabel
+                                                .setText("Downloading (" + currentCount +
+                                                        "/" + playlist.getVideoCount() + ")"));
                                     }
                                     lastKnownState = QUEUE_STATUS.DOWNLOADING;
                                     Platform.runLater(() -> updateItem.setDisable(true));

@@ -33,7 +33,8 @@ public class RootListViewController implements Initializable {
                 .getInstance()
                 .getObservablePlaylists();
 
-        LOG.debug("Finished loading playlists in controller, succesfully loaded " + playlistObservableList.size() + " playlists into the ListView");
+        LOG.debug("Finished loading playlists in controller, succesfully loaded " +
+                playlistObservableList.size() + " playlists into the ListView");
     }
 
 
