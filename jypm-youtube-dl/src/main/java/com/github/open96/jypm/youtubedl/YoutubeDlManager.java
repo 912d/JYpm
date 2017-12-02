@@ -74,7 +74,8 @@ public class YoutubeDlManager {
 
     /**
      * @param releaseJSON Object that has wrapped API response in it.
-     * @return Map that contains two executables - one for Windows (key:OS_TYPE.WINDOWS) and for Unix systems(key:OS_TYPE.OPEN_SOURCE_UNIX).
+     * @return Map that contains two executables - one for Windows (key:OS_TYPE.WINDOWS) and
+     * for Unix systems(key:OS_TYPE.OPEN_SOURCE_UNIX).
      */
     private Map<OS_TYPE, Asset> getExecutablesAssets(ReleaseJSON releaseJSON) {
         Map<OS_TYPE, Asset> assets = new HashMap<>();
@@ -162,7 +163,9 @@ public class YoutubeDlManager {
             boolean isVersionOutOfDate = (!SettingsManager
                     .getInstance()
                     .getYoutubeDlVersion().equals(onlineVersion));
-            boolean doesFileIntegritySeemOk = !new File(YOUTUBE_DL_DIRECTORY).exists() || (new File(YOUTUBE_DL_DIRECTORY).exists() && new File(YOUTUBE_DL_DIRECTORY).listFiles().length != 1);
+            boolean doesFileIntegritySeemOk = !new File(YOUTUBE_DL_DIRECTORY).exists()
+                    || (new File(YOUTUBE_DL_DIRECTORY).exists()
+                    && new File(YOUTUBE_DL_DIRECTORY).listFiles().length != 1);
             if ((isVersionOutOfDate || doesFileIntegritySeemOk) && ThreadManager.getExecutionPermission()) {
                 LOG.debug("New youtube-dl version available, downloading...");
                 try {
