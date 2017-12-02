@@ -11,7 +11,6 @@
             </PatternLayout>
             <Policies>
                 <TimeBasedTriggeringPolicy/>
-                <SizeBasedTriggeringPolicy size="40 MB"/>
             </Policies>
         </RollingFile>
     </Appenders>
