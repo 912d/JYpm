@@ -41,13 +41,18 @@ public class UpdateWindow {
                 //Create message
                 StringBuilder messageBuilder = new StringBuilder();
                 messageBuilder.append("Update available").append("\n");
-                messageBuilder.append(SettingsManager.getInstance().getRuntimeVersion()).append(" ").append("(Current)").append(" --> ")
-                        .append(releaseJSON.getTagName()).append(" ").append("(").append(releaseJSON.getPublishedAt().substring(0, 10)).append(")")
+                messageBuilder.append(SettingsManager
+                        .getInstance()
+                        .getRuntimeVersion()).append(" ").append("(Current)").append(" --> ")
+                        .append(releaseJSON.getTagName()).append(" ")
+                        .append("(").append(releaseJSON.getPublishedAt().substring(0, 10)).append(")")
                         .append("\n");
-                messageBuilder.append("Visit").append(" ").append(releaseJSON.getHtmlUrl()).append(" ").append("for changelog and more details.")
+                messageBuilder.append("Visit").append(" ").append(releaseJSON.getHtmlUrl()).append(" ")
+                        .append("for changelog and more details.")
                         .append("\n");
 
-                //Windows users have executables, so they have to visit GitHub and download it manually for the time being
+                //Windows users have executables, so they have to visit GitHub
+                //and download it manually for the time being
                 String positiveButtonText = "Visit GitHub";
                 String negativeButtonText = "Later";
 
@@ -68,26 +73,28 @@ public class UpdateWindow {
                     }
                 };
                 //Display update window
-                ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
-                    Platform.runLater(() -> {
-                        try {
-                            Stage subStage = new Stage();
-                            subStage.setTitle("Update available");
-                            subStage.getIcons().add(new Image("/icon/launcher-128-128.png"));
-                            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/dialogWindow.fxml"));
-                            Parent root = fxmlLoader.load();
-                            DialogWindowController controller = fxmlLoader.getController();
-                            controller.setData(messageBuilder.toString(), positiveButtonText, negativeButtonText, positiveButtonEventHandler);
-                            Scene scene = new Scene(root);
-                            subStage.setScene(scene);
-                            subStage.show();
-                            subStage.setAlwaysOnTop(true);
-                            subStage.requestFocus();
-                        } catch (IOException e) {
-                            LOG.error("Failed to load dialogWindow.fxml", e);
-                        }
-                    });
-                }), TASK_TYPE.UI);
+                ThreadManager
+                        .getInstance()
+                        .sendVoidTask(new Thread(() -> Platform.runLater(() -> {
+                            try {
+                                Stage subStage = new Stage();
+                                subStage.setTitle("Update available");
+                                subStage.getIcons().add(new Image("/icon/launcher-128-128.png"));
+                                FXMLLoader fxmlLoader = new FXMLLoader(getClass()
+                                        .getResource("/fxml/dialogWindow.fxml"));
+                                Parent root = fxmlLoader.load();
+                                DialogWindowController controller = fxmlLoader.getController();
+                                controller.setData(messageBuilder.toString(), positiveButtonText
+                                        , negativeButtonText, positiveButtonEventHandler);
+                                Scene scene = new Scene(root);
+                                subStage.setScene(scene);
+                                subStage.show();
+                                subStage.setAlwaysOnTop(true);
+                                subStage.requestFocus();
+                            } catch (IOException e) {
+                                LOG.error("Failed to load dialogWindow.fxml", e);
+                            }
+                        })), TASK_TYPE.UI);
             }), TASK_TYPE.OTHER);
         }
     }

@@ -79,8 +79,17 @@ public class DownloadManager {
         //Assign queued status to playlist and put it in queue in ThreadManagers singleThreadExecutor.
         PlaylistManager.getInstance().updatePlaylistStatus(playlist, QUEUE_STATUS.QUEUED);
 
-        LOG.trace("Downloading playlist \"" + playlist.getPlaylistName() + "\" " + "specified by link " + playlist.getPlaylistLink() + " to location " + playlist.getPlaylistLocation());
-        detailsString.append("Downloading playlist \"").append(playlist.getPlaylistName()).append("\" ").append("specified by link ").append(playlist.getPlaylistLink()).append(" to location ").append(playlist.getPlaylistLocation()).append("\n");
+        LOG.trace("Downloading playlist \""
+                + playlist.getPlaylistName() + "\" "
+                + "specified by link " + playlist.getPlaylistLink()
+                + " to location "
+                + playlist.getPlaylistLocation());
+        detailsString.append("Downloading playlist \"")
+                .append(playlist.getPlaylistName())
+                .append("\" ").append("specified by link ")
+                .append(playlist.getPlaylistLink())
+                .append(" to location ")
+                .append(playlist.getPlaylistLocation()).append("\n");
 
         //Download playlist
         ThreadManager
@@ -102,9 +111,16 @@ public class DownloadManager {
                         detailsString.append("\n").append("-----------Task completed-----------").append("\n");
                         LOG.trace("Playlist " + playlist.getPlaylistName() + " has finished downloading");
                     } catch (InterruptedException | IOException | NullPointerException e) {
-                        LOG.warn("Missing executable, start the download again after executable is finished downloading.");
-                        ExecutableWrapper.getInstance().triggerExecutableRedownload();
-                        detailsString.append("\n").append("-----------Task failed-----------").append("\n").append(e.toString());
+                        LOG.warn("Missing executable, start the download again " +
+                                "after executable is finished downloading.");
+                        ExecutableWrapper
+                                .getInstance()
+                                .triggerExecutableRedownload();
+                        detailsString
+                                .append("\n")
+                                .append("-----------Task failed-----------")
+                                .append("\n")
+                                .append(e.toString());
                         LOG.error("Download failed", e);
                         PlaylistManager.getInstance().updatePlaylistStatus(playlist, QUEUE_STATUS.FAILED);
                     }
@@ -144,11 +160,16 @@ public class DownloadManager {
         Callable<Integer> countGetterThread = () -> {
             String output = processOutputGetter();
             if (output != null && output.toCharArray().length >= 0) {
-                //youtube-dl outputs following message "[download] Downloading video x out of y" each time it downloads next video, so we just need to get the "x" part to know the progress
+                //youtube-dl outputs following message
+                //"[download] Downloading video x out of y" each time it downloads next video,
+                //so we just need to get the "x" part to know the progress
                 String dividerString = "[download] Downloading video ";
                 String[] downloadMessages = output.split(dividerString);
                 String[] splitMessages = downloadMessages[downloadMessages.length - 1].split(" of ");
-                String videoCount = splitMessages[splitMessages.length - 2].substring(splitMessages[splitMessages.length - 2].indexOf(dividerString) + dividerString.length());
+                String videoCount = splitMessages[splitMessages.length - 2]
+                        .substring(splitMessages[splitMessages.length - 2]
+                                .indexOf(dividerString)
+                                + dividerString.length());
                 return Integer.valueOf(videoCount);
             }
             return null;
@@ -228,7 +249,10 @@ public class DownloadManager {
                             if (resumedPlaylists.size() > 0 && TrayIcon.isTrayWorking()) {
                                 TrayIcon
                                         .getInstance()
-                                        .displayNotification("JYpm - resuming downloads", "Resuming " + resumedPlaylists.size() + " playlist downloads");
+                                        .displayNotification("JYpm - resuming downloads",
+                                                "Resuming "
+                                                        + resumedPlaylists.size()
+                                                        + " playlist downloads");
                             }
                             LOG.debug("Initializer thread has completed initialization...");
                             break;
@@ -243,7 +267,8 @@ public class DownloadManager {
                 }), TASK_TYPE.DOWNLOAD);
     }
 
-    private void parseOutputWhileProcessIsAlive(Playlist playlist, Process process, InputStream inputStream) throws IOException, InterruptedException {
+    private void parseOutputWhileProcessIsAlive(Playlist playlist, Process process, InputStream inputStream)
+            throws IOException, InterruptedException {
         //Create BufferedReader and read all output of the process until it dies
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
         String line;
@@ -256,7 +281,9 @@ public class DownloadManager {
                     //Trim the StringBuilder to reduce memory usage
                     if (detailsString.length() > 16000) {
                         detailsString.trimToSize();
-                        detailsString = new StringBuilder(detailsString.toString().substring(detailsString.length() - 16000));
+                        detailsString = new StringBuilder(detailsString
+                                .toString()
+                                .substring(detailsString.length() - 16000));
                     }
                     Thread.sleep(250);
                 }

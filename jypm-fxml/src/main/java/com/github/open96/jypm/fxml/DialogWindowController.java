@@ -38,7 +38,8 @@ public class DialogWindowController implements Initializable {
      * @param negativeButtonText   Text in button on the right.
      * @param positiveButtonAction Functionality of button on the left.
      */
-    public void setData(String message, String positiveButtonText, String negativeButtonText, EventHandler<ActionEvent> positiveButtonAction) {
+    public void setData(String message, String positiveButtonText, String negativeButtonText,
+                        EventHandler<ActionEvent> positiveButtonAction) {
         Platform.runLater(() -> {
             messageText.setText(message);
             positiveButton.setText(positiveButtonText);
@@ -55,7 +56,9 @@ public class DialogWindowController implements Initializable {
      * @param negativeButtonText   Text in button on the right.
      * @param positiveButtonAction Functionality of button on the left.
      */
-    public void setData(String message, String positiveButtonText, String negativeButtonText, EventHandler<ActionEvent> positiveButtonAction, EventHandler<ActionEvent> negativeButtonAction) {
+    public void setData(String message, String positiveButtonText, String negativeButtonText,
+                        EventHandler<ActionEvent> positiveButtonAction,
+                        EventHandler<ActionEvent> negativeButtonAction) {
         Platform.runLater(() -> {
             messageText.setText(message);
             positiveButton.setText(positiveButtonText);

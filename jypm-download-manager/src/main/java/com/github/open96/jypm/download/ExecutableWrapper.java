@@ -85,7 +85,8 @@ public class ExecutableWrapper {
             return null;
         }
         //Issue main youtube-dl command for an actual download and return it's process for further operations on it
-        String command[] = {settingsManager.getYoutubeDlExecutable(), "-i", "-o %(title)s.%(ext)s", BASE_YOUTUBE_URL + playlist.getPlaylistLink()};
+        String command[] = {settingsManager
+                .getYoutubeDlExecutable(), "-i", "-o %(title)s.%(ext)s", BASE_YOUTUBE_URL + playlist.getPlaylistLink()};
         return runtime.exec(command, null, new File(playlist.getPlaylistLocation()));
     }
 
@@ -99,7 +100,7 @@ public class ExecutableWrapper {
      */
     private String getProcessOutput(Process process) throws IOException, InterruptedException {
         //Create BufferedReader that will read process's output
-        try(InputStream inputStream = process.getInputStream()){
+        try (InputStream inputStream = process.getInputStream()) {
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
             String line;
             StringBuilder output = new StringBuilder();
