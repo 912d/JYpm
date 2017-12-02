@@ -79,7 +79,8 @@ public class Updater {
     public String checkForUpdate() {
         if (releaseJSON != null) {
             if (!releaseJSON.getTagName().equals(runtimeVersion)) {
-                LOG.trace("New update available\nCURRENT VERSION: " + runtimeVersion + "\nNEW VERSION: " + releaseJSON.getTagName());
+                LOG.trace("New update available\nCURRENT VERSION: " + runtimeVersion + "\nNEW VERSION: "
+                        + releaseJSON.getTagName());
                 return releaseJSON.getTagName();
             }
         } else {
@@ -100,7 +101,8 @@ public class Updater {
             int retryCount = 0;
             while (true) {
                 if (releaseJSON == null) {
-                    Call<ReleaseJSON> repeatedJSONCall = apiService.getLatestRelease("Open96", "JYpm");
+                    Call<ReleaseJSON> repeatedJSONCall = apiService
+                            .getLatestRelease("Open96", "JYpm");
                     releaseJSON = repeatedJSONCall.execute().body();
                     retryCount++;
                     if (retryCount > 10) {
