@@ -18,7 +18,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.Queue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -285,6 +284,19 @@ public class DownloadManager {
                         detailsString = new StringBuilder(detailsString
                                 .toString()
                                 .substring(detailsString.length() - 16000));
+                    }
+                    if (getDownloadProgress() != null) {
+                        Thread.sleep(50);
+                        int currentVideoCount = getDownloadProgress();
+                        if (currentVideoCount != PlaylistManager
+                                .getInstance()
+                                .getPlaylistByLink(playlist.getPlaylistLink())
+                                .getCurrentVideoCount()) {
+                            PlaylistManager
+                                    .getInstance()
+                                    .getPlaylistByLink(playlist.getPlaylistLink())
+                                    .setCurrentVideoCount(currentVideoCount);
+                        }
                     }
                     Thread.sleep(250);
                 }

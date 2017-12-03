@@ -238,9 +238,7 @@ public class RootListCellController extends ListCell<Playlist> {
                                     Platform.runLater(() -> updateItem.setDisable(true));
                                     break;
                                 case DOWNLOADING:
-                                    Integer currentCount = DownloadManager
-                                            .getInstance()
-                                            .getDownloadProgress();
+                                    Integer currentCount = playlist.getCurrentVideoCount();
                                     if (currentCount != null) {
                                         Platform.runLater(() -> currentStatusLabel
                                                 .setText("Downloading (" + currentCount +
