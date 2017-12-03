@@ -238,6 +238,27 @@ public class PlaylistManager {
                                     .equals(playlist1.getPlaylistLink()))
                             .forEach(playlist1 -> {
                                 playlist1.setStatus(status);
+                                if (status == QUEUE_STATUS.DOWNLOADING) {
+                                    playlist1.setCurrentVideoCount(0);
+                                }
+                                saveToJson();
+                            });
+                }), TASK_TYPE.PLAYLIST);
+    }
+
+
+    /**
+     * Sets current video count of requested playlist
+     */
+    public void setCurrentVideoCount(Playlist playlist, Integer videoCount) {
+        ThreadManager
+                .getInstance()
+                .sendVoidTask(new Thread(() -> {
+                    playlists.stream()
+                            .filter(playlist1 -> playlist.getPlaylistLink()
+                                    .equals(playlist1.getPlaylistLink()))
+                            .forEach(playlist1 -> {
+                                playlist1.setCurrentVideoCount(videoCount);
                                 saveToJson();
                             });
                 }), TASK_TYPE.PLAYLIST);
