@@ -10,6 +10,7 @@ import com.github.open96.jypm.thread.ThreadManager;
 import com.github.open96.jypm.tray.TrayIcon;
 import com.github.open96.jypm.youtubedl.EXECUTABLE_STATE;
 import com.github.open96.jypm.youtubedl.YoutubeDlManager;
+import javafx.collections.ObservableList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -17,7 +18,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.Queue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -228,7 +228,7 @@ public class DownloadManager {
                         if (ConnectionChecker
                                 .getInstance()
                                 .checkInternetConnection()) {
-                            ArrayList<Playlist> playlists = PlaylistManager.getInstance().getPlaylists();
+                            ObservableList<Playlist> playlists = PlaylistManager.getInstance().getPlaylists();
                             Queue<Playlist> resumedPlaylists = new LinkedBlockingQueue<>();
                             //Redownload playlist if its download was interrupted during last shutdown
                             playlists.stream()
@@ -284,6 +284,18 @@ public class DownloadManager {
                         detailsString = new StringBuilder(detailsString
                                 .toString()
                                 .substring(detailsString.length() - 16000));
+                    }
+                    if (getDownloadProgress() != null) {
+                        Thread.sleep(50);
+                        int currentVideoCount = getDownloadProgress();
+                        if (currentVideoCount != PlaylistManager
+                                .getInstance()
+                                .getPlaylistByLink(playlist.getPlaylistLink())
+                                .getCurrentVideoCount()) {
+                            PlaylistManager
+                                    .getInstance()
+                                    .setCurrentVideoCount(playlist, currentVideoCount);
+                        }
                     }
                     Thread.sleep(250);
                 }

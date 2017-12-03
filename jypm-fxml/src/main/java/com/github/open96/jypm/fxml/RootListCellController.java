@@ -88,7 +88,7 @@ public class RootListCellController extends ListCell<Playlist> {
 
             //Now it's time to load values into their respective fields
             playlistNameLabel.setText(playlist.getPlaylistName());
-            videoCountLabel.setText(playlist.getVideoCount() + " videos");
+            videoCountLabel.setText(playlist.getTotalVideoCount() + " videos");
 
             //Load thumbnail asynchronously from main JavaFX thread
             ThreadManager
@@ -132,7 +132,7 @@ public class RootListCellController extends ListCell<Playlist> {
                                                     Platform.runLater(() ->
                                                             PlaylistManager
                                                                     .getInstance()
-                                                                    .getObservablePlaylists()
+                                                                    .getPlaylists()
                                                                     .remove(playlist1));
                                                     ThreadManager
                                                             .getInstance()
@@ -159,7 +159,7 @@ public class RootListCellController extends ListCell<Playlist> {
                                                     Platform.runLater(() ->
                                                             PlaylistManager
                                                                     .getInstance()
-                                                                    .getObservablePlaylists()
+                                                                    .getPlaylists()
                                                                     .remove(playlist1));
                                                     ThreadManager
                                                             .getInstance()
@@ -238,13 +238,11 @@ public class RootListCellController extends ListCell<Playlist> {
                                     Platform.runLater(() -> updateItem.setDisable(true));
                                     break;
                                 case DOWNLOADING:
-                                    Integer currentCount = DownloadManager
-                                            .getInstance()
-                                            .getDownloadProgress();
+                                    Integer currentCount = playlist.getCurrentVideoCount();
                                     if (currentCount != null) {
                                         Platform.runLater(() -> currentStatusLabel
                                                 .setText("Downloading (" + currentCount +
-                                                        "/" + playlist.getVideoCount() + ")"));
+                                                        "/" + playlist.getTotalVideoCount() + ")"));
                                     }
                                     lastKnownState = QUEUE_STATUS.DOWNLOADING;
                                     Platform.runLater(() -> updateItem.setDisable(true));

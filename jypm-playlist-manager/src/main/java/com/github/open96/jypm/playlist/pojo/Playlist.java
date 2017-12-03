@@ -5,7 +5,8 @@ import com.github.open96.jypm.playlist.QUEUE_STATUS;
 public class Playlist {
     private String playlistName;
     private String playlistLink;
-    private Integer videoCount;
+    private Integer totalVideoCount;
+    private Integer currentVideoCount;
     private String playlistLocation;
     private String playlistThumbnailUrl;
     private QUEUE_STATUS status;
@@ -40,12 +41,20 @@ public class Playlist {
         return playlistLocation;
     }
 
-    public Integer getVideoCount() {
-        return videoCount;
+    public Integer getTotalVideoCount() {
+        return totalVideoCount;
     }
 
-    public void setVideoCount(Integer videoCount) {
-        this.videoCount = videoCount;
+    public void setTotalVideoCount(Integer totalVideoCount) {
+        this.totalVideoCount = totalVideoCount;
+    }
+
+    public Integer getCurrentVideoCount() {
+        return currentVideoCount;
+    }
+
+    public void setCurrentVideoCount(Integer currentVideoCount) {
+        this.currentVideoCount = currentVideoCount;
     }
 
     public QUEUE_STATUS getStatus() {
