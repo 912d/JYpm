@@ -8,6 +8,7 @@ import com.github.open96.jypm.thread.ThreadManager;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.apache.logging.log4j.LogManager;
@@ -149,11 +150,11 @@ public class PlaylistManager {
                     playlists.stream()
                             .filter(playlist1 -> playlist1.getPlaylistLink()
                                     .equals(playlist.getPlaylistLink()))
-                            .forEach(playlist1 -> {
+                            .forEach(playlist1 -> Platform.runLater(() -> {
                                 LOG.trace("Removing " + playlist1.getPlaylistName());
                                 playlists.remove(playlist1);
                                 saveToJson();
-                            });
+                            }));
                 }), TASK_TYPE.PLAYLIST);
         //Delete playlist directory
         if (deleteDir) {
