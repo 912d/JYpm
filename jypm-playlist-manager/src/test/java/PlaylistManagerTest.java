@@ -72,7 +72,7 @@ public class PlaylistManagerTest {
                 assertEquals(samplePlaylist.getPlaylistLink(), PlaylistManager.getInstance().getPlaylistByLink(samplePlaylist.getPlaylistLink()).getPlaylistLink());
                 assertEquals(samplePlaylist.getPlaylistLocation(), PlaylistManager.getInstance().getPlaylistByLink(samplePlaylist.getPlaylistLink()).getPlaylistLocation());
                 Thread.sleep(1000); //Give YouTubeParser time to parse html
-                int videoCount = PlaylistManager.getInstance().getPlaylistByLink(samplePlaylist.getPlaylistLink()).getVideoCount();
+                int videoCount = PlaylistManager.getInstance().getPlaylistByLink(samplePlaylist.getPlaylistLink()).getTotalVideoCount();
                 assertEquals(2, videoCount);
                 assertEquals(QUEUE_STATUS.QUEUED, PlaylistManager.getInstance().getPlaylistByLink(samplePlaylist.getPlaylistLink()).getStatus());
             }

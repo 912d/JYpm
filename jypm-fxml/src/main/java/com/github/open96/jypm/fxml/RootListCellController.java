@@ -88,7 +88,7 @@ public class RootListCellController extends ListCell<Playlist> {
 
             //Now it's time to load values into their respective fields
             playlistNameLabel.setText(playlist.getPlaylistName());
-            videoCountLabel.setText(playlist.getVideoCount() + " videos");
+            videoCountLabel.setText(playlist.getTotalVideoCount() + " videos");
 
             //Load thumbnail asynchronously from main JavaFX thread
             ThreadManager
@@ -244,7 +244,7 @@ public class RootListCellController extends ListCell<Playlist> {
                                     if (currentCount != null) {
                                         Platform.runLater(() -> currentStatusLabel
                                                 .setText("Downloading (" + currentCount +
-                                                        "/" + playlist.getVideoCount() + ")"));
+                                                        "/" + playlist.getTotalVideoCount() + ")"));
                                     }
                                     lastKnownState = QUEUE_STATUS.DOWNLOADING;
                                     Platform.runLater(() -> updateItem.setDisable(true));

@@ -122,7 +122,7 @@ public class PlaylistManager {
                 sendVoidTask(new Thread(() -> {
                     YouTubeParser youTubeParser = new YouTubeParser(playlist.getPlaylistLink());
                     playlist.setPlaylistName(youTubeParser.getPlaylistName());
-                    playlist.setVideoCount(Integer.parseInt(youTubeParser.getVideoCount()));
+                    playlist.setTotalVideoCount(Integer.parseInt(youTubeParser.getVideoCount()));
                     playlist.setPlaylistThumbnailUrl(youTubeParser.getThumbnailLink());
                     LOG.trace("Playlist data successfully parsed.");
                     if (ThreadManager.getExecutionPermission() && ConnectionChecker
