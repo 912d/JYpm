@@ -3,6 +3,8 @@ import com.github.open96.jypm.playlist.QUEUE_STATUS;
 import com.github.open96.jypm.playlist.pojo.Playlist;
 import com.github.open96.jypm.settings.SettingsManager;
 import javafx.collections.ObservableList;
+import javafx.embed.swing.JFXPanel;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
@@ -159,6 +161,14 @@ public class PlaylistManagerTest {
             System.out.println("Empty API object");
         }
 
+    }
+
+    /**
+     * By calling JavaFX component we initialize JavaFX Platform and make Platform.runLater() tasks execute.
+     */
+    @BeforeClass
+    public static void startJavaFX() {
+        new JFXPanel();
     }
 
 }
