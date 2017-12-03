@@ -294,8 +294,7 @@ public class DownloadManager {
                                 .getCurrentVideoCount()) {
                             PlaylistManager
                                     .getInstance()
-                                    .getPlaylistByLink(playlist.getPlaylistLink())
-                                    .setCurrentVideoCount(currentVideoCount);
+                                    .setCurrentVideoCount(playlist, currentVideoCount);
                         }
                     }
                     Thread.sleep(250);
