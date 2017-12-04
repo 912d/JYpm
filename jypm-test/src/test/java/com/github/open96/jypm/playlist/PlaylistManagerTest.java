@@ -1,5 +1,5 @@
-import com.github.open96.jypm.playlist.PlaylistManager;
-import com.github.open96.jypm.playlist.QUEUE_STATUS;
+package com.github.open96.jypm.playlist;
+
 import com.github.open96.jypm.playlist.pojo.Playlist;
 import com.github.open96.jypm.settings.SettingsManager;
 import javafx.collections.ObservableList;

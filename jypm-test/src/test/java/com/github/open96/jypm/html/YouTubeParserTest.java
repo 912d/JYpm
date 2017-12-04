@@ -1,4 +1,5 @@
-import com.github.open96.jypm.html.YouTubeParser;
+package com.github.open96.jypm.html;
+
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
