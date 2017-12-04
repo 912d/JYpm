@@ -1,5 +1,6 @@
+package com.github.open96.jypm.updater;
+
 import com.github.open96.jypm.internetconnection.ConnectionChecker;
-import com.github.open96.jypm.updater.Updater;
 import org.junit.Test;
 
 import java.io.IOException;
