@@ -90,5 +90,6 @@ public class ThreadManagerTest {
         } catch (RejectedExecutionException e) {
             assertTrue(true);
         }
+        resetSingleton();
     }
 }
