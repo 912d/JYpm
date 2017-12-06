@@ -175,7 +175,7 @@ public class PlaylistManagerTest {
             PlaylistManager.getInstance().remove(samplePlaylist, false);
             Thread.sleep(1000);
             assertTrue(samplePlaylistDir.exists());
-            assertEquals(samplePlaylistDir.listFiles().length, 2);
+            assertEquals(2, samplePlaylistDir.listFiles().length);
             PlaylistManager.getInstance().add(samplePlaylist);
             waitForPlaylistInitialization(samplePlaylist);
             PlaylistManager.getInstance().remove(samplePlaylist, true);
