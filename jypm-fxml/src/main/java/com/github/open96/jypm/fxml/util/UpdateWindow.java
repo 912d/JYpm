@@ -88,8 +88,9 @@ public class UpdateWindow {
                                         , negativeButtonText, positiveButtonEventHandler);
                                 Scene scene = new Scene(root);
                                 subStage.setScene(scene);
-                                subStage.show();
                                 subStage.setAlwaysOnTop(true);
+                                subStage.show();
+                                subStage.toFront();
                                 subStage.requestFocus();
                             } catch (IOException e) {
                                 LOG.error("Failed to load dialogWindow.fxml", e);
