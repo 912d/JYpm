@@ -161,29 +161,27 @@ public class PlaylistManagerTest {
     }
 
     @Test
-    public void testRemoveDirectoryDeletion() {
+    public void testDirectoryDeletion() {
         try {
             File samplePlaylistDir = new File(playlistPath);
             PlaylistManager.getInstance().add(samplePlaylist);
-            Thread.sleep(1000);
-            assertTrue(samplePlaylistDir.exists());
-            File sampleVid1 = new File(playlistPath + "/v1");
-            File sampleVid2 = new File(playlistPath + "/v2");
+            waitForPlaylistInitialization(samplePlaylist);
+            //Simulate DownloadManager's behaviour and create 2 empty video dummy files
+            File sampleVid1 = new File(playlistPath + "/v1.mp4");
+            File sampleVid2 = new File(playlistPath + "/v2.mkv");
             sampleVid1.createNewFile();
             sampleVid2.createNewFile();
-            assertEquals(samplePlaylistDir.listFiles().length, 2);
+            //Check if PlaylistManager doesn't delete directory when not prompted
             PlaylistManager.getInstance().remove(samplePlaylist, false);
             Thread.sleep(1000);
             assertTrue(samplePlaylistDir.exists());
             assertEquals(samplePlaylistDir.listFiles().length, 2);
             PlaylistManager.getInstance().add(samplePlaylist);
-            Thread.sleep(1000);
+            waitForPlaylistInitialization(samplePlaylist);
             PlaylistManager.getInstance().remove(samplePlaylist, true);
-            Thread.sleep(2000);
+            Thread.sleep(2500);
             assertFalse(samplePlaylistDir.exists());
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (InterruptedException | IOException e) {
             e.printStackTrace();
         }
     }
