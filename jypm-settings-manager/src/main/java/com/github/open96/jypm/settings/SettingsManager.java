@@ -114,8 +114,7 @@ public class SettingsManager {
      * @param executableLocation path to youtube-dl executable
      */
     public void setYoutubeDlExecutable(String executableLocation) {
-
-        //Create a Runnable thread that will download needed playlist and video data
+        
         ThreadManager
                 .getInstance()
                 .sendVoidTask(new Thread(() -> {
