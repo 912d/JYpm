@@ -89,12 +89,14 @@ public class PlaylistManagerTest {
         final int OBJECT_INITIALIZATION_TIMEOUT = 10000, SLEEP_TIME = 10;
         int timeout = 0;
         try {
-            boolean checkIfNotNull = p.getTotalVideoCount() != null && p.getPlaylistName() != null && p.getPlaylistThumbnailUrl() != null;
+            boolean checkIfNotNull = false;
             while (!checkIfNotNull) {
                 Thread.sleep(SLEEP_TIME);
                 timeout += SLEEP_TIME;
                 assertTrue(timeout <= OBJECT_INITIALIZATION_TIMEOUT);
-                checkIfNotNull = p.getTotalVideoCount() != null && p.getPlaylistName() != null && p.getPlaylistThumbnailUrl() != null;
+                checkIfNotNull = p.getTotalVideoCount() != null
+                        && p.getPlaylistName() != null
+                        && p.getPlaylistThumbnailUrl() != null;
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -127,7 +129,8 @@ public class PlaylistManagerTest {
                     .getInstance()
                     .getPlaylistByLink(samplePlaylist.getPlaylistLink()).getTotalVideoCount();
             assertEquals(2, videoCount);
-            assertEquals(QUEUE_STATUS.QUEUED, PlaylistManager.getInstance().getPlaylistByLink(samplePlaylist.getPlaylistLink()).getStatus());
+            assertEquals(QUEUE_STATUS.QUEUED, PlaylistManager
+                    .getInstance().getPlaylistByLink(samplePlaylist.getPlaylistLink()).getStatus());
         } catch (IllegalStateException e) {
             System.out.println("Empty API object");
             e.printStackTrace();
