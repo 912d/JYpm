@@ -72,6 +72,7 @@ public class SettingsManager {
         }
         determineHostOS();
         setDefaultFileManagerIfNotSet();
+        setFfmpegExecutableIfPossibleAndNotSet();
         saveToJson();
         LOG.debug("SettingsManager has been successfully initialized");
     }
@@ -151,7 +152,7 @@ public class SettingsManager {
      * @param executableLocation path to youtube-dl executable
      */
     public void setFfmpegExecutable(String executableLocation) {
-        
+
         ThreadManager
                 .getInstance()
                 .sendVoidTask(new Thread(() -> {
@@ -336,6 +337,17 @@ public class SettingsManager {
             } else if (getOS() == OS_TYPE.OPEN_SOURCE_UNIX) {
                 setFileManagerCommand("xdg-open");
             }
+        }
+    }
+
+    private void setFfmpegExecutableIfPossibleAndNotSet() {
+        if (getOS() != OS_TYPE.WINDOWS && getFfmpegExecutable().equals("")) {
+            setFfmpegExecutable("ffmpeg");
+            LOG.warn("FFmpeg has been assumed to be available via \"ffmpeg\" command. Make sure it is available" +
+                    "via command line or download it from page/via your package manager.");
+        }
+        if (getOS() == OS_TYPE.WINDOWS && getFfmpegExecutable().equals("")) {
+            LOG.warn("Ffmpeg is not set, download one and set it in settings to make video conversion possible.");
         }
     }
 
