@@ -189,23 +189,26 @@ public class PlaylistManagerTest {
     @Test
     public void testGetPlaylists() {
         try {
-            PlaylistManager.getInstance();
-            Thread.sleep(1000);
-            assertEquals(0, PlaylistManager.getInstance().getPlaylists().size());
-            assertNull(PlaylistManager.getInstance().getPlaylistByLink(samplePlaylist.getPlaylistLink()));
+            assertEquals(0, PlaylistManager
+                    .getInstance()
+                    .getPlaylists().size());
+            assertNull(PlaylistManager
+                    .getInstance()
+                    .getPlaylistByLink(samplePlaylist.getPlaylistLink()));
             PlaylistManager.getInstance().add(samplePlaylist);
-            Thread.sleep(1000);
+            waitForPlaylistInitialization(samplePlaylist);
             assertEquals(1, PlaylistManager.getInstance().getPlaylists().size());
             assertEquals(samplePlaylist, PlaylistManager.getInstance().getPlaylists().get(0));
             assertEquals(samplePlaylist, PlaylistManager.getInstance().getPlaylistByLink(samplePlaylist.getPlaylistLink()));
             PlaylistManager.getInstance().remove(samplePlaylist, false);
-            Thread.sleep(500);
+            Thread.sleep(2500);
             assertNull(PlaylistManager.getInstance().getPlaylistByLink(samplePlaylist.getPlaylistLink()));
             assertEquals(0, PlaylistManager.getInstance().getPlaylists().size());
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (IllegalStateException e) {
             System.out.println("Empty API object");
+            e.printStackTrace();
         }
 
     }
