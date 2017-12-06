@@ -2,6 +2,7 @@ package com.github.open96.jypm.settings;
 
 class Settings {
     private String youtubeDlExecutable;
+    private String ffmpegExecutable;
     private OS_TYPE osType;
     private String fileManagerCommand;
     private boolean notificationPolicy;
@@ -9,11 +10,12 @@ class Settings {
     private String runtimeVersion;
 
     public Settings() {
+        ffmpegExecutable = "";
         youtubeDlExecutable = "";
         fileManagerCommand = "";
         notificationPolicy = true;
         youtubeDlVersion = "";
-        runtimeVersion="";
+        runtimeVersion = "";
     }
 
     String getYoutubeDlExecutable() {
@@ -63,4 +65,14 @@ class Settings {
     void setRuntimeVersion(String runtimeVersion) {
         this.runtimeVersion = runtimeVersion;
     }
+
+    public String getFfmpegExecutable() {
+        return ffmpegExecutable;
+    }
+
+    public void setFfmpegExecutable(String ffmpegExecutable) {
+        this.ffmpegExecutable = ffmpegExecutable;
+    }
+
+
 }
