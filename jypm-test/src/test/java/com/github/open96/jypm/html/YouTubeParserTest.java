@@ -1,32 +1,37 @@
 package com.github.open96.jypm.html;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
 public class YouTubeParserTest {
 
+    //Feel free to change playlist token and assertions if you don't like default one
+    private static final String TEST_PLAYLIST_TOKEN = "PLK1OE0wPYodKbHOX0pd5nD4TTT9CflG39";
+    //Instance of YouTubeParser that is created before tests are ran
+    private static YouTubeParser youTubeParser;
+
+    @BeforeClass
+    public static void initialize() {
+        youTubeParser = new YouTubeParser(TEST_PLAYLIST_TOKEN);
+    }
 
     @Test
     public void testGetPlaylistName() {
-        YouTubeParser youTubeParser = new YouTubeParser("PLK1OE0wPYodKbHOX0pd5nD4TTT9CflG39");
-        String playlistName = youTubeParser.getPlaylistName();
-        assertEquals("Test playlist", playlistName);
+        assertEquals("Test playlist", youTubeParser.getPlaylistName());
     }
 
     @Test
     public void testGetVideoCount() {
-        YouTubeParser youTubeParser = new YouTubeParser("PLK1OE0wPYodKbHOX0pd5nD4TTT9CflG39");
-        String videoCount = youTubeParser.getVideoCount();
-        assertEquals("2", videoCount);
+        assertEquals("2", youTubeParser.getVideoCount());
     }
 
     @Test
     public void testGetThumbnailUrl() {
-        YouTubeParser youTubeParser = new YouTubeParser("PLK1OE0wPYodKbHOX0pd5nD4TTT9CflG39");
-        String thumbnailUrl = youTubeParser.getThumbnailLink();
-        //Not sure about that as I'm not 100% sure link doesn't change.
-        assertEquals("https://i.ytimg.com/vi/yVpbFMhOAwE/hqdefault.jpg?sqp=-oaymwEXCPYBEIoBSFryq4qpAwkIARUAAIhCGAE=&rs=AOn4CLDWV3RjB4O1AkB0KolNoZO1AxuOlQ", thumbnailUrl);
+        assertEquals("https://i.ytimg.com/vi/yVpbFMhOAwE/hqdefault.jpg?" +
+                        "sqp=-oaymwEXCPYBEIoBSFryq4qpAwkIARUAAIhCGAE=&rs=AOn4CLDWV3RjB4O1AkB0KolNoZO1AxuOlQ",
+                youTubeParser.getThumbnailLink());
     }
 
 }

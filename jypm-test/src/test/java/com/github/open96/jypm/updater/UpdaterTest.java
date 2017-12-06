@@ -1,25 +1,17 @@
 package com.github.open96.jypm.updater;
 
 import com.github.open96.jypm.internetconnection.ConnectionChecker;
+import org.junit.Before;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.Properties;
 
 import static org.junit.Assert.*;
 
 public class UpdaterTest {
 
-    public UpdaterTest() {
-        try {
-            Updater.getInstance();
-        } catch (IllegalStateException e) {
-            System.out.println("Empty API object");
-        }
-    }
-
-    private void resetSingleton() {
+    @Before
+    public void resetSingleton() {
         try {
             Field singletonInstance = Updater.class.getDeclaredField("singletonInstance");
             singletonInstance.setAccessible(true);
@@ -27,6 +19,12 @@ public class UpdaterTest {
         } catch (IllegalAccessException | NoSuchFieldException e) {
             e.printStackTrace();
         }
+        Updater.getInstance();
+    }
+
+    @Before
+    public void checkInternetConnection() {
+        assertTrue(ConnectionChecker.getInstance().checkInternetConnection());
     }
 
     private void setFakeRuntimeVersion(String version) {
@@ -41,44 +39,18 @@ public class UpdaterTest {
 
     @Test
     public void testCheckForUpdate() {
-        if (ConnectionChecker.getInstance().checkInternetConnection()) {
-            try {
-                resetSingleton();
-                setFakeRuntimeVersion("-1");
-                String newestVersion = Updater.getInstance().checkForUpdate();
-                assertNotNull(newestVersion);
-                if (newestVersion != null) {
-                    setFakeRuntimeVersion(newestVersion);
-                    assertNull(Updater.getInstance().checkForUpdate());
-                }
-            } catch (IllegalStateException e) {
-                System.out.println("Empty API object");
-            }
+        try {
+            //Check if checkForUpdate() returns not-null string when online version is different from runtime one
+            setFakeRuntimeVersion("VERSION THAT DOESN'T EXIST");
+            String newestVersion = Updater.getInstance().checkForUpdate();
+            assertNotNull(newestVersion);
+            //Now check if checkForUpdate() will return null when runtime version matches the online one
+            setFakeRuntimeVersion(newestVersion);
+            assertNull(Updater.getInstance().checkForUpdate());
+        } catch (IllegalStateException e) {
+            System.out.println("Empty API object");
+            e.printStackTrace();
         }
     }
-
-    @Test
-    public void testRefresh() {
-        if (ConnectionChecker.getInstance().checkInternetConnection()) {
-            try {
-                //Get runtime version
-                Properties properties = new Properties();
-                properties.load(Updater.class.getClassLoader().getResourceAsStream("version.properties"));
-                resetSingleton();
-                String newestVersion = Updater.getInstance().checkForUpdate();
-                setFakeRuntimeVersion("-1");
-                Updater.getInstance().refresh();
-                String updatedVersion = Updater.getInstance().checkForUpdate();
-                if (!updatedVersion.equals(properties.getProperty("runtime.version"))) {
-                    assertEquals(newestVersion, Updater.getInstance().checkForUpdate());
-                }
-            } catch (IllegalStateException e) {
-                System.out.println("Empty API object");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
 
 }
