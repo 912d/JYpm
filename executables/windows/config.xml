@@ -19,7 +19,7 @@
         <windowTitle>JYpm</windowTitle>
     </singleInstance>
     <classPath>
-        <mainClass>com.github.open96.JYpm</mainClass>
+        <mainClass>com.github.open96.jypm.JYpm</mainClass>
     </classPath>
     <jre>
         <path></path>

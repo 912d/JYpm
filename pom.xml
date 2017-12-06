@@ -4,10 +4,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.github.open96</groupId>
+    <groupId>com.github.open96.jypm</groupId>
     <artifactId>jypm</artifactId>
     <packaging>pom</packaging>
-    <version>1.2.1</version>
+    <version>1.2.1-SNAPSHOT</version>
     <url>https://github.com/Open96/jypm</url>
     <description>jypm - Java YouTube Playlist Manager</description>
     <modules>
@@ -23,6 +23,7 @@
         <module>jypm-updater</module>
         <module>jypm-html-parser</module>
         <module>jypm-internet-checker</module>
+        <module>jypm-test</module>
     </modules>
 
     <properties>
@@ -43,11 +44,6 @@
                     <source>1.9</source>
                     <target>1.9</target>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>2.9</version>
             </plugin>
         </plugins>
     </build>

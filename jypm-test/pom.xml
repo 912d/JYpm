@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>jypm</artifactId>
+        <groupId>com.github.open96.jypm</groupId>
+        <version>1.2.1-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>jypm-test</artifactId>
+    <url>https://github.com/Open96/jypm</url>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>com.github.open96.jypm</groupId>
+            <artifactId>jypm-api</artifactId>
+            <version>1.2.1-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.open96.jypm</groupId>
+            <artifactId>jypm-app</artifactId>
+            <version>1.2.1-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.open96.jypm</groupId>
+            <artifactId>jypm-download-manager</artifactId>
+            <version>1.2.1-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.open96.jypm</groupId>
+            <artifactId>jypm-fxml</artifactId>
+            <version>1.2.1-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.open96.jypm</groupId>
+            <artifactId>jypm-html-parser</artifactId>
+            <version>1.2.1-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.open96.jypm</groupId>
+            <artifactId>jypm-internet-checker</artifactId>
+            <version>1.2.1-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.open96.jypm</groupId>
+            <artifactId>jypm-playlist-manager</artifactId>
+            <version>1.2.1-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.open96.jypm</groupId>
+            <artifactId>jypm-settings-manager</artifactId>
+            <version>1.2.1-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.open96.jypm</groupId>
+            <artifactId>jypm-thread-manager</artifactId>
+            <version>1.2.1-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.open96.jypm</groupId>
+            <artifactId>jypm-tray-icon</artifactId>
+            <version>1.2.1-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.open96.jypm</groupId>
+            <artifactId>jypm-updater</artifactId>
+            <version>1.2.1-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.open96.jypm</groupId>
+            <artifactId>jypm-youtube-dl</artifactId>
+            <version>1.2.1-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+    <!-- This prevents test module from being packed into .jar -->
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.0.2</version>
+                <executions>
+                    <execution>
+                        <id>default-jar</id>
+                        <phase>none</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-install-plugin</artifactId>
+                <version>2.5.2</version>
+                <executions>
+                    <execution>
+                        <id>default-install</id>
+                        <phase>none</phase>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
