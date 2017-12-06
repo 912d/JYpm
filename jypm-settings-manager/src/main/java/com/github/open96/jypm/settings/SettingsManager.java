@@ -126,6 +126,42 @@ public class SettingsManager {
                 }), TASK_TYPE.SETTING);
     }
 
+
+    /**
+     * @return Path to ffmpeg executable stored in SettingsManager in form of String object
+     */
+    public String getFfmpegExecutable() {
+
+        Callable<String> settingsGetterThread = () -> settings.getFfmpegExecutable();
+        Future<String> settingsFuture = ThreadManager
+                .getInstance()
+                .sendTask(settingsGetterThread, TASK_TYPE.SETTING);
+
+        try {
+            return settingsFuture.get();
+        } catch (InterruptedException | ExecutionException e) {
+            LOG.error("Failed to retrieve setting", e);
+        }
+        return null;
+    }
+
+    /**
+     * Sets path to ffmpeg executable and saves it in SettingsManager
+     *
+     * @param executableLocation path to youtube-dl executable
+     */
+    public void setFfmpegExecutable(String executableLocation) {
+        
+        ThreadManager
+                .getInstance()
+                .sendVoidTask(new Thread(() -> {
+                    settings.setFfmpegExecutable(executableLocation);
+                    if (ThreadManager.getExecutionPermission()) {
+                        saveToJson();
+                    }
+                }), TASK_TYPE.SETTING);
+    }
+
     /**
      * @return Type of OS application is running on
      */
