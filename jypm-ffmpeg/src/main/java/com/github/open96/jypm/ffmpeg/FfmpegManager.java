@@ -36,4 +36,11 @@ public class FfmpegManager {
     public boolean checkIfExecutableIsValid() {
         return false;
     }
+
+    /**
+     * Attempts to convert every file in directory via ffmpeg
+     */
+    public void convertDirectory(String directory, FILE_EXTENSION fileExtension) {
+
+    }
 }
