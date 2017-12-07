@@ -71,7 +71,7 @@ public class YoutubeDlManagerTest {
 
 
     private void waitForDownload() {
-        final int DOWNLOAD_TIMEOUT = 10000 * 60 * 4, SLEEP_TIME = 10;
+        final int DOWNLOAD_TIMEOUT = 1000 * 60 * 4, SLEEP_TIME = 10;
         int timeout = 0;
         try {
             while (YoutubeDlManager.getInstance().getExecutableState() != EXECUTABLE_STATE.READY) {
