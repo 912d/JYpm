@@ -53,6 +53,7 @@ public class FfmpegManagerTest {
     }
 
 
+    //TODO Create Util module and put this code and other universal methods in there
     private String getProcessOutput(Process process) throws IOException, InterruptedException {
         //Create BufferedReader that will read process's output
         try (InputStream inputStream = process.getInputStream()) {
