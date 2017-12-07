@@ -45,6 +45,8 @@ public class SettingsWindowController implements Initializable {
     @FXML
     Label notificationLabel;
     @FXML
+    Label ffmpegLocationLabel;
+    @FXML
     Button saveSettingsButton;
     @FXML
     Button restoreDefaultsButton;
@@ -54,6 +56,8 @@ public class SettingsWindowController implements Initializable {
     Button updateYTDLButton;
     @FXML
     TextField fileManagerCommandTextField;
+    @FXML
+    TextField ffmpegLocationTextField;
     @FXML
     CheckBox notificationCheckBox;
 
@@ -77,6 +81,9 @@ public class SettingsWindowController implements Initializable {
         fileManagerCommandTextField.setText(SettingsManager
                 .getInstance()
                 .getFileManagerCommand());
+        ffmpegLocationTextField.setText(SettingsManager
+                .getInstance()
+                .getFfmpegExecutable());
         if (SettingsManager
                 .getInstance()
                 .getNotificationPolicy()) {
@@ -119,6 +126,9 @@ public class SettingsWindowController implements Initializable {
         SettingsManager
                 .getInstance()
                 .setFileManagerCommand(fileManagerCommandTextField.getText());
+        SettingsManager
+                .getInstance()
+                .setFfmpegExecutable(ffmpegLocationTextField.getText());
         SettingsManager
                 .getInstance()
                 .setNotificationPolicy(notificationCheckBox.isSelected());

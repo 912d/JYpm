@@ -72,6 +72,7 @@ public class SettingsManager {
         }
         determineHostOS();
         setDefaultFileManagerIfNotSet();
+        setFfmpegExecutableIfPossibleAndNotSet();
         saveToJson();
         LOG.debug("SettingsManager has been successfully initialized");
     }
@@ -120,6 +121,42 @@ public class SettingsManager {
                 .getInstance()
                 .sendVoidTask(new Thread(() -> {
                     settings.setYoutubeDlExecutable(executableLocation);
+                    if (ThreadManager.getExecutionPermission()) {
+                        saveToJson();
+                    }
+                }), TASK_TYPE.SETTING);
+    }
+
+
+    /**
+     * @return Path to ffmpeg executable stored in SettingsManager in form of String object
+     */
+    public String getFfmpegExecutable() {
+
+        Callable<String> settingsGetterThread = () -> settings.getFfmpegExecutable();
+        Future<String> settingsFuture = ThreadManager
+                .getInstance()
+                .sendTask(settingsGetterThread, TASK_TYPE.SETTING);
+
+        try {
+            return settingsFuture.get();
+        } catch (InterruptedException | ExecutionException e) {
+            LOG.error("Failed to retrieve setting", e);
+        }
+        return null;
+    }
+
+    /**
+     * Sets path to ffmpeg executable and saves it in SettingsManager
+     *
+     * @param executableLocation path to youtube-dl executable
+     */
+    public void setFfmpegExecutable(String executableLocation) {
+
+        ThreadManager
+                .getInstance()
+                .sendVoidTask(new Thread(() -> {
+                    settings.setFfmpegExecutable(executableLocation);
                     if (ThreadManager.getExecutionPermission()) {
                         saveToJson();
                     }
@@ -300,6 +337,17 @@ public class SettingsManager {
             } else if (getOS() == OS_TYPE.OPEN_SOURCE_UNIX) {
                 setFileManagerCommand("xdg-open");
             }
+        }
+    }
+
+    private void setFfmpegExecutableIfPossibleAndNotSet() {
+        if (getOS() != OS_TYPE.WINDOWS && getFfmpegExecutable().equals("")) {
+            setFfmpegExecutable("ffmpeg");
+            LOG.warn("FFmpeg has been assumed to be available via \"ffmpeg\" command. Make sure it is available" +
+                    "via command line or download it from page/via your package manager.");
+        }
+        if (getOS() == OS_TYPE.WINDOWS && getFfmpegExecutable().equals("")) {
+            LOG.warn("Ffmpeg is not set, download one and set it in settings to make video conversion possible.");
         }
     }
 
