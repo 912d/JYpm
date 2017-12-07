@@ -24,6 +24,7 @@
         <module>jypm-html-parser</module>
         <module>jypm-internet-checker</module>
         <module>jypm-test</module>
+        <module>jypm-ffmpeg</module>
     </modules>
 
     <properties>
