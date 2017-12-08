@@ -32,7 +32,7 @@ public class FfmpegManager {
     }
 
     private void init() {
-
+        checkIfExecutableIsValid();
     }
 
 
