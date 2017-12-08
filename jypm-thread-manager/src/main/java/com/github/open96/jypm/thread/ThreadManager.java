@@ -61,6 +61,10 @@ public class ThreadManager {
                 case OTHER:
                     executorServiceMap.put(taskType, Executors.newCachedThreadPool());
                     break;
+                case CONVERSION:
+                    //TODO Make it source thread count from SettingsManager
+                    executorServiceMap.put(taskType, Executors.newFixedThreadPool(4));
+                    break;
                 //Rest of executorServices should only process one task at a time
                 default:
                     executorServiceMap.put(taskType, Executors.newSingleThreadExecutor());

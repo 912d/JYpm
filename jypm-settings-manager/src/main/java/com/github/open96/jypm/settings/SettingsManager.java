@@ -115,7 +115,7 @@ public class SettingsManager {
      * @param executableLocation path to youtube-dl executable
      */
     public void setYoutubeDlExecutable(String executableLocation) {
-        
+
         ThreadManager
                 .getInstance()
                 .sendVoidTask(new Thread(() -> {
@@ -308,6 +308,43 @@ public class SettingsManager {
                 .getInstance()
                 .sendVoidTask(new Thread(() -> {
                     settings.setRuntimeVersion(version);
+                    if (ThreadManager.getExecutionPermission()) {
+                        saveToJson();
+                    }
+                }), TASK_TYPE.SETTING);
+    }
+
+
+    /**
+     * @return maximum number of allowed ffmpeg  concurrent tasks
+     */
+    public Integer getFfmpegThreadLimit() {
+
+        Callable<Integer> settingsGetterThread = () -> settings.getFfmpegThreadLimit();
+        Future<Integer> settingsFuture = ThreadManager
+                .getInstance()
+                .sendTask(settingsGetterThread, TASK_TYPE.SETTING);
+
+        try {
+            return settingsFuture.get();
+        } catch (InterruptedException | ExecutionException e) {
+            LOG.error("Failed to retrieve setting", e);
+        }
+        return null;
+    }
+
+    /**
+     * Sets maximum number of allowed ffmpeg  concurrent tasks
+     *
+     * @param ffmpegThreadLimit Number of desired allowed concurrent tasks
+     */
+    public void setFfmpegThreadLimit(Integer ffmpegThreadLimit) {
+
+        //Create a Runnable thread that will download needed playlist and video data
+        ThreadManager
+                .getInstance()
+                .sendVoidTask(new Thread(() -> {
+                    settings.setFfmpegThreadLimit(ffmpegThreadLimit);
                     if (ThreadManager.getExecutionPermission()) {
                         saveToJson();
                     }
