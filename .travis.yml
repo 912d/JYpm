@@ -4,9 +4,9 @@ before_script:
 - sleep 5
 
 before_install:
-- sudo add-apt-repository ppa:jonathonf/ffmpeg-3
-- sudo apt update
-- sudo apt install ffmpeg
+- sudo add-apt-repository ppa:jonathonf/ffmpeg-3 -y
+- sudo apt update -q
+- sudo apt install ffmpeg -y
 
 script: mvn clean package && mvn clean install && mvn clean
 
