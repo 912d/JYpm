@@ -97,6 +97,9 @@ public class SettingsWindowController implements Initializable {
                 .getNotificationPolicy()) {
             notificationCheckBox.setSelected(true);
         }
+        threadCounterLabel.setText(String.valueOf(SettingsManager
+                .getInstance()
+                .getFfmpegThreadLimit()));
 
         //Prevent user from enforcing youtube-dl from updating while download is in progress
         ThreadManager
@@ -140,6 +143,9 @@ public class SettingsWindowController implements Initializable {
         SettingsManager
                 .getInstance()
                 .setNotificationPolicy(notificationCheckBox.isSelected());
+        SettingsManager
+                .getInstance()
+                .setFfmpegThreadLimit(Integer.valueOf(threadCounterLabel.getText()));
         rootPane.getScene().getWindow().hide();
     }
 
