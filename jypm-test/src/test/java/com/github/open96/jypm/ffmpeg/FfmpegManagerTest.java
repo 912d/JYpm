@@ -37,13 +37,13 @@ public class FfmpegManagerTest {
         playlistDirectory.delete();
     }
 
-    public static void setPlaylistPath() {
+    private static void setPlaylistPath() {
         File playlistDirectory = new File("playlist_dir/");
         playlistPath = playlistDirectory.getAbsolutePath();
         ensurePlaylistDirectoryIsPresentAndEmpty();
     }
 
-    public static void deleteConfigFiles() {
+    private static void deleteConfigFiles() {
         File settingsJSON = new File("settings.json");
         File playlistsJSON = new File("playlists.json");
         settingsJSON.delete();
@@ -136,7 +136,7 @@ public class FfmpegManagerTest {
         }
     }
 
-    public static void ensurePlaylistDirectoryIsPresentAndEmpty() {
+    private static void ensurePlaylistDirectoryIsPresentAndEmpty() {
         File dir = new File(playlistPath);
         //If file/directory with "playlist_dir" name is present, delete it
         if (dir.exists()) {
