@@ -43,6 +43,10 @@ public class SettingsWindowController implements Initializable {
     @FXML
     Label runtimeVersionLabel;
     @FXML
+    Label threadCountLabel;
+    @FXML
+    Label threadCounterLabel;
+    @FXML
     Label notificationLabel;
     @FXML
     Label ffmpegLocationLabel;
@@ -54,6 +58,10 @@ public class SettingsWindowController implements Initializable {
     Button visitGitHubButton;
     @FXML
     Button updateYTDLButton;
+    @FXML
+    Button incrementThreadCountButton;
+    @FXML
+    Button decrementThreadCountButton;
     @FXML
     TextField fileManagerCommandTextField;
     @FXML
@@ -212,4 +220,19 @@ public class SettingsWindowController implements Initializable {
                 }), TASK_TYPE.UI);
     }
 
+
+    public void onIncrementThreadCountButtonClick(ActionEvent actionEvent) {
+        Integer currentThreadCount = Integer.valueOf(threadCounterLabel.getText());
+        if (currentThreadCount < 100) {
+            threadCounterLabel.setText(String.valueOf(currentThreadCount + 1));
+        }
+    }
+
+
+    public void onDecrementThreadCountButtonClick(ActionEvent actionEvent) {
+        Integer currentThreadCount = Integer.valueOf(threadCounterLabel.getText());
+        if (currentThreadCount > 1) {
+            threadCounterLabel.setText(String.valueOf(currentThreadCount - 1));
+        }
+    }
 }
