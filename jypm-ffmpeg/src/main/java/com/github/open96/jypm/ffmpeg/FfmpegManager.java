@@ -12,6 +12,10 @@ public class FfmpegManager {
     private static FfmpegManager singletonInstance;
     //Initialize log4j logger for later use in this class
     private static final Logger LOG = LogManager.getLogger(FfmpegManager.class.getName());
+    //Allowed bitrate for mp3
+    private static final Integer[] availableBitrates = {
+            8, 16, 24, 32, 40, 48, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320
+    };
 
 
     private FfmpegManager() {
