@@ -43,6 +43,8 @@ public class FfmpegManager {
             while (process.isAlive()) {
                 Thread.sleep(10);
             }
+            //TODO - check if executable is indeed ffmpeg. To do that I need to finally
+            //export getProcessOutput() from ExecutableWrapper into some utility class.
         } catch (IOException | InterruptedException e) {
             return false;
         }
