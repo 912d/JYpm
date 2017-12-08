@@ -13,4 +13,14 @@
     <url>https://github.com/Open96/jypm</url>
 
 
+    <dependencies>
+
+        <dependency>
+            <groupId>com.github.open96.jypm</groupId>
+            <artifactId>jypm-settings-manager</artifactId>
+            <version>1.2.1-SNAPSHOT</version>
+        </dependency>
+
+    </dependencies>
+
 </project>
