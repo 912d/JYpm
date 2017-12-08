@@ -17,6 +17,7 @@ class Settings {
         notificationPolicy = true;
         youtubeDlVersion = "";
         runtimeVersion = "";
+        ffmpegThreadLimit = 2;
     }
 
     String getYoutubeDlExecutable() {
