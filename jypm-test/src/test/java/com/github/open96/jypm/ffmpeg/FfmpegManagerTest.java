@@ -101,7 +101,20 @@ public class FfmpegManagerTest {
                 System.out.println(downloadProgress + "/" + testPlaylist.getTotalVideoCount());
             }
         }
+        //Make sure files are in place where they should be
         assertEquals(QUEUE_STATUS.DOWNLOADED, testPlaylist.getStatus());
+        Integer directoryFileCount = new File(playlistPath).listFiles().length;
+        assertEquals(testPlaylist.getTotalVideoCount(), directoryFileCount);
+        //After successful download convert all files in that directory to mp3 format
+        //and expect twice as many files as a result from which half of them have a .mp3 extension
+        FfmpegManager.getInstance().convertDirectory(playlistPath, FILE_EXTENSION.MP3);
+        Integer mp3FileCounter = 0;
+        for (File f : new File(playlistPath).listFiles()) {
+            if (f.getName().endsWith(".mp3")) {
+                mp3FileCounter++;
+            }
+        }
+        assertEquals(testPlaylist.getTotalVideoCount(), mp3FileCounter);
     }
 
 
