@@ -70,17 +70,6 @@ public class FfmpegManagerTest {
     @Test
     public void testCheckIfExecutableIsValid() {
         SettingsManager.getInstance().setFfmpegExecutable(PATH_TO_FFMPEG);
-        try {
-            String command[] = {PATH_TO_FFMPEG, "-version"};
-            Process process = Runtime.getRuntime().exec(command);
-            while (process.isAlive()) {
-                Thread.sleep(10);
-            }
-            System.out.println(getProcessOutput(process));
-        } catch (IOException | InterruptedException e) {
-            assertFalse(FfmpegManager.getInstance().checkIfExecutableIsValid());
-            e.printStackTrace();
-        }
         assertTrue(FfmpegManager.getInstance().checkIfExecutableIsValid());
     }
 
