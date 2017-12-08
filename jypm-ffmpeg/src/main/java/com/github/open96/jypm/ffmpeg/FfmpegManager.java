@@ -1,8 +1,11 @@
 package com.github.open96.jypm.ffmpeg;
 
 
+import com.github.open96.jypm.settings.SettingsManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.io.IOException;
 
 public class FfmpegManager {
     //This object is a singleton thus storing instance of it is needed
@@ -34,7 +37,16 @@ public class FfmpegManager {
 
 
     public boolean checkIfExecutableIsValid() {
-        return false;
+        try {
+            String command[] = {SettingsManager.getInstance().getFfmpegExecutable(), "-version"};
+            Process process = Runtime.getRuntime().exec(command);
+            while (process.isAlive()) {
+                Thread.sleep(10);
+            }
+        } catch (IOException | InterruptedException e) {
+            return false;
+        }
+        return true;
     }
 
     /**
