@@ -1,7 +1,6 @@
 package com.github.open96.jypm.thread;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.lang.reflect.Field;
@@ -17,7 +16,7 @@ import static org.junit.Assert.assertNull;
 public class ThreadManagerTest {
 
     @Before
-    public static void resetSingleton() {
+    public void resetSingleton() {
         try {
             Field singletonInstance = ThreadManager.class.getDeclaredField("singletonInstance");
             singletonInstance.setAccessible(true);
@@ -31,8 +30,8 @@ public class ThreadManagerTest {
         ThreadManager.getInstance();
     }
 
-    @BeforeClass
-    public static void checkInitialState() {
+    @Test
+    public void checkInitialState() {
         resetSingleton();
         assertFalse(ThreadManager.getExecutionPermission());
         ThreadManager.getInstance();
