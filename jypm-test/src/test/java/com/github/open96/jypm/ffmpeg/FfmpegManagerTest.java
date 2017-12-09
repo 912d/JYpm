@@ -1,6 +1,7 @@
 package com.github.open96.jypm.ffmpeg;
 
 import com.github.open96.jypm.download.DownloadManager;
+import com.github.open96.jypm.download.ExecutableWrapper;
 import com.github.open96.jypm.playlist.PlaylistManager;
 import com.github.open96.jypm.playlist.QUEUE_STATUS;
 import com.github.open96.jypm.playlist.pojo.Playlist;
@@ -25,6 +26,7 @@ public class FfmpegManagerTest {
     public static void initialize() {
         setPlaylistPath();
         deleteConfigFiles();
+        prepareYoutubeDl();
         PlaylistManager.getInstance();
         assertEquals(0, PlaylistManager.getInstance().getPlaylists().size());
         DownloadManager.getInstance();
@@ -48,6 +50,16 @@ public class FfmpegManagerTest {
         File playlistsJSON = new File("playlists.json");
         settingsJSON.delete();
         playlistsJSON.delete();
+    }
+
+    private static void prepareYoutubeDl() {
+        while (!ExecutableWrapper.getInstance().getYoutubeDlVersion().equals("")) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Before
