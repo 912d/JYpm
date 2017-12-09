@@ -17,7 +17,7 @@ import static org.junit.Assert.assertNull;
 public class ThreadManagerTest {
 
     @Before
-    public void resetSingleton() {
+    public static void resetSingleton() {
         try {
             Field singletonInstance = ThreadManager.class.getDeclaredField("singletonInstance");
             singletonInstance.setAccessible(true);
@@ -33,6 +33,7 @@ public class ThreadManagerTest {
 
     @BeforeClass
     public static void checkInitialState() {
+        resetSingleton();
         assertFalse(ThreadManager.getExecutionPermission());
         ThreadManager.getInstance();
         assertTrue(ThreadManager.getExecutionPermission());
