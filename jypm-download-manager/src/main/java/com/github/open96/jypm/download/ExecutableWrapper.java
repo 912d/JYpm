@@ -4,7 +4,6 @@ import com.github.open96.jypm.playlist.pojo.Playlist;
 import com.github.open96.jypm.settings.SettingsManager;
 import com.github.open96.jypm.thread.TASK_TYPE;
 import com.github.open96.jypm.thread.ThreadManager;
-import com.github.open96.jypm.util.ProcessWrapper;
 import com.github.open96.jypm.youtubedl.YoutubeDlManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -56,23 +55,6 @@ public class ExecutableWrapper {
     }
 
     /**
-     * Query executable specified by SettingsManager for it's version
-     *
-     * @return Output of command "path-to-executable --version"
-     */
-    public String getYoutubeDlVersion() {
-        try {
-            String command[] = {settingsManager.getYoutubeDlExecutable(), "--version"};
-            Process process = runtime.exec(command);
-            return new ProcessWrapper(process).getProcessOutput();
-        } catch (IOException e) {
-            LOG.error("There was an error when querying executable for version", e);
-            triggerExecutableRedownload();
-            return "";
-        }
-    }
-
-    /**
      * Downloads playlist with youtube-dl
      *
      * @param playlist Playlist that should be downloaded
@@ -80,7 +62,7 @@ public class ExecutableWrapper {
      */
     Process downloadPlaylist(Playlist playlist) throws IOException {
         //Check if there is at least something set as executable
-        if (getYoutubeDlVersion().equals("")) {
+        if (SettingsManager.getInstance().getYoutubeDlVersion().equals("")) {
             return null;
         }
         //Issue main youtube-dl command for an actual download and return it's process for further operations on it
