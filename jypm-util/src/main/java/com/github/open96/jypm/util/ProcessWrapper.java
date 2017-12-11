@@ -2,6 +2,8 @@ package com.github.open96.jypm.util;
 
 import com.github.open96.jypm.thread.TASK_TYPE;
 import com.github.open96.jypm.thread.ThreadManager;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -12,6 +14,8 @@ import java.util.concurrent.Future;
 
 public class ProcessWrapper {
     private Process process;
+    //Initialize log4j logger for later use in this class
+    private static final Logger LOG = LogManager.getLogger(ProcessWrapper.class.getName());
 
     public ProcessWrapper(Process process) {
         this.process = process;
@@ -22,7 +26,7 @@ public class ProcessWrapper {
      *
      * @return String with process's output
      */
-    public String getProcessOutput() throws InterruptedException {
+    public String getProcessOutput() {
         //Create BufferedReader that will read process's output
         Callable<String> processOutputGetter = () -> {
             try (InputStream inputStream = process.getInputStream()) {
@@ -42,8 +46,8 @@ public class ProcessWrapper {
         Future<String> processOutputFuture = ThreadManager.getInstance().sendTask(processOutputGetter, TASK_TYPE.OTHER);
         try {
             return processOutputFuture.get();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
+        } catch (ExecutionException | InterruptedException e) {
+            LOG.error(e);
         }
         return null;
     }
