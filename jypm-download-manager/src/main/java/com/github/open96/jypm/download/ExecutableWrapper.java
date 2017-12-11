@@ -69,9 +69,6 @@ public class ExecutableWrapper {
             LOG.error("There was an error when querying executable for version", e);
             triggerExecutableRedownload();
             return "";
-        } catch (InterruptedException e) {
-            LOG.error(e);
-            return "";
         }
     }
 
