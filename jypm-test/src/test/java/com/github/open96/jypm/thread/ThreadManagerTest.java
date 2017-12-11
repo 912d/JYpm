@@ -16,7 +16,7 @@ import static org.junit.Assert.assertNull;
 public class ThreadManagerTest {
 
     @Before
-    public void resetSingleton() {
+    public void deleteSingleton() {
         try {
             Field singletonInstance = ThreadManager.class.getDeclaredField("singletonInstance");
             singletonInstance.setAccessible(true);
@@ -27,12 +27,10 @@ public class ThreadManagerTest {
         } catch (IllegalAccessException | NoSuchFieldException e) {
             e.printStackTrace();
         }
-        ThreadManager.getInstance();
     }
 
     @Test
     public void checkInitialState() {
-        resetSingleton();
         assertFalse(ThreadManager.getExecutionPermission());
         ThreadManager.getInstance();
         assertTrue(ThreadManager.getExecutionPermission());
@@ -89,7 +87,7 @@ public class ThreadManagerTest {
                 assertTrue(true);
             }
             //Call resetSingleton manually so ThreadManager will be responsible if ran with other test classes
-            resetSingleton();
+            deleteSingleton();
         }
     }
 }
