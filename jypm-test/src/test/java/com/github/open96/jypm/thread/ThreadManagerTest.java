@@ -86,7 +86,7 @@ public class ThreadManagerTest {
             } catch (RejectedExecutionException e) {
                 assertTrue(true);
             }
-            //Call resetSingleton manually so ThreadManager will be responsible if ran with other test classes
+            //Below line ensures rest of the tests from this module don't fail when ran in single batch
             deleteSingleton();
         }
     }
