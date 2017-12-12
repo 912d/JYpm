@@ -10,7 +10,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.*;
+import java.io.File;
 import java.lang.reflect.Field;
 
 import static org.junit.Assert.*;
@@ -107,25 +107,6 @@ public class FfmpegManagerTest {
             }
         }
         assertEquals(testPlaylist.getTotalVideoCount(), mp3FileCounter);
-    }
-
-
-    //TODO Create Util module and put this code and other universal methods in there
-    private String getProcessOutput(Process process) throws IOException, InterruptedException {
-        //Create BufferedReader that will read process's output
-        try (InputStream inputStream = process.getInputStream()) {
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-            String line;
-            StringBuilder output = new StringBuilder();
-            while ((line = bufferedReader.readLine()) != null || process.isAlive()) {
-                if (line != null) {
-                    output.append(line);
-                }
-            }
-            process.waitFor();
-            bufferedReader.close();
-            return output.toString();
-        }
     }
 
     private static void ensurePlaylistDirectoryIsPresentAndEmpty() {
