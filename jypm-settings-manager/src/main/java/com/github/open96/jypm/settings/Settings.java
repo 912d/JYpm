@@ -8,6 +8,7 @@ class Settings {
     private boolean notificationPolicy;
     private String youtubeDlVersion;
     private String runtimeVersion;
+    private Integer ffmpegThreadLimit;
 
     public Settings() {
         ffmpegExecutable = "";
@@ -16,6 +17,7 @@ class Settings {
         notificationPolicy = true;
         youtubeDlVersion = "";
         runtimeVersion = "";
+        ffmpegThreadLimit = 2;
     }
 
     String getYoutubeDlExecutable() {
@@ -74,5 +76,11 @@ class Settings {
         this.ffmpegExecutable = ffmpegExecutable;
     }
 
+    public Integer getFfmpegThreadLimit() {
+        return ffmpegThreadLimit;
+    }
 
+    public void setFfmpegThreadLimit(Integer ffmpegThreadLimit) {
+        this.ffmpegThreadLimit = ffmpegThreadLimit;
+    }
 }

@@ -39,6 +39,13 @@
             <version>${project.version}</version>
         </dependency>
 
+
+        <dependency>
+            <groupId>com.github.open96.jypm</groupId>
+            <artifactId>jypm-util</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
     </dependencies>
 
 

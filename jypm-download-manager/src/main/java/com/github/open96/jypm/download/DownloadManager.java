@@ -16,7 +16,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Queue;
 import java.util.concurrent.Callable;
@@ -57,7 +56,7 @@ public class DownloadManager {
      * Initialize subcomponents on first instance creation
      */
     private void init() {
-        YoutubeDlManager.getInstance();
+        YoutubeDlManager.getInstance().downloadYoutubeDl();
         LOG.trace("Initializing DownloadManager");
         executableWrapper = ExecutableWrapper.getInstance();
         threadLock = false;
@@ -101,9 +100,7 @@ public class DownloadManager {
                                 .updatePlaylistStatus(playlist, QUEUE_STATUS.DOWNLOADING);
                         //Start the download
                         Process process = executableWrapper.downloadPlaylist(playlist);
-                        try (InputStream inputStream = process.getInputStream()) {
-                            parseOutputWhileProcessIsAlive(playlist, process, inputStream);
-                        }
+                        parseOutputWhileProcessIsAlive(playlist, process);
                         //Mark playlist as downloaded
                         PlaylistManager
                                 .getInstance()
@@ -267,37 +264,42 @@ public class DownloadManager {
                 }), TASK_TYPE.DOWNLOAD);
     }
 
-    private void parseOutputWhileProcessIsAlive(Playlist playlist, Process process, InputStream inputStream)
+    /**
+     * This method is actually a bit different from the one included in ProcessWrapper as this one
+     * will update output in realtime while one in ProcessWrapper returns finished output
+     */
+    private void parseOutputWhileProcessIsAlive(Playlist playlist, Process process)
             throws IOException, InterruptedException {
         //Create BufferedReader and read all output of the process until it dies
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-        String line;
-        while (process.isAlive() && PlaylistManager
-                .getInstance()
-                .getPlaylistByLink(playlist.getPlaylistLink()) != null && ThreadManager.getExecutionPermission()) {
-            if (!threadLock) {
-                if ((line = bufferedReader.readLine()) != null || line != null) {
-                    detailsString.append(line).append("\n");
-                    //Trim the StringBuilder to reduce memory usage
-                    if (detailsString.length() > 16000) {
-                        detailsString.trimToSize();
-                        detailsString = new StringBuilder(detailsString
-                                .toString()
-                                .substring(detailsString.length() - 16000));
-                    }
-                    if (getDownloadProgress() != null) {
-                        Thread.sleep(50);
-                        int currentVideoCount = getDownloadProgress();
-                        if (currentVideoCount != PlaylistManager
-                                .getInstance()
-                                .getPlaylistByLink(playlist.getPlaylistLink())
-                                .getCurrentVideoCount()) {
-                            PlaylistManager
-                                    .getInstance()
-                                    .setCurrentVideoCount(playlist, currentVideoCount);
+        try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+            String line;
+            while (process.isAlive() && PlaylistManager
+                    .getInstance()
+                    .getPlaylistByLink(playlist.getPlaylistLink()) != null && ThreadManager.getExecutionPermission()) {
+                if (!threadLock) {
+                    if ((line = bufferedReader.readLine()) != null || line != null) {
+                        detailsString.append(line).append("\n");
+                        //Trim the StringBuilder to reduce memory usage
+                        if (detailsString.length() > 16000) {
+                            detailsString.trimToSize();
+                            detailsString = new StringBuilder(detailsString
+                                    .toString()
+                                    .substring(detailsString.length() - 16000));
                         }
+                        if (getDownloadProgress() != null) {
+                            Thread.sleep(50);
+                            int currentVideoCount = getDownloadProgress();
+                            if (currentVideoCount != PlaylistManager
+                                    .getInstance()
+                                    .getPlaylistByLink(playlist.getPlaylistLink())
+                                    .getCurrentVideoCount()) {
+                                PlaylistManager
+                                        .getInstance()
+                                        .setCurrentVideoCount(playlist, currentVideoCount);
+                            }
+                        }
+                        Thread.sleep(250);
                     }
-                    Thread.sleep(250);
                 }
             }
         }
