@@ -56,7 +56,7 @@ public class DownloadManager {
      * Initialize subcomponents on first instance creation
      */
     private void init() {
-        YoutubeDlManager.getInstance();
+        YoutubeDlManager.getInstance().downloadYoutubeDl();
         LOG.trace("Initializing DownloadManager");
         executableWrapper = ExecutableWrapper.getInstance();
         threadLock = false;
