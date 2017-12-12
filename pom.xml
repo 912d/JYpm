@@ -25,6 +25,7 @@
         <module>jypm-internet-checker</module>
         <module>jypm-test</module>
         <module>jypm-ffmpeg</module>
+        <module>jypm-util</module>
     </modules>
 
     <properties>
