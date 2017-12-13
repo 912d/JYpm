@@ -48,7 +48,10 @@ public class FfmpegManager {
     }
 
     private void init() {
-        checkIfExecutableIsValid();
+        if (!checkIfExecutableIsValid()) {
+            LOG.warn("Ffmpeg executable is not valid, change that in settings!");
+        }
+        LOG.debug("FfmpegManager has been successfully initialized");
     }
 
 
