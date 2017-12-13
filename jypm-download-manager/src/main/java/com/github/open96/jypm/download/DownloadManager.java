@@ -26,7 +26,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class DownloadManager {
     //This object is a singleton thus storing instance of it is needed
-    private static DownloadManager singletonInstance;
+    private volatile static DownloadManager singletonInstance;
     //Initialize log4j logger for later use in this class
     private static final Logger LOG = LogManager.getLogger(DownloadManager.class.getName());
     //Store the wrapper in variable as it is critical component of this class
@@ -47,8 +47,12 @@ public class DownloadManager {
      */
     public static DownloadManager getInstance() {
         if (singletonInstance == null) {
-            LOG.debug("Instance is null, initializing...");
-            singletonInstance = new DownloadManager();
+            synchronized (DownloadManager.class) {
+                if (singletonInstance == null) {
+                    LOG.debug("Instance is null, initializing...");
+                    singletonInstance = new DownloadManager();
+                }
+            }
         }
         return singletonInstance;
     }

@@ -16,7 +16,7 @@ import java.io.*;
 public class ExecutableWrapper {
     private final static String BASE_YOUTUBE_URL = "https://www.youtube.com/playlist?list=";
     //This object is a singleton thus storing instance of it is needed
-    private static ExecutableWrapper singletonInstance;
+    private volatile static ExecutableWrapper singletonInstance;
     //Initialize log4j logger for later use in this class
     private static final Logger LOG = LogManager.getLogger(ExecutableWrapper.class.getName());
     //Store SettingsManager for easier usage
@@ -35,8 +35,12 @@ public class ExecutableWrapper {
      */
     public static ExecutableWrapper getInstance() {
         if (singletonInstance == null) {
-            LOG.debug("Instance is null, initializing...");
-            singletonInstance = new ExecutableWrapper();
+            synchronized (ExecutableWrapper.class){
+                if (singletonInstance == null) {
+                    LOG.debug("Instance is null, initializing...");
+                    singletonInstance = new ExecutableWrapper();
+                }
+            }
         }
         return singletonInstance;
     }
