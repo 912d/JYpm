@@ -100,7 +100,6 @@ public class FfmpegManagerTest {
         //and expect twice as many files as a result from which half of them have a .mp3 extension
         List<Boolean> taskList = FfmpegManager
                 .getInstance().convertDirectory(playlistPath, FILE_EXTENSION.MP3, 320);
-        //TODO Change below line later
         boolean areAllTasksFinished = false;
         while (!areAllTasksFinished) {
             areAllTasksFinished = true;
