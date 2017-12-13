@@ -82,8 +82,10 @@ public class FfmpegManager {
         //Check if bitrate is supported
         if (Arrays.stream(availableBitrates)
                 .noneMatch(allowedBitrate -> allowedBitrate.equals(bitrate))) {
-            LOG.error("Unsupported bitrate!");
-            return null;
+            if (bitrate != null && targetExtension == FILE_EXTENSION.MP3) {
+                LOG.error("Unsupported bitrate!");
+                return null;
+            }
         }
         //Save state of directory in variable so converted files will be filtered out later
         File targetDirectory = new File(directory);
