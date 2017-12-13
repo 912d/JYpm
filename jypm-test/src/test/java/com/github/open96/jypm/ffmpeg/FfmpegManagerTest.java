@@ -73,6 +73,8 @@ public class FfmpegManagerTest {
     public void testCheckIfExecutableIsValid() {
         SettingsManager.getInstance().setFfmpegExecutable(PATH_TO_FFMPEG);
         assertTrue(FfmpegManager.getInstance().checkIfExecutableIsValid());
+        SettingsManager.getInstance().setFfmpegExecutable("totally_not_ffmpeg");
+        assertFalse(FfmpegManager.getInstance().checkIfExecutableIsValid());
     }
 
     @Test
