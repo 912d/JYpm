@@ -122,13 +122,14 @@ public class FfmpegManager {
     private String[] createCommand(String filename, FILE_EXTENSION extension, Integer bitrate) {
         String command[] = {SettingsManager.getInstance().getFfmpegExecutable(), "-i", filename};
         String filenameWithoutExtension = filename.split("\\.")[0];
+        String extensionCommand[];
         switch (extension) {
             case MP3:
-                String extensionCommand[] = {"-codec:a", "libmp3lame", "-b:a", bitrate + "k", filenameWithoutExtension + ".mp3"};
+                extensionCommand = new String[]{"-codec:a", "libmp3lame", "-b:a", bitrate + "k", filenameWithoutExtension + ".mp3"};
                 return ArrayUtils.addAll(command, extensionCommand);
             case MP4:
-                //TODO
-                break;
+                extensionCommand = new String[]{filenameWithoutExtension + ".mp4"};
+                return ArrayUtils.addAll(command, extensionCommand);
             default:
                 LOG.error("Extension is not supported!");
         }
