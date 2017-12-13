@@ -4,6 +4,7 @@ package com.github.open96.jypm.ffmpeg;
 import com.github.open96.jypm.settings.SettingsManager;
 import com.github.open96.jypm.thread.TASK_TYPE;
 import com.github.open96.jypm.thread.ThreadManager;
+import com.github.open96.jypm.util.ProcessWrapper;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -58,8 +59,11 @@ public class FfmpegManager {
             while (process.isAlive()) {
                 Thread.sleep(10);
             }
-            //TODO - check if executable is indeed ffmpeg. To do that I need to finally
-            //export getProcessOutput() from ExecutableWrapper into some utility class.
+            //Check if executable is indeed ffmpeg.
+            ProcessWrapper processWrapper = new ProcessWrapper(process);
+            if (!processWrapper.getProcessOutput().contains("ffmpeg version ")) {
+                return false;
+            }
         } catch (IOException | InterruptedException e) {
             return false;
         }
