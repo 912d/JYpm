@@ -85,7 +85,7 @@ public class FfmpegManager {
                 ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
                     try {
                         //Create command that will be issued via Runtime
-                        String command[] = createCommand(file.getName(), targetExtension);
+                        String command[] = createCommand(file.getName(), targetExtension, bitrate);
                         //Run ffmpeg
                         Process p = runtime.exec(command, null, targetDirectory);
                         //Wait until it finishes
@@ -105,12 +105,12 @@ public class FfmpegManager {
     }
 
 
-    private String[] createCommand(String filename, FILE_EXTENSION extension) {
+    private String[] createCommand(String filename, FILE_EXTENSION extension, Integer bitrate) {
         String command[] = {SettingsManager.getInstance().getFfmpegExecutable(), "-i", filename};
         String filenameWithoutExtension = filename.split("\\.")[0];
         switch (extension) {
             case MP3:
-                String extensionCommand[] = {"-codec:a", "libmp3lame", "-b:a", "320k", filenameWithoutExtension + ".mp3"};
+                String extensionCommand[] = {"-codec:a", "libmp3lame", "-b:a", bitrate + "k", filenameWithoutExtension + ".mp3"};
                 return ArrayUtils.addAll(command, extensionCommand);
             case MP4:
                 //TODO
