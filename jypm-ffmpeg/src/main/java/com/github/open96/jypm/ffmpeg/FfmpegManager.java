@@ -14,7 +14,7 @@ import java.util.Arrays;
 
 public class FfmpegManager {
     //This object is a singleton thus storing instance of it is needed
-    private static FfmpegManager singletonInstance;
+    private volatile static FfmpegManager singletonInstance;
     //Initialize log4j logger for later use in this class
     private static final Logger LOG = LogManager.getLogger(FfmpegManager.class.getName());
     //Allowed bitrate options for mp3
@@ -34,8 +34,12 @@ public class FfmpegManager {
      */
     public static FfmpegManager getInstance() {
         if (singletonInstance == null) {
-            LOG.debug("Instance is null, initializing...");
-            singletonInstance = new FfmpegManager();
+            synchronized (FfmpegManager.class) {
+                if (singletonInstance == null) {
+                    LOG.debug("Instance is null, initializing...");
+                    singletonInstance = new FfmpegManager();
+                }
+            }
         }
         return singletonInstance;
     }

@@ -13,7 +13,7 @@ import java.io.IOException;
 public class TrayIcon {
 
     //Variable that stores object of this class
-    private static TrayIcon singletonInstance;
+    private volatile static TrayIcon singletonInstance;
     //Initialize log4j logger for later use in this class
     private static final Logger LOG = LogManager.getLogger(TrayIcon.class.getName());
     //Stage to which tray icon should be linked, preferably the main one
@@ -35,8 +35,12 @@ public class TrayIcon {
      */
     public static TrayIcon getInstance() {
         if (singletonInstance == null) {
-            LOG.debug("Instance is null, initializing...");
-            singletonInstance = new TrayIcon();
+            synchronized (TrayIcon.class) {
+                if (singletonInstance == null) {
+                    LOG.debug("Instance is null, initializing...");
+                    singletonInstance = new TrayIcon();
+                }
+            }
         }
         return singletonInstance;
     }

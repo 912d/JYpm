@@ -14,7 +14,7 @@ public class GitHubApiClient {
     //Variable that stores reference to Retrofit object.
     private Retrofit retrofit;
     //Singleton instance that stores instance of this class
-    private static GitHubApiClient singletonInstance;
+    private volatile static GitHubApiClient singletonInstance;
 
     /**
      * Initializes Retrofit object and stores it in variable.
@@ -34,8 +34,12 @@ public class GitHubApiClient {
     public static GitHubApiClient getInstance() {
         LOG.debug("Instance of GitHubApiClient has been requested.");
         if (singletonInstance == null) {
-            LOG.debug("Instance is null, initializing...");
-            singletonInstance = new GitHubApiClient();
+            synchronized (GitHubApiClient.class) {
+                if (singletonInstance == null) {
+                    LOG.debug("Instance is null, initializing...");
+                    singletonInstance = new GitHubApiClient();
+                }
+            }
         }
         return singletonInstance;
     }
