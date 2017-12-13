@@ -22,7 +22,7 @@ public class SettingsManager {
     //File which stores Playlist objects in form of JSON
     private final static String JSON_FILE_NAME = "settings.json";
     //This object is a singleton thus storing instance of it is needed
-    private static SettingsManager singletonInstance;
+    private volatile static SettingsManager singletonInstance;
     //Initialize log4j logger for later use in this class
     private static final Logger LOG = LogManager.getLogger(SettingsManager.class.getName());
     //Pojo object where settings are stored during the runtime
@@ -41,8 +41,12 @@ public class SettingsManager {
      */
     public static SettingsManager getInstance() {
         if (singletonInstance == null) {
-            LOG.debug("Instance is null, initializing...");
-            singletonInstance = new SettingsManager();
+            synchronized (SettingsManager.class) {
+                if (singletonInstance == null) {
+                    LOG.debug("Instance is null, initializing...");
+                    singletonInstance = new SettingsManager();
+                }
+            }
         }
         return singletonInstance;
     }

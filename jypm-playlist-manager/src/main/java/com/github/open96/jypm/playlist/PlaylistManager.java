@@ -32,7 +32,7 @@ public class PlaylistManager {
     //File which stores Playlist objects in form of JSON
     private final static String JSON_FILE_NAME = "playlists.json";
     //This object is a singleton thus storing instance of it is needed
-    private static PlaylistManager singletonInstance;
+    private volatile static PlaylistManager singletonInstance;
     //Initialize log4j logger for later use in this class
     private static final Logger LOG = LogManager.getLogger(PlaylistManager.class.getName());
     //Variable where all managed playlists are stored
@@ -50,8 +50,12 @@ public class PlaylistManager {
      */
     public static PlaylistManager getInstance() {
         if (singletonInstance == null) {
-            LOG.debug("Instance is null, initializing...");
-            singletonInstance = new PlaylistManager();
+            synchronized (PlaylistManager.class) {
+                if (singletonInstance == null) {
+                    LOG.debug("Instance is null, initializing...");
+                    singletonInstance = new PlaylistManager();
+                }
+            }
         }
         return singletonInstance;
     }

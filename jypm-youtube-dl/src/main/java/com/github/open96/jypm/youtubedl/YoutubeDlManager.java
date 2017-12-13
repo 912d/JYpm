@@ -26,7 +26,7 @@ import java.util.Map;
 
 public class YoutubeDlManager {
     //This object is a singleton thus storing instance of it is needed
-    private static YoutubeDlManager singletonInstance;
+    private volatile static YoutubeDlManager singletonInstance;
     //Initialize log4j logger for later use in this class
     private static final Logger LOG = LogManager.getLogger(YoutubeDlManager.class.getName());
     //Field to store ready for querying retrofit client
@@ -52,8 +52,12 @@ public class YoutubeDlManager {
      */
     public static YoutubeDlManager getInstance() {
         if (singletonInstance == null) {
-            LOG.debug("Instance is null, initializing...");
-            singletonInstance = new YoutubeDlManager();
+            synchronized (YoutubeDlManager.class) {
+                if (singletonInstance == null) {
+                    LOG.debug("Instance is null, initializing...");
+                    singletonInstance = new YoutubeDlManager();
+                }
+            }
         }
         return singletonInstance;
     }
