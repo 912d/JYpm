@@ -10,7 +10,9 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class FfmpegManager {
     //This object is a singleton thus storing instance of it is needed
@@ -67,12 +69,14 @@ public class FfmpegManager {
     /**
      * Attempts to convert every file in directory via ffmpeg
      */
-    public boolean convertDirectory(String directory, FILE_EXTENSION targetExtension, Integer bitrate) {
+    public List<Boolean> convertDirectory(String directory, FILE_EXTENSION targetExtension, Integer bitrate) {
+        //Initialize list which will contain states of ffmpeg tasks
+        List<Boolean> taskList = new ArrayList<>();
         //Check if bitrate is supported
         if (Arrays.stream(availableBitrates)
                 .noneMatch(allowedBitrate -> allowedBitrate.equals(bitrate))) {
             LOG.error("Unsupported bitrate!");
-            return false;
+            return null;
         }
         //Save state of directory in variable so converted files will be filtered out later
         File targetDirectory = new File(directory);
@@ -81,6 +85,8 @@ public class FfmpegManager {
         if (directoryContentsBeforeConversion != null) {
             Runtime runtime = Runtime.getRuntime();
             for (File file : directoryContentsBeforeConversion) {
+                taskList.add(Boolean.FALSE);
+                int positionInList = taskList.size() - 1;
                 //Issue conversion task
                 ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
                     try {
@@ -92,6 +98,7 @@ public class FfmpegManager {
                         while (p.isAlive()) {
                             Thread.sleep(100);
                         }
+                        taskList.set(positionInList, Boolean.TRUE);
                     } catch (IOException | InterruptedException e) {
                         LOG.error("Conversion failed", e);
                     }
@@ -99,9 +106,9 @@ public class FfmpegManager {
             }
         } else {
             LOG.warn("No files in directory, conversion is not possible...");
-            return false;
+            return null;
         }
-        return true;
+        return taskList;
     }
 
 

@@ -12,6 +12,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.lang.reflect.Field;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -97,9 +98,18 @@ public class FfmpegManagerTest {
         assertEquals(testPlaylist.getTotalVideoCount(), directoryFileCount);
         //After successful download convert all files in that directory to mp3 format
         //and expect twice as many files as a result from which half of them have a .mp3 extension
-        FfmpegManager.getInstance().convertDirectory(playlistPath, FILE_EXTENSION.MP3, 320);
+        List<Boolean> taskList = FfmpegManager
+                .getInstance().convertDirectory(playlistPath, FILE_EXTENSION.MP3, 320);
         //TODO Change below line later
-        Thread.sleep(5000);
+        boolean areAllTasksFinished = false;
+        while (!areAllTasksFinished) {
+            areAllTasksFinished = true;
+            for (Boolean b : taskList) {
+                if (b == Boolean.FALSE) {
+                    areAllTasksFinished = false;
+                }
+            }
+        }
         Integer mp3FileCounter = 0;
         for (File f : new File(playlistPath).listFiles()) {
             if (f.getName().endsWith(".mp3")) {
