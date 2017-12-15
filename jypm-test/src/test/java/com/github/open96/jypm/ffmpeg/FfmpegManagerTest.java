@@ -5,10 +5,9 @@ import com.github.open96.jypm.playlist.PlaylistManager;
 import com.github.open96.jypm.playlist.QUEUE_STATUS;
 import com.github.open96.jypm.playlist.pojo.Playlist;
 import com.github.open96.jypm.settings.SettingsManager;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import com.github.open96.jypm.youtubedl.EXECUTABLE_STATE;
+import com.github.open96.jypm.youtubedl.YoutubeDlManager;
+import org.junit.*;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -24,24 +23,23 @@ public class FfmpegManagerTest {
 
     @BeforeClass
     public static void initialize() {
-        setPlaylistPath();
         deleteConfigFiles();
         PlaylistManager.getInstance();
-        assertEquals(0, PlaylistManager.getInstance().getPlaylists().size());
+        YoutubeDlManager.getInstance();
         DownloadManager.getInstance();
+        setPlaylistPath();
+        assertEquals(0, PlaylistManager.getInstance().getPlaylists().size());
     }
 
     @AfterClass
     public static void cleanup() {
         File playlistDirectory = new File("playlist_dir/");
-        ensurePlaylistDirectoryIsPresentAndEmpty();
         playlistDirectory.delete();
     }
 
     private static void setPlaylistPath() {
         File playlistDirectory = new File("playlist_dir/");
         playlistPath = playlistDirectory.getAbsolutePath();
-        ensurePlaylistDirectoryIsPresentAndEmpty();
     }
 
     private static void deleteConfigFiles() {
@@ -51,8 +49,23 @@ public class FfmpegManagerTest {
         playlistsJSON.delete();
     }
 
-
     @Before
+    public void prepareYoutubeDl() throws InterruptedException {
+        YoutubeDlManager.getInstance().deletePreviousVersionIfExists();
+        if (YoutubeDlManager.getInstance().getExecutableState() != EXECUTABLE_STATE.READY) {
+            int retryCount = 0;
+            YoutubeDlManager.getInstance().downloadYoutubeDl();
+            while (retryCount < 180) {
+                Thread.sleep(1000);
+                retryCount++;
+                if (YoutubeDlManager.getInstance().getExecutableState() == EXECUTABLE_STATE.READY) {
+                    break;
+                }
+            }
+        }
+    }
+
+    @After
     public void resetSingleton() {
         try {
             FfmpegManager.getInstance();
@@ -69,16 +82,35 @@ public class FfmpegManagerTest {
         FfmpegManager.getInstance();
     }
 
+    @Before
+    public void ensurePlaylistDirectoryIsPresentAndEmpty() {
+        File dir = new File(playlistPath);
+        //If file/directory with "playlist_dir" name is present, delete it
+        if (dir.exists()) {
+            if (dir.isDirectory()) {
+                for (File f : dir.listFiles()) {
+                    f.delete();
+                }
+            }
+            dir.delete();
+            assertFalse(dir.exists());
+        }
+        dir.mkdir();
+        assertTrue(dir.exists());
+        assertEquals(0, dir.listFiles().length);
+    }
+
     @Test
     public void testCheckIfExecutableIsValid() {
         SettingsManager.getInstance().setFfmpegExecutable(PATH_TO_FFMPEG);
         assertTrue(FfmpegManager.getInstance().checkIfExecutableIsValid());
         SettingsManager.getInstance().setFfmpegExecutable("totally_not_ffmpeg");
         assertFalse(FfmpegManager.getInstance().checkIfExecutableIsValid());
+        SettingsManager.getInstance().setFfmpegExecutable(PATH_TO_FFMPEG);
     }
 
     @Test
-    public void testConvertDirectory() throws InterruptedException {
+    public void testConvertDirectoryToMP3() throws InterruptedException {
         //Create playlist object and issue the download
         Playlist testPlaylist = new Playlist(SAMPLE_PLAYLIST_LINK, playlistPath);
         PlaylistManager.getInstance().add(testPlaylist);
@@ -102,6 +134,7 @@ public class FfmpegManagerTest {
         //and expect twice as many files as a result from which half of them have a .mp3 extension
         List<Boolean> taskList = FfmpegManager
                 .getInstance().convertDirectory(playlistPath, FILE_EXTENSION.MP3, 320);
+        assertNotNull(taskList);
         boolean areAllTasksFinished = false;
         while (!areAllTasksFinished) {
             areAllTasksFinished = true;
@@ -109,6 +142,7 @@ public class FfmpegManagerTest {
                 if (b == Boolean.FALSE) {
                     areAllTasksFinished = false;
                 }
+                Thread.sleep(1000);
             }
         }
         Integer mp3FileCounter = 0;
@@ -118,21 +152,54 @@ public class FfmpegManagerTest {
             }
         }
         assertEquals(testPlaylist.getTotalVideoCount(), mp3FileCounter);
+        PlaylistManager.getInstance().remove(testPlaylist, true);
     }
 
-    private static void ensurePlaylistDirectoryIsPresentAndEmpty() {
-        File dir = new File(playlistPath);
-        //If file/directory with "playlist_dir" name is present, delete it
-        if (dir.exists()) {
-            if (dir.isDirectory()) {
-                for (File f : dir.listFiles()) {
-                    f.delete();
+
+    @Test
+    public void testConvertDirectoryToMP4() throws InterruptedException {
+        //Create playlist object and issue the download
+        Playlist testPlaylist = new Playlist(SAMPLE_PLAYLIST_LINK, playlistPath);
+        PlaylistManager.getInstance().add(testPlaylist);
+        while (PlaylistManager.getInstance().getPlaylistByLink(testPlaylist.getPlaylistLink()) == null) {
+            Thread.sleep(10);
+        }
+        DownloadManager.getInstance().download(testPlaylist);
+        while (testPlaylist.getStatus() == QUEUE_STATUS.DOWNLOADING
+                || testPlaylist.getStatus() == QUEUE_STATUS.QUEUED) {
+            Thread.sleep(500);
+            Integer downloadProgress = DownloadManager.getInstance().getDownloadProgress();
+            if (downloadProgress != null) {
+                System.out.println(downloadProgress + "/" + testPlaylist.getTotalVideoCount());
+            }
+        }
+        //Make sure files are in place where they should be
+        assertEquals(QUEUE_STATUS.DOWNLOADED, testPlaylist.getStatus());
+        Integer directoryFileCount = new File(playlistPath).listFiles().length;
+        assertEquals(testPlaylist.getTotalVideoCount(), directoryFileCount);
+        //After successful download convert all files in that directory to mp3 format
+        //and expect twice as many files as a result from which half of them have a .mp3 extension
+        List<Boolean> taskList = FfmpegManager
+                .getInstance().convertDirectory(playlistPath, FILE_EXTENSION.MP4, null);
+        assertNotNull(taskList);
+        boolean areAllTasksFinished = false;
+        while (!areAllTasksFinished) {
+            areAllTasksFinished = true;
+            for (Boolean b : taskList) {
+                if (b == Boolean.FALSE) {
+                    areAllTasksFinished = false;
                 }
             }
-            dir.delete();
-            assertFalse(dir.exists());
+            Thread.sleep(1000);
         }
-        dir.mkdir();
-        assertTrue(dir.exists());
+        Integer mp4FileCounter = 0;
+        for (File f : new File(playlistPath).listFiles()) {
+            if (f.getName().endsWith(".mp4")) {
+                mp4FileCounter++;
+            }
+        }
+        assertEquals(testPlaylist.getTotalVideoCount(), mp4FileCounter);
+        PlaylistManager.getInstance().remove(testPlaylist, true);
     }
+
 }
