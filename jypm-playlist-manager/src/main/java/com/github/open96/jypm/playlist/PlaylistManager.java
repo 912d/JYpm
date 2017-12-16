@@ -122,6 +122,15 @@ public class PlaylistManager {
                 .getInstance().
                 sendVoidTask(new Thread(() -> {
                     YouTubeParser youTubeParser = new YouTubeParser(playlist.getPlaylistLink());
+                    int parserRetryCount = 0;
+                    while (!youTubeParser.validateDocument() && parserRetryCount < 10) {
+                        youTubeParser = new YouTubeParser(playlist.getPlaylistLink());
+                        parserRetryCount++;
+                    }
+                    if (parserRetryCount >= 10) {
+                        LOG.error("Could not parse playlist info, " +
+                                "check if your firewall doesn't block youtube access");
+                    }
                     playlist.setPlaylistName(youTubeParser.getPlaylistName());
                     playlist.setTotalVideoCount(Integer.parseInt(youTubeParser.getVideoCount()));
                     playlist.setPlaylistThumbnailUrl(youTubeParser.getThumbnailLink());
