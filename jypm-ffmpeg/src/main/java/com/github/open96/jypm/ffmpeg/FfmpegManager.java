@@ -99,6 +99,8 @@ public class FfmpegManager {
                 //Issue conversion task
                 ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
                     try {
+                        LOG.trace("Starting conversion of directory: " + directory
+                                + "\nFormat: " + targetExtension.toString());
                         //Create command that will be issued via Runtime
                         String command[] = createCommand(file.getName(), targetExtension, bitrate);
                         if (file.getName().endsWith(targetExtension.toString())) {
@@ -112,6 +114,7 @@ public class FfmpegManager {
                             }
                         }
                         taskList.set(positionInList, Boolean.TRUE);
+                        LOG.trace("Conversion finished");
                     } catch (IOException | InterruptedException e) {
                         LOG.error("Conversion failed", e);
                     }
