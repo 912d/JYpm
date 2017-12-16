@@ -126,7 +126,7 @@ public class FfmpegManager {
 
 
     private String[] createCommand(String filename, FILE_EXTENSION extension, Integer bitrate) {
-        String command[] = {SettingsManager.getInstance().getFfmpegExecutable(), "-y", "-i", filename};
+        String command[] = {SettingsManager.getInstance().getFfmpegExecutable(), "-threads", "1", "-y", "-i", filename};
         String filenameWithoutExtension = filename.split("\\.")[0];
         String extensionCommand[];
         switch (extension) {
