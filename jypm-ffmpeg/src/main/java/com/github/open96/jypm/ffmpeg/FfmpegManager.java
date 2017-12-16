@@ -103,14 +103,16 @@ public class FfmpegManager {
                     try {
                         //Create command that will be issued via Runtime
                         String command[] = createCommand(file.getName(), targetExtension, bitrate);
-                        if (file.getName().endsWith(targetExtension.toString())) {
-                            LOG.trace(file.getName() + " - Conversion from to same format is pointless, skipping");
-                        } else {
-                            //Run ffmpeg
-                            Process p = runtime.exec(command, null, targetDirectory);
-                            //Wait until it finishes
-                            while (p.isAlive()) {
-                                Thread.sleep(100);
+                        if (command != null) {
+                            if (file.getName().endsWith(targetExtension.toString())) {
+                                LOG.trace(file.getName() + " - Conversion from to same format is pointless, skipping");
+                            } else {
+                                //Run ffmpeg
+                                Process p = runtime.exec(command, null, targetDirectory);
+                                //Wait until it finishes
+                                while (p.isAlive()) {
+                                    Thread.sleep(100);
+                                }
                             }
                         }
                         taskList.set(positionInList, Boolean.TRUE);
