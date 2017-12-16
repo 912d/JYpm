@@ -153,6 +153,9 @@ public class FfmpegManagerTest {
         }
         assertEquals(testPlaylist.getTotalVideoCount(), mp3FileCounter);
         PlaylistManager.getInstance().remove(testPlaylist, true);
+        while (PlaylistManager.getInstance().getPlaylists().size() != 0) {
+            Thread.sleep(100);
+        }
     }
 
 
@@ -200,6 +203,9 @@ public class FfmpegManagerTest {
         }
         assertEquals(testPlaylist.getTotalVideoCount(), mp4FileCounter);
         PlaylistManager.getInstance().remove(testPlaylist, true);
+        while (PlaylistManager.getInstance().getPlaylists().size() != 0) {
+            Thread.sleep(100);
+        }
     }
 
 }
