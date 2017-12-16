@@ -143,6 +143,7 @@ public class FfmpegManagerTest {
             Thread.sleep(10);
         }
         DownloadManager.getInstance().download(testPlaylist);
+        //Track download progress
         while (testPlaylist.getStatus() == QUEUE_STATUS.DOWNLOADING
                 || testPlaylist.getStatus() == QUEUE_STATUS.QUEUED) {
             Thread.sleep(500);
@@ -162,13 +163,16 @@ public class FfmpegManagerTest {
         assertNotNull(taskList);
         boolean areAllTasksFinished = false;
         while (!areAllTasksFinished) {
+            int unfinishedTasks = 0;
             areAllTasksFinished = true;
             for (Boolean b : taskList) {
                 if (b == Boolean.FALSE) {
+                    unfinishedTasks++;
                     areAllTasksFinished = false;
                 }
-                Thread.sleep(1000);
             }
+            System.out.println("Conversion progress: " + (taskList.size() - unfinishedTasks) + "/" + taskList.size());
+            Thread.sleep(1000);
         }
         Integer mp3FileCounter = 0;
         for (File f : new File(playlistPath).listFiles()) {
@@ -190,6 +194,7 @@ public class FfmpegManagerTest {
             Thread.sleep(10);
         }
         DownloadManager.getInstance().download(testPlaylist);
+        //Track download progress
         while (testPlaylist.getStatus() == QUEUE_STATUS.DOWNLOADING
                 || testPlaylist.getStatus() == QUEUE_STATUS.QUEUED) {
             Thread.sleep(500);
@@ -209,12 +214,15 @@ public class FfmpegManagerTest {
         assertNotNull(taskList);
         boolean areAllTasksFinished = false;
         while (!areAllTasksFinished) {
+            int unfinishedTasks = 0;
             areAllTasksFinished = true;
             for (Boolean b : taskList) {
                 if (b == Boolean.FALSE) {
+                    unfinishedTasks++;
                     areAllTasksFinished = false;
                 }
             }
+            System.out.println("Conversion progress: " + (taskList.size() - unfinishedTasks) + "/" + taskList.size());
             Thread.sleep(1000);
         }
         Integer mp4FileCounter = 0;
