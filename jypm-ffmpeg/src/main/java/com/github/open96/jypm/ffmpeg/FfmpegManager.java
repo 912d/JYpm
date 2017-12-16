@@ -4,13 +4,16 @@ package com.github.open96.jypm.ffmpeg;
 import com.github.open96.jypm.settings.SettingsManager;
 import com.github.open96.jypm.thread.TASK_TYPE;
 import com.github.open96.jypm.thread.ThreadManager;
+import com.github.open96.jypm.util.ProcessWrapper;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class FfmpegManager {
     //This object is a singleton thus storing instance of it is needed
@@ -45,7 +48,10 @@ public class FfmpegManager {
     }
 
     private void init() {
-        checkIfExecutableIsValid();
+        if (!checkIfExecutableIsValid()) {
+            LOG.warn("Ffmpeg executable is not valid, change that in settings!");
+        }
+        LOG.debug("FfmpegManager has been successfully initialized");
     }
 
 
@@ -56,8 +62,11 @@ public class FfmpegManager {
             while (process.isAlive()) {
                 Thread.sleep(10);
             }
-            //TODO - check if executable is indeed ffmpeg. To do that I need to finally
-            //export getProcessOutput() from ExecutableWrapper into some utility class.
+            //Check if executable is indeed ffmpeg.
+            ProcessWrapper processWrapper = new ProcessWrapper(process);
+            if (!processWrapper.getProcessOutput().contains("ffmpeg version ")) {
+                return false;
+            }
         } catch (IOException | InterruptedException e) {
             return false;
         }
@@ -67,31 +76,46 @@ public class FfmpegManager {
     /**
      * Attempts to convert every file in directory via ffmpeg
      */
-    public boolean convertDirectory(String directory, FILE_EXTENSION targetExtension, Integer bitrate) {
+    public List<Boolean> convertDirectory(String directory, FILE_EXTENSION targetExtension, Integer bitrate) {
+        //Initialize list which will contain states of ffmpeg tasks
+        List<Boolean> taskList = new ArrayList<>();
         //Check if bitrate is supported
         if (Arrays.stream(availableBitrates)
                 .noneMatch(allowedBitrate -> allowedBitrate.equals(bitrate))) {
-            LOG.error("Unsupported bitrate!");
-            return false;
+            if (bitrate != null && targetExtension == FILE_EXTENSION.MP3) {
+                LOG.error("Unsupported bitrate!");
+                return null;
+            }
         }
         //Save state of directory in variable so converted files will be filtered out later
         File targetDirectory = new File(directory);
         File[] directoryContentsBeforeConversion = targetDirectory.listFiles();
         //For each file in that directory - run ffmpeg
         if (directoryContentsBeforeConversion != null) {
+            LOG.trace("Starting conversion of directory: " + directory
+                    + "\nFormat: " + targetExtension.toString());
             Runtime runtime = Runtime.getRuntime();
             for (File file : directoryContentsBeforeConversion) {
+                taskList.add(Boolean.FALSE);
+                int positionInList = taskList.size() - 1;
                 //Issue conversion task
                 ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
                     try {
                         //Create command that will be issued via Runtime
-                        String command[] = createCommand(file.getName(), targetExtension);
-                        //Run ffmpeg
-                        Process p = runtime.exec(command, null, targetDirectory);
-                        //Wait until it finishes
-                        while (p.isAlive()) {
-                            Thread.sleep(100);
+                        String command[] = createCommand(file.getName(), targetExtension, bitrate);
+                        if (command != null) {
+                            if (file.getName().endsWith(targetExtension.toString())) {
+                                LOG.trace(file.getName() + " - Conversion from to same format is pointless, skipping");
+                            } else {
+                                //Run ffmpeg
+                                Process p = runtime.exec(command, null, targetDirectory);
+                                //Wait until it finishes
+                                while (p.isAlive()) {
+                                    Thread.sleep(100);
+                                }
+                            }
                         }
+                        taskList.set(positionInList, Boolean.TRUE);
                     } catch (IOException | InterruptedException e) {
                         LOG.error("Conversion failed", e);
                     }
@@ -99,22 +123,23 @@ public class FfmpegManager {
             }
         } else {
             LOG.warn("No files in directory, conversion is not possible...");
-            return false;
+            return null;
         }
-        return true;
+        return taskList;
     }
 
 
-    private String[] createCommand(String filename, FILE_EXTENSION extension) {
-        String command[] = {SettingsManager.getInstance().getFfmpegExecutable(), "-i", filename};
+    private String[] createCommand(String filename, FILE_EXTENSION extension, Integer bitrate) {
+        String command[] = {SettingsManager.getInstance().getFfmpegExecutable(), "-threads", "1", "-y", "-i", filename};
         String filenameWithoutExtension = filename.split("\\.")[0];
+        String extensionCommand[];
         switch (extension) {
             case MP3:
-                String extensionCommand[] = {"-codec:a", "libmp3lame", "-b:a", "320k", filenameWithoutExtension + ".mp3"};
+                extensionCommand = new String[]{"-codec:a", "libmp3lame", "-b:a", bitrate + "k", filenameWithoutExtension + ".mp3"};
                 return ArrayUtils.addAll(command, extensionCommand);
             case MP4:
-                //TODO
-                break;
+                extensionCommand = new String[]{filenameWithoutExtension + ".mp4"};
+                return ArrayUtils.addAll(command, extensionCommand);
             default:
                 LOG.error("Extension is not supported!");
         }
