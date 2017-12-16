@@ -71,4 +71,8 @@ public class YouTubeParser {
         return "";
     }
 
+    public boolean validateDocument() {
+        return getPlaylistName() != null && getVideoCount() != null && getThumbnailLink() != null;
+    }
+
 }
