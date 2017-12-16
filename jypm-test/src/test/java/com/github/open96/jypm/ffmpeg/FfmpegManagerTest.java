@@ -7,7 +7,10 @@ import com.github.open96.jypm.playlist.pojo.Playlist;
 import com.github.open96.jypm.settings.SettingsManager;
 import com.github.open96.jypm.youtubedl.EXECUTABLE_STATE;
 import com.github.open96.jypm.youtubedl.YoutubeDlManager;
-import org.junit.*;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -65,7 +68,7 @@ public class FfmpegManagerTest {
         }
     }
 
-    @After
+    @Before
     public void resetSingleton() {
         try {
             FfmpegManager.getInstance();
@@ -80,6 +83,28 @@ public class FfmpegManagerTest {
         }
         //Call singleton class to let it set itself up again
         FfmpegManager.getInstance();
+    }
+
+    /**
+     * Resets PlaylistManager via reflections
+     */
+    @Before
+    public void resetPlaylistManagerSingleton() {
+        try {
+            //Delete playlists.json to ensure that we don't have leftovers from other tests
+            new File("playlists.json").delete();
+            PlaylistManager.getInstance();
+            Field singletonInstance = PlaylistManager.class.getDeclaredField("singletonInstance");
+            singletonInstance.setAccessible(true);
+            singletonInstance.set(null, null);
+        } catch (IllegalAccessException | NoSuchFieldException e) {
+            e.printStackTrace();
+        } catch (IllegalStateException e) {
+            System.out.println("Empty API object");
+            e.printStackTrace();
+        }
+        //Call PlaylistManager to intialize it from scratch
+        assertTrue(PlaylistManager.getInstance().getPlaylists().size() == 0);
     }
 
     @Before
@@ -153,9 +178,6 @@ public class FfmpegManagerTest {
         }
         assertEquals(testPlaylist.getTotalVideoCount(), mp3FileCounter);
         PlaylistManager.getInstance().remove(testPlaylist, true);
-        while (PlaylistManager.getInstance().getPlaylists().size() != 0) {
-            Thread.sleep(100);
-        }
     }
 
 
@@ -203,9 +225,6 @@ public class FfmpegManagerTest {
         }
         assertEquals(testPlaylist.getTotalVideoCount(), mp4FileCounter);
         PlaylistManager.getInstance().remove(testPlaylist, true);
-        while (PlaylistManager.getInstance().getPlaylists().size() != 0) {
-            Thread.sleep(100);
-        }
     }
 
 }
