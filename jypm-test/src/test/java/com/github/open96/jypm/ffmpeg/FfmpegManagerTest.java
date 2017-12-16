@@ -7,7 +7,6 @@ import com.github.open96.jypm.playlist.pojo.Playlist;
 import com.github.open96.jypm.settings.SettingsManager;
 import com.github.open96.jypm.youtubedl.EXECUTABLE_STATE;
 import com.github.open96.jypm.youtubedl.YoutubeDlManager;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -26,7 +25,6 @@ public class FfmpegManagerTest {
 
     @BeforeClass
     public static void initialize() {
-        deleteConfigFiles();
         PlaylistManager.getInstance();
         YoutubeDlManager.getInstance();
         DownloadManager.getInstance();
@@ -34,22 +32,9 @@ public class FfmpegManagerTest {
         assertEquals(0, PlaylistManager.getInstance().getPlaylists().size());
     }
 
-    @AfterClass
-    public static void cleanup() {
-        File playlistDirectory = new File("playlist_dir/");
-        playlistDirectory.delete();
-    }
-
     private static void setPlaylistPath() {
         File playlistDirectory = new File("playlist_dir/");
         playlistPath = playlistDirectory.getAbsolutePath();
-    }
-
-    private static void deleteConfigFiles() {
-        File settingsJSON = new File("settings.json");
-        File playlistsJSON = new File("playlists.json");
-        settingsJSON.delete();
-        playlistsJSON.delete();
     }
 
     @Before
