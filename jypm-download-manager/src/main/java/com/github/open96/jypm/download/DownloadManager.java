@@ -1,8 +1,8 @@
 package com.github.open96.jypm.download;
 
 import com.github.open96.jypm.internetconnection.ConnectionChecker;
+import com.github.open96.jypm.playlist.PLAYLIST_STATUS;
 import com.github.open96.jypm.playlist.PlaylistManager;
-import com.github.open96.jypm.playlist.QUEUE_STATUS;
 import com.github.open96.jypm.playlist.pojo.Playlist;
 import com.github.open96.jypm.settings.SettingsManager;
 import com.github.open96.jypm.thread.TASK_TYPE;
@@ -80,7 +80,7 @@ public class DownloadManager {
      */
     public void download(Playlist playlist) {
         //Assign queued status to playlist and put it in queue in ThreadManagers singleThreadExecutor.
-        PlaylistManager.getInstance().updatePlaylistStatus(playlist, QUEUE_STATUS.QUEUED);
+        PlaylistManager.getInstance().updatePlaylistStatus(playlist, PLAYLIST_STATUS.QUEUED);
 
         LOG.trace("Downloading playlist \""
                 + playlist.getPlaylistName() + "\" "
@@ -101,14 +101,14 @@ public class DownloadManager {
                     try {
                         PlaylistManager
                                 .getInstance()
-                                .updatePlaylistStatus(playlist, QUEUE_STATUS.DOWNLOADING);
+                                .updatePlaylistStatus(playlist, PLAYLIST_STATUS.DOWNLOADING);
                         //Start the download
                         Process process = executableWrapper.downloadPlaylist(playlist);
                         parseOutputWhileProcessIsAlive(playlist, process);
                         //Mark playlist as downloaded
                         PlaylistManager
                                 .getInstance()
-                                .updatePlaylistStatus(playlist, QUEUE_STATUS.DOWNLOADED);
+                                .updatePlaylistStatus(playlist, PLAYLIST_STATUS.DOWNLOADED);
                         detailsString.append("\n").append("-----------Task completed-----------").append("\n");
                         LOG.trace("Playlist " + playlist.getPlaylistName() + " has finished downloading");
                     } catch (InterruptedException | IOException | NullPointerException e) {
@@ -123,7 +123,7 @@ public class DownloadManager {
                                 .append("\n")
                                 .append(e.toString());
                         LOG.error("Download failed", e);
-                        PlaylistManager.getInstance().updatePlaylistStatus(playlist, QUEUE_STATUS.FAILED);
+                        PlaylistManager.getInstance().updatePlaylistStatus(playlist, PLAYLIST_STATUS.FAILED);
                     }
                 }), TASK_TYPE.DOWNLOAD);
     }
@@ -209,7 +209,7 @@ public class DownloadManager {
     }
 
     /**
-     * Downloads every playlist that status is different from QUEUE_STATUS.DOWNLOADED.
+     * Downloads every playlist that status is different from PLAYLIST_STATUS.DOWNLOADED.
      */
     private void resumeInterruptedPlaylists() {
         ThreadManager
@@ -233,14 +233,14 @@ public class DownloadManager {
                             Queue<Playlist> resumedPlaylists = new LinkedBlockingQueue<>();
                             //Redownload playlist if its download was interrupted during last shutdown
                             playlists.stream()
-                                    .filter(playlist -> playlist.getStatus() == QUEUE_STATUS.DOWNLOADING)
+                                    .filter(playlist -> playlist.getStatus() == PLAYLIST_STATUS.DOWNLOADING)
                                     .forEach(playlist -> {
                                         download(playlist);
                                         resumedPlaylists.add(playlist);
                                     });
                             //Resume all queued tasks
                             playlists.stream()
-                                    .filter(playlist -> playlist.getStatus() == QUEUE_STATUS.QUEUED)
+                                    .filter(playlist -> playlist.getStatus() == PLAYLIST_STATUS.QUEUED)
                                     .filter(playlist -> !resumedPlaylists.contains(playlist))
                                     .forEach(playlist -> {
                                         download(playlist);

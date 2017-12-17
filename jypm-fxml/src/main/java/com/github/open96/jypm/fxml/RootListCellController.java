@@ -1,8 +1,8 @@
 package com.github.open96.jypm.fxml;
 
 import com.github.open96.jypm.download.DownloadManager;
+import com.github.open96.jypm.playlist.PLAYLIST_STATUS;
 import com.github.open96.jypm.playlist.PlaylistManager;
-import com.github.open96.jypm.playlist.QUEUE_STATUS;
 import com.github.open96.jypm.playlist.pojo.Playlist;
 import com.github.open96.jypm.settings.SettingsManager;
 import com.github.open96.jypm.thread.TASK_TYPE;
@@ -215,7 +215,7 @@ public class RootListCellController extends ListCell<Playlist> {
                 .getInstance()
                 .sendVoidTask(new Thread(() -> {
                     threadHashMap.put(playlist.getPlaylistLink(), Thread.currentThread());
-                    QUEUE_STATUS lastKnownState = QUEUE_STATUS.UNKNOWN;
+                    PLAYLIST_STATUS lastKnownState = PLAYLIST_STATUS.UNKNOWN;
                     while (ThreadManager.getExecutionPermission()) {
                         //Dirty cheat because JavaFX changes references to objects on listview update,
                         //so it is obligatory to make sure we are still operating on same object.
@@ -231,9 +231,9 @@ public class RootListCellController extends ListCell<Playlist> {
                                     .getInstance()
                                     .getPlaylistByLink(playlist.getPlaylistLink()).getStatus()) {
                                 case QUEUED:
-                                    if (lastKnownState != QUEUE_STATUS.QUEUED) {
+                                    if (lastKnownState != PLAYLIST_STATUS.QUEUED) {
                                         Platform.runLater(() -> currentStatusLabel.setText("In queue"));
-                                        lastKnownState = QUEUE_STATUS.QUEUED;
+                                        lastKnownState = PLAYLIST_STATUS.QUEUED;
                                     }
                                     Platform.runLater(() -> updateItem.setDisable(true));
                                     break;
@@ -244,20 +244,20 @@ public class RootListCellController extends ListCell<Playlist> {
                                                 .setText("Downloading (" + currentCount +
                                                         "/" + playlist.getTotalVideoCount() + ")"));
                                     }
-                                    lastKnownState = QUEUE_STATUS.DOWNLOADING;
+                                    lastKnownState = PLAYLIST_STATUS.DOWNLOADING;
                                     Platform.runLater(() -> updateItem.setDisable(true));
                                     break;
                                 case DOWNLOADED:
-                                    if (lastKnownState != QUEUE_STATUS.DOWNLOADED) {
+                                    if (lastKnownState != PLAYLIST_STATUS.DOWNLOADED) {
                                         Platform.runLater(() -> currentStatusLabel.setText("Downloaded"));
-                                        lastKnownState = QUEUE_STATUS.DOWNLOADED;
+                                        lastKnownState = PLAYLIST_STATUS.DOWNLOADED;
                                     }
                                     Platform.runLater(() -> updateItem.setDisable(false));
                                     break;
                                 case FAILED:
-                                    if (lastKnownState != QUEUE_STATUS.FAILED) {
+                                    if (lastKnownState != PLAYLIST_STATUS.FAILED) {
                                         Platform.runLater(() -> currentStatusLabel.setText("Error during downloading"));
-                                        lastKnownState = QUEUE_STATUS.FAILED;
+                                        lastKnownState = PLAYLIST_STATUS.FAILED;
                                     }
                                     Platform.runLater(() -> updateItem.setDisable(false));
                                     break;

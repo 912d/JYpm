@@ -1,8 +1,8 @@
 package com.github.open96.jypm.fxml;
 
 import com.github.open96.jypm.fxml.util.UpdateWindow;
+import com.github.open96.jypm.playlist.PLAYLIST_STATUS;
 import com.github.open96.jypm.playlist.PlaylistManager;
-import com.github.open96.jypm.playlist.QUEUE_STATUS;
 import com.github.open96.jypm.playlist.pojo.Playlist;
 import com.github.open96.jypm.settings.OS_TYPE;
 import com.github.open96.jypm.settings.SettingsManager;
@@ -110,7 +110,7 @@ public class SettingsWindowController implements Initializable {
                         for (Playlist p : PlaylistManager
                                 .getInstance()
                                 .getPlaylists()) {
-                            if (p.getStatus() == QUEUE_STATUS.QUEUED || p.getStatus() == QUEUE_STATUS.DOWNLOADING) {
+                            if (p.getStatus() == PLAYLIST_STATUS.QUEUED || p.getStatus() == PLAYLIST_STATUS.DOWNLOADING) {
                                 isDownloadInProgress = true;
                                 break;
                             }

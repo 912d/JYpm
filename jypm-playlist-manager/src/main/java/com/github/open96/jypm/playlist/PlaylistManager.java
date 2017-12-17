@@ -243,7 +243,7 @@ public class PlaylistManager {
     /**
      * Sets requested status of requested playlist
      */
-    public void updatePlaylistStatus(Playlist playlist, QUEUE_STATUS status) {
+    public void updatePlaylistStatus(Playlist playlist, PLAYLIST_STATUS status) {
         ThreadManager
                 .getInstance()
                 .sendVoidTask(new Thread(() -> {
@@ -252,7 +252,7 @@ public class PlaylistManager {
                                     .equals(playlist1.getPlaylistLink()))
                             .forEach(playlist1 -> {
                                 playlist1.setStatus(status);
-                                if (status == QUEUE_STATUS.DOWNLOADING) {
+                                if (status == PLAYLIST_STATUS.DOWNLOADING) {
                                     playlist1.setCurrentVideoCount(0);
                                 }
                                 saveToJson();

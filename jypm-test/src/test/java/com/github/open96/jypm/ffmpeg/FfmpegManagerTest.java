@@ -2,7 +2,7 @@ package com.github.open96.jypm.ffmpeg;
 
 import com.github.open96.jypm.download.DownloadManager;
 import com.github.open96.jypm.playlist.PlaylistManager;
-import com.github.open96.jypm.playlist.QUEUE_STATUS;
+import com.github.open96.jypm.playlist.PLAYLIST_STATUS;
 import com.github.open96.jypm.playlist.pojo.Playlist;
 import com.github.open96.jypm.settings.SettingsManager;
 import com.github.open96.jypm.youtubedl.EXECUTABLE_STATE;
@@ -129,8 +129,8 @@ public class FfmpegManagerTest {
         }
         DownloadManager.getInstance().download(testPlaylist);
         //Track download progress
-        while (testPlaylist.getStatus() == QUEUE_STATUS.DOWNLOADING
-                || testPlaylist.getStatus() == QUEUE_STATUS.QUEUED) {
+        while (testPlaylist.getStatus() == PLAYLIST_STATUS.DOWNLOADING
+                || testPlaylist.getStatus() == PLAYLIST_STATUS.QUEUED) {
             Thread.sleep(500);
             Integer downloadProgress = DownloadManager.getInstance().getDownloadProgress();
             if (downloadProgress != null) {
@@ -138,7 +138,7 @@ public class FfmpegManagerTest {
             }
         }
         //Make sure files are in place where they should be
-        assertEquals(QUEUE_STATUS.DOWNLOADED, testPlaylist.getStatus());
+        assertEquals(PLAYLIST_STATUS.DOWNLOADED, testPlaylist.getStatus());
         Integer directoryFileCount = new File(playlistPath).listFiles().length;
         assertEquals(testPlaylist.getTotalVideoCount(), directoryFileCount);
         //After successful download convert all files in that directory to mp3 format
@@ -180,8 +180,8 @@ public class FfmpegManagerTest {
         }
         DownloadManager.getInstance().download(testPlaylist);
         //Track download progress
-        while (testPlaylist.getStatus() == QUEUE_STATUS.DOWNLOADING
-                || testPlaylist.getStatus() == QUEUE_STATUS.QUEUED) {
+        while (testPlaylist.getStatus() == PLAYLIST_STATUS.DOWNLOADING
+                || testPlaylist.getStatus() == PLAYLIST_STATUS.QUEUED) {
             Thread.sleep(500);
             Integer downloadProgress = DownloadManager.getInstance().getDownloadProgress();
             if (downloadProgress != null) {
@@ -189,7 +189,7 @@ public class FfmpegManagerTest {
             }
         }
         //Make sure files are in place where they should be
-        assertEquals(QUEUE_STATUS.DOWNLOADED, testPlaylist.getStatus());
+        assertEquals(PLAYLIST_STATUS.DOWNLOADED, testPlaylist.getStatus());
         Integer directoryFileCount = new File(playlistPath).listFiles().length;
         assertEquals(testPlaylist.getTotalVideoCount(), directoryFileCount);
         //After successful download convert all files in that directory to mp3 format
