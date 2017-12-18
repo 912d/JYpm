@@ -94,23 +94,7 @@ public class RootListCellController extends ListCell<Playlist> {
             }
             LOG.debug("Loading playlist " + playlist.getPlaylistName());
 
-            //Now it's time to load values into their respective fields
-            playlistNameLabel.setText(playlist.getPlaylistName());
-            videoCountLabel.setText(playlist.getTotalVideoCount() + " videos");
-
-            //Load thumbnail asynchronously from main JavaFX thread
-            ThreadManager
-                    .getInstance()
-                    .sendVoidTask(new Thread(() -> {
-                        if (thumbnailImageView.getImage() == null) {
-                            Image thumbnailImage = new Image(playlist.getPlaylistThumbnailUrl());
-                            Platform.runLater(() -> thumbnailImageView.setImage(thumbnailImage));
-                        } else if (!thumbnailImageView.getImage().getUrl().equals(playlist.getPlaylistThumbnailUrl())
-                                && ThreadManager.getExecutionPermission()) {
-                            Image thumbnailImage = new Image(playlist.getPlaylistThumbnailUrl());
-                            Platform.runLater(() -> thumbnailImageView.setImage(thumbnailImage));
-                        }
-                    }), TASK_TYPE.UI);
+            updateUIItems(playlist);
 
             createStatusUpdaterThread(playlist);
 
@@ -193,12 +177,25 @@ public class RootListCellController extends ListCell<Playlist> {
                 }
             });
 
-            updateItem.setOnAction(actionEvent -> ThreadManager
-                    .getInstance()
-                    .sendVoidTask(new Thread(() ->
-                            DownloadManager
-                                    .getInstance()
-                                    .download(playlist)), TASK_TYPE.OTHER));
+            updateItem.setOnAction(actionEvent -> ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
+                //Parse playlist data from youtube
+                Boolean isParsed = PlaylistManager
+                        .getInstance()
+                        .updatePlaylistData(playlist);
+                while (isParsed == null || !isParsed) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        LOG.error("Thread sleep has been interrupted");
+                    }
+                }
+                //Update GUI
+                Platform.runLater(() -> updateUIItems(playlist));
+                //Trigger download
+                DownloadManager
+                        .getInstance()
+                        .download(playlist);
+            }), TASK_TYPE.OTHER));
 
             openItem.setOnAction(actionEvent -> ThreadManager
                     .getInstance()
@@ -326,6 +323,27 @@ public class RootListCellController extends ListCell<Playlist> {
                             //in case when user deletes a list and terminate that thread
                             break;
                         }
+                    }
+                }), TASK_TYPE.UI);
+    }
+
+
+    public void updateUIItems(Playlist playlist) {
+        //Load values into their respective fields
+        playlistNameLabel.setText(playlist.getPlaylistName());
+        videoCountLabel.setText(playlist.getTotalVideoCount() + " videos");
+
+        //Load thumbnail asynchronously from main JavaFX thread
+        ThreadManager
+                .getInstance()
+                .sendVoidTask(new Thread(() -> {
+                    if (thumbnailImageView.getImage() == null) {
+                        Image thumbnailImage = new Image(playlist.getPlaylistThumbnailUrl());
+                        Platform.runLater(() -> thumbnailImageView.setImage(thumbnailImage));
+                    } else if (!thumbnailImageView.getImage().getUrl().equals(playlist.getPlaylistThumbnailUrl())
+                            && ThreadManager.getExecutionPermission()) {
+                        Image thumbnailImage = new Image(playlist.getPlaylistThumbnailUrl());
+                        Platform.runLater(() -> thumbnailImageView.setImage(thumbnailImage));
                     }
                 }), TASK_TYPE.UI);
     }
