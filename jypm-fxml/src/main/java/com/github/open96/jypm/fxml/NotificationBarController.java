@@ -178,12 +178,37 @@ public class NotificationBarController implements Initializable {
      * Forces all playlists to be redownloaded.
      */
     public void onSyncButtonClick(ActionEvent actionEvent) {
-        PlaylistManager
-                .getInstance()
-                .getPlaylists()
-                .forEach(playlist -> DownloadManager
-                        .getInstance()
-                        .download(playlist));
+        ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
+            PlaylistManager
+                    .getInstance()
+                    .getPlaylists()
+                    .forEach(playlist -> {
+                        //Parse playlist data from youtube
+                        Boolean isParsed = PlaylistManager
+                                .getInstance()
+                                .updatePlaylistData(playlist);
+                        while (isParsed == null || !isParsed) {
+                            try {
+                                Thread.sleep(100);
+                            } catch (InterruptedException e) {
+                                LOG.error("Thread sleep has been interrupted");
+                            }
+                        }
+                        PlaylistManager
+                                .getInstance()
+                                .updatePlaylistData(playlist);
+                        //Show changes in UI
+                        Playlist placeholder = new Playlist("s", "");
+                        Platform.runLater(() -> {
+                            PlaylistManager.getInstance().getPlaylists().addAll(placeholder);
+                            PlaylistManager.getInstance().getPlaylists().remove(placeholder);
+                        });
+                        //Trigger download
+                        DownloadManager
+                                .getInstance()
+                                .download(playlist);
+                    });
+        }), TASK_TYPE.OTHER);
     }
 
     private void startNotifierThread() {
