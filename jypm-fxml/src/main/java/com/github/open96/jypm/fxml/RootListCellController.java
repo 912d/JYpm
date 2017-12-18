@@ -9,6 +9,7 @@ import com.github.open96.jypm.playlist.pojo.Playlist;
 import com.github.open96.jypm.settings.SettingsManager;
 import com.github.open96.jypm.thread.TASK_TYPE;
 import com.github.open96.jypm.thread.ThreadManager;
+import com.github.open96.jypm.tray.TrayIcon;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -235,6 +236,10 @@ public class RootListCellController extends ListCell<Playlist> {
                                 }
                             }
                             playlist.setStatus(PLAYLIST_STATUS.DOWNLOADED);
+                        }
+                        //Display notification from tray
+                        if (TrayIcon.isTrayWorking()) {
+                            TrayIcon.getInstance().displayNotification("Conversion finished", playlist.getPlaylistName() + " has been converted");
                         }
                     }), TASK_TYPE.CONVERSION));
 
