@@ -1,6 +1,6 @@
 package com.github.open96.jypm.fxml;
 
-import com.github.open96.jypm.fxml.util.UpdateWindow;
+import com.github.open96.jypm.fxml.window.UpdateWindow;
 import com.github.open96.jypm.playlist.PLAYLIST_STATUS;
 import com.github.open96.jypm.playlist.PlaylistManager;
 import com.github.open96.jypm.playlist.pojo.Playlist;
