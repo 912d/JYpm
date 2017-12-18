@@ -218,10 +218,12 @@ public class RootListCellController extends ListCell<Playlist> {
                     .getInstance()
                     .sendVoidTask(new Thread(() -> {
                         if (playlist.getStatus() == PLAYLIST_STATUS.DOWNLOADED) {
+                            //Start conversion
                             playlist.setStatus(PLAYLIST_STATUS.CONVERTING);
                             conversionProgress = FfmpegManager
                                     .getInstance()
                                     .convertDirectory(playlist.getPlaylistLocation(), FILE_EXTENSION.MP3, 320);
+                            //Wait until all videos have been converted
                             int convertedVideos = 0;
                             while (convertedVideos != conversionProgress.size()) {
                                 try {
@@ -235,6 +237,7 @@ public class RootListCellController extends ListCell<Playlist> {
                                     LOG.error("Thread sleep has been interrupted!");
                                 }
                             }
+                            //Indicate that playlist has finished it's conversion
                             playlist.setStatus(PLAYLIST_STATUS.DOWNLOADED);
                         }
                         //Display notification from tray
