@@ -1,6 +1,8 @@
 package com.github.open96.jypm.fxml;
 
 import com.github.open96.jypm.download.DownloadManager;
+import com.github.open96.jypm.ffmpeg.FILE_EXTENSION;
+import com.github.open96.jypm.ffmpeg.FfmpegManager;
 import com.github.open96.jypm.playlist.PLAYLIST_STATUS;
 import com.github.open96.jypm.playlist.PlaylistManager;
 import com.github.open96.jypm.playlist.pojo.Playlist;
@@ -28,6 +30,7 @@ import org.apache.logging.log4j.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -36,6 +39,8 @@ import java.util.Map;
 public class RootListCellController extends ListCell<Playlist> {
 
     private static final Logger LOG = LogManager.getLogger(RootListCellController.class.getName());
+
+    private List<Boolean> conversionProgress;
 
     //Load elements from fxml file that have id and cast them to objects of their respective types
 
@@ -207,6 +212,32 @@ public class RootListCellController extends ListCell<Playlist> {
                         }
                     }), TASK_TYPE.OTHER));
 
+
+            convertItem.setOnAction(actionEvent -> ThreadManager
+                    .getInstance()
+                    .sendVoidTask(new Thread(() -> {
+                        if (playlist.getStatus() == PLAYLIST_STATUS.DOWNLOADED) {
+                            playlist.setStatus(PLAYLIST_STATUS.CONVERTING);
+                            conversionProgress = FfmpegManager
+                                    .getInstance()
+                                    .convertDirectory(playlist.getPlaylistLocation(), FILE_EXTENSION.MP3, 320);
+                            int convertedVideos = 0;
+                            while (convertedVideos != conversionProgress.size()) {
+                                try {
+                                    convertedVideos = conversionProgress
+                                            .stream()
+                                            .filter(conversionState -> conversionState.equals(Boolean.TRUE))
+                                            .toArray()
+                                            .length;
+                                    Thread.sleep(100);
+                                } catch (InterruptedException e) {
+                                    LOG.error("Thread sleep has been interrupted!");
+                                }
+                            }
+                            playlist.setStatus(PLAYLIST_STATUS.DOWNLOADED);
+                        }
+                    }), TASK_TYPE.CONVERSION));
+
             setGraphic(rootHBox);
         }
 
@@ -232,6 +263,19 @@ public class RootListCellController extends ListCell<Playlist> {
                             switch (PlaylistManager
                                     .getInstance()
                                     .getPlaylistByLink(playlist.getPlaylistLink()).getStatus()) {
+                                case CONVERTING:
+                                    if (conversionProgress != null) {
+                                        //Count converted videos and display them
+                                        int convertedVideos = conversionProgress
+                                                .stream()
+                                                .filter(conversionState -> conversionState.equals(Boolean.TRUE))
+                                                .toArray()
+                                                .length;
+                                        Platform.runLater(() -> currentStatusLabel.setText("Converting ("
+                                                + convertedVideos + "/" + conversionProgress.size() + ")"));
+                                        lastKnownState = PLAYLIST_STATUS.QUEUED;
+                                    }
+                                    Platform.runLater(() -> updateItem.setDisable(true));
                                 case QUEUED:
                                     if (lastKnownState != PLAYLIST_STATUS.QUEUED) {
                                         Platform.runLater(() -> currentStatusLabel.setText("In queue"));
