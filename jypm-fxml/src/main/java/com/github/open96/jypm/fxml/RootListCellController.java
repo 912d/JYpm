@@ -56,6 +56,8 @@ public class RootListCellController extends ListCell<Playlist> {
     @FXML
     private MenuItem openItem;
     @FXML
+    private MenuItem convertItem;
+    @FXML
     private ImageView thumbnailImageView;
     //In this FXMLLoader our listCell layout will be stored
     private FXMLLoader fxmlLoader;
