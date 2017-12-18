@@ -1,6 +1,8 @@
 package com.github.open96.jypm.ffmpeg;
 
 
+import com.github.open96.jypm.playlist.PLAYLIST_STATUS;
+import com.github.open96.jypm.playlist.PlaylistManager;
 import com.github.open96.jypm.settings.SettingsManager;
 import com.github.open96.jypm.thread.TASK_TYPE;
 import com.github.open96.jypm.thread.ThreadManager;
@@ -51,6 +53,7 @@ public class FfmpegManager {
         if (!checkIfExecutableIsValid()) {
             LOG.warn("Ffmpeg executable is not valid, change that in settings!");
         }
+        resetInterruptedPlaylistsState();
         LOG.debug("FfmpegManager has been successfully initialized");
     }
 
@@ -144,6 +147,16 @@ public class FfmpegManager {
                 LOG.error("Extension is not supported!");
         }
         return null;
+    }
+
+
+    private void resetInterruptedPlaylistsState() {
+        PlaylistManager
+                .getInstance()
+                .getPlaylists()
+                .stream()
+                .filter(playlist -> playlist.getStatus() == PLAYLIST_STATUS.CONVERTING)
+                .forEach(playlist -> playlist.setStatus(PLAYLIST_STATUS.DOWNLOADED));
     }
 
 }
