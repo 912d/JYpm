@@ -2,6 +2,7 @@ package com.github.open96.jypm.fxml;
 
 import com.github.open96.jypm.download.DownloadManager;
 import com.github.open96.jypm.internetconnection.ConnectionChecker;
+import com.github.open96.jypm.playlist.PLAYLIST_STATUS;
 import com.github.open96.jypm.playlist.PlaylistManager;
 import com.github.open96.jypm.playlist.pojo.Playlist;
 import com.github.open96.jypm.thread.TASK_TYPE;
@@ -204,6 +205,12 @@ public class NotificationBarController implements Initializable {
                                     .getExecutableState() == EXECUTABLE_STATE.NOT_READY) {
                                 Platform.runLater(() -> notificationText
                                         .setText("Looking for youtube-dl executable..."));
+                            }
+                            if (PlaylistManager.getInstance().getPlaylists()
+                                    .stream()
+                                    .anyMatch(playlist -> playlist.getStatus() == PLAYLIST_STATUS.CONVERTING)) {
+                                Platform.runLater(() -> notificationText
+                                        .setText("Conversion in progress..."));
                             }
                             int queued = 0;
                             boolean isDownloadInProgress = false;
