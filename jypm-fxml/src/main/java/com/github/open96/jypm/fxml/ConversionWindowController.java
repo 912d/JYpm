@@ -84,11 +84,39 @@ public class ConversionWindowController implements Initializable {
 
 
     public void onConvertButtonClick(ActionEvent actionEvent) {
+        //Cast target extension to enum
+        String targetExtension = targetExtensionSplitMenuButton.getText();
+        FILE_EXTENSION extension = null;
+        for (FILE_EXTENSION f : FILE_EXTENSION.values()) {
+            if (f.toString().toLowerCase().equals(targetExtension.toLowerCase())) {
+                extension = f;
+            }
+        }
 
+        //Cast bitrate to Integer
+        String targetBitrate = bitrateSplitMenuButton.getText();
+        Integer bitrate = null;
+        if (extension == FILE_EXTENSION.MP3) {
+            for (Integer i : FfmpegManager.availableBitrates) {
+                if (i.equals(Integer.valueOf(targetBitrate))) {
+                    bitrate = i;
+                }
+            }
+        }
+
+        //Now do some validation and issue conversion task
+        if (extension != FILE_EXTENSION.MP3) {
+            bitrate = 0;
+        }
+        if (extension != null) {
+            triggerConversion(extension, bitrate);
+            //Close conversion window
+            rootPane.getScene().getWindow().hide();
+        }
     }
 
 
-    private void triggerConversion() {
+    private void triggerConversion(FILE_EXTENSION fileExtension, Integer bitrate) {
         ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
             if (playlist.getStatus() == PLAYLIST_STATUS.DOWNLOADED) {
                 //Start conversion
