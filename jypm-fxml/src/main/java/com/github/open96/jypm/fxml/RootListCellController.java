@@ -119,11 +119,6 @@ public class RootListCellController extends ListCell<Playlist> {
                                                 .filter(playlist1 -> playlist1.getPlaylistLink().equals(playlist
                                                         .getPlaylistLink()))
                                                 .forEach(playlist1 -> {
-                                                    Platform.runLater(() ->
-                                                            PlaylistManager
-                                                                    .getInstance()
-                                                                    .getPlaylists()
-                                                                    .remove(playlist1));
                                                     ThreadManager
                                                             .getInstance()
                                                             .sendVoidTask(new Thread(() ->
@@ -146,11 +141,6 @@ public class RootListCellController extends ListCell<Playlist> {
                                                 .filter(playlist1 -> playlist1.getPlaylistLink().equals(playlist
                                                         .getPlaylistLink()))
                                                 .forEach(playlist1 -> {
-                                                    Platform.runLater(() ->
-                                                            PlaylistManager
-                                                                    .getInstance()
-                                                                    .getPlaylists()
-                                                                    .remove(playlist1));
                                                     ThreadManager
                                                             .getInstance()
                                                             .sendVoidTask(new Thread(() ->
