@@ -153,7 +153,7 @@ public class PlaylistManager {
                             .forEach(playlist1 -> Platform.runLater(() -> {
                                 LOG.trace("Removing " + playlist1.getPlaylistName());
                                 playlists.remove(playlist1);
-                                ;
+                                saveToJson();
                             }));
                 }), TASK_TYPE.PLAYLIST);
         //Delete playlist directory
@@ -177,7 +177,6 @@ public class PlaylistManager {
                         }
                     }), TASK_TYPE.OTHER);
         }
-        saveToJson();
     }
 
     /**
