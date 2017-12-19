@@ -224,7 +224,9 @@ public class RootListCellController extends ListCell<Playlist> {
                             //subStage.getIcons().add(LAUNCHER_ICON);
 
                             try {
-                                Parent window = FXMLLoader.load(getClass().getResource("/fxml/conversionWindow.fxml"));
+                                FXMLLoader fxmlLoader = new FXMLLoader(getClass()
+                                        .getResource("/fxml/conversionWindow.fxml"));
+                                Parent window = fxmlLoader.load();
                                 ConversionWindowController controller = fxmlLoader.getController();
                                 controller.setData(playlist, conversionProgress);
                                 //Create a scene, add FXML layout to it.
