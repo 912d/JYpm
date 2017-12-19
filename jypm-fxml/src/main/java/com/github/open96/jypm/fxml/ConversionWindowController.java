@@ -83,7 +83,7 @@ public class ConversionWindowController implements Initializable {
 
 
     public void onConvertButtonClick(ActionEvent actionEvent) {
-
+        
     }
 
 
@@ -118,5 +118,11 @@ public class ConversionWindowController implements Initializable {
                         playlist.getPlaylistName() + " has been converted");
             }
         }), TASK_TYPE.CONVERSION);
+    }
+
+
+    public void setData(Playlist playlist, List<Boolean> conversionProgress) {
+        this.playlist = playlist;
+        this.conversionProgress = conversionProgress;
     }
 }

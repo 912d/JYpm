@@ -225,7 +225,8 @@ public class RootListCellController extends ListCell<Playlist> {
 
                             try {
                                 Parent window = FXMLLoader.load(getClass().getResource("/fxml/conversionWindow.fxml"));
-
+                                ConversionWindowController controller = fxmlLoader.getController();
+                                controller.setData(playlist, conversionProgress);
                                 //Create a scene, add FXML layout to it.
                                 Scene scene = new Scene(window);
 
