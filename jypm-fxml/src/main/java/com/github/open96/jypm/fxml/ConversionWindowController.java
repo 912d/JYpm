@@ -33,8 +33,9 @@ public class ConversionWindowController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        //Disable command textfield by default
+        //Disable command textfield and bitrate menubutton by default
         customCommandTextField.setDisable(true);
+        bitrateSplitMenuButton.setDisable(true);
 
         //Create menu entries for both menu buttons
         for (FILE_EXTENSION f : FILE_EXTENSION.values()) {
@@ -42,6 +43,11 @@ public class ConversionWindowController implements Initializable {
             menuItem.setOnAction(actionEvent -> {
                 targetExtensionSplitMenuButton.setText(menuItem.getText());
                 customCommandTextField.setDisable(true);
+                if (menuItem.getText().equals("MP3")) {
+                    bitrateSplitMenuButton.setDisable(false);
+                } else {
+                    bitrateSplitMenuButton.setDisable(true);
+                }
             });
             targetExtensionSplitMenuButton.getItems().addAll(menuItem);
         }
@@ -59,6 +65,7 @@ public class ConversionWindowController implements Initializable {
         customCommandMenuItem.setOnAction(actionEvent -> {
             targetExtensionSplitMenuButton.setText(customCommandMenuItem.getText());
             customCommandTextField.setDisable(false);
+            bitrateSplitMenuButton.setDisable(true);
         });
         targetExtensionSplitMenuButton.getItems().addAll(customCommandMenuItem);
 
