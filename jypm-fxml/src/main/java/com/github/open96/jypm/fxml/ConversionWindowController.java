@@ -44,6 +44,9 @@ public class ConversionWindowController implements Initializable {
             bitrateSplitMenuButton.getItems().addAll(menuItem);
         }
 
+        //Also add "custom" option for targetExtensionSplitMenuButton
+        targetExtensionSplitMenuButton.getItems().addAll(new MenuItem("Custom"));
+
     }
 
 
