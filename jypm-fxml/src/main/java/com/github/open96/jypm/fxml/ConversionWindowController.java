@@ -39,16 +39,28 @@ public class ConversionWindowController implements Initializable {
         //Create menu entries for both menu buttons
         for (FILE_EXTENSION f : FILE_EXTENSION.values()) {
             MenuItem menuItem = new MenuItem(f.toString());
+            menuItem.setOnAction(actionEvent -> {
+                targetExtensionSplitMenuButton.setText(menuItem.getText());
+                customCommandTextField.setDisable(true);
+            });
             targetExtensionSplitMenuButton.getItems().addAll(menuItem);
         }
 
         for (Integer bitrate : FfmpegManager.availableBitrates) {
             MenuItem menuItem = new MenuItem(bitrate.toString());
+            menuItem.setOnAction(actionEvent -> {
+                bitrateSplitMenuButton.setText(menuItem.getText());
+            });
             bitrateSplitMenuButton.getItems().addAll(menuItem);
         }
 
         //Also add "custom" option for targetExtensionSplitMenuButton
-        targetExtensionSplitMenuButton.getItems().addAll(new MenuItem("Custom"));
+        MenuItem customCommandMenuItem = new MenuItem("Custom");
+        customCommandMenuItem.setOnAction(actionEvent -> {
+            targetExtensionSplitMenuButton.setText(customCommandMenuItem.getText());
+            customCommandTextField.setDisable(false);
+        });
+        targetExtensionSplitMenuButton.getItems().addAll(customCommandMenuItem);
 
     }
 
