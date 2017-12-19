@@ -63,6 +63,40 @@ Button classes
     -fx-text-fill: #EFF0F1;
 }
 
+.split-menu-button {
+    -fx-background-color: #24292d;
+    -fx-border-radius: 10 10 10 10;
+    -fx-background-radius: 10 10 10 10;
+}
+
+.split-menu-button .label {
+    -fx-background-color: #24292d;
+}
+
+.split-menu-button .menu-item {
+    -fx-background-color: inherit;
+    -fx-text-fill: #EFF0F1
+}
+
+.split-menu-button .menu-item:focused {
+    -fx-background-color: #2B3034;
+    -fx-text-fill: #EFF0F1
+}
+
+.split-menu-button .menu-item .label {
+    -fx-background-color: inherit;
+    -fx-text-fill: #EFF0F1
+}
+
+.split-menu-button .menu-item:focused .label {
+    -fx-background-color: #2B3034;
+    -fx-text-fill: #EFF0F1
+}
+
+.split-menu-button .arrow-button {
+    -fx-background-color: #24292d;
+}
+
 /**
 ListView classes
  */

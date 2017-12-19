@@ -4,8 +4,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>jypm</artifactId>
-        <groupId>com.github.open96</groupId>
-        <version>1.2.1</version>
+        <groupId>com.github.open96.jypm</groupId>
+        <version>1.3.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -15,44 +15,50 @@
     <dependencies>
 
         <dependency>
-            <groupId>com.github.open96</groupId>
+            <groupId>com.github.open96.jypm</groupId>
             <artifactId>jypm-playlist-manager</artifactId>
             <version>${project.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>com.github.open96</groupId>
+            <groupId>com.github.open96.jypm</groupId>
             <artifactId>jypm-download-manager</artifactId>
             <version>${project.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>com.github.open96</groupId>
+            <groupId>com.github.open96.jypm</groupId>
             <artifactId>jypm-youtube-dl</artifactId>
             <version>${project.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>com.github.open96</groupId>
+            <groupId>com.github.open96.jypm</groupId>
             <artifactId>jypm-thread-manager</artifactId>
             <version>${project.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>com.github.open96</groupId>
+            <groupId>com.github.open96.jypm</groupId>
             <artifactId>jypm-tray-icon</artifactId>
             <version>${project.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>com.github.open96</groupId>
+            <groupId>com.github.open96.jypm</groupId>
             <artifactId>jypm-updater</artifactId>
             <version>${project.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>com.github.open96</groupId>
+            <groupId>com.github.open96.jypm</groupId>
             <artifactId>jypm-internet-checker</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.open96.jypm</groupId>
+            <artifactId>jypm-ffmpeg</artifactId>
             <version>${project.version}</version>
         </dependency>
 
