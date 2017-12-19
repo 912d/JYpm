@@ -129,7 +129,7 @@ public class PlaylistManagerTest {
                     .getInstance()
                     .getPlaylistByLink(samplePlaylist.getPlaylistLink()).getTotalVideoCount();
             assertEquals(2, videoCount);
-            assertEquals(QUEUE_STATUS.QUEUED, PlaylistManager
+            assertEquals(PLAYLIST_STATUS.QUEUED, PlaylistManager
                     .getInstance().getPlaylistByLink(samplePlaylist.getPlaylistLink()).getStatus());
         } catch (IllegalStateException e) {
             System.out.println("Empty API object");

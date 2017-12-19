@@ -1,6 +1,7 @@
 package com.github.open96.jypm;
 
 import com.github.open96.jypm.download.DownloadManager;
+import com.github.open96.jypm.ffmpeg.FfmpegManager;
 import com.github.open96.jypm.playlist.PlaylistManager;
 import com.github.open96.jypm.settings.SettingsManager;
 import com.github.open96.jypm.thread.TASK_TYPE;
@@ -41,6 +42,7 @@ public class JYpm extends Application {
         ThreadManager.getInstance();
         SettingsManager.getInstance();
         PlaylistManager.getInstance();
+        FfmpegManager.getInstance();
     }
 
     /**

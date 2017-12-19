@@ -1,6 +1,6 @@
 package com.github.open96.jypm.playlist.pojo;
 
-import com.github.open96.jypm.playlist.QUEUE_STATUS;
+import com.github.open96.jypm.playlist.PLAYLIST_STATUS;
 
 public class Playlist {
     private String playlistName;
@@ -9,12 +9,12 @@ public class Playlist {
     private Integer currentVideoCount;
     private String playlistLocation;
     private String playlistThumbnailUrl;
-    private QUEUE_STATUS status;
+    private PLAYLIST_STATUS status;
 
     public Playlist(String playlistLink, String playlistLocation) {
         this.playlistLink = playlistLink;
         this.playlistLocation = playlistLocation;
-        status = QUEUE_STATUS.QUEUED;
+        status = PLAYLIST_STATUS.QUEUED;
     }
 
     public String getPlaylistThumbnailUrl() {
@@ -57,11 +57,11 @@ public class Playlist {
         this.currentVideoCount = currentVideoCount;
     }
 
-    public QUEUE_STATUS getStatus() {
+    public PLAYLIST_STATUS getStatus() {
         return status;
     }
 
-    public void setStatus(QUEUE_STATUS status) {
+    public void setStatus(PLAYLIST_STATUS status) {
         this.status = status;
     }
 }

@@ -125,20 +125,7 @@ public class PlaylistManager {
         ThreadManager
                 .getInstance().
                 sendVoidTask(new Thread(() -> {
-                    YouTubeParser youTubeParser = new YouTubeParser(playlist.getPlaylistLink());
-                    int parserRetryCount = 0;
-                    while (!youTubeParser.validateDocument() && parserRetryCount < 10) {
-                        youTubeParser = new YouTubeParser(playlist.getPlaylistLink());
-                        parserRetryCount++;
-                    }
-                    if (parserRetryCount >= 10) {
-                        LOG.error("Could not parse playlist info, " +
-                                "check if your firewall doesn't block youtube access");
-                    }
-                    playlist.setPlaylistName(youTubeParser.getPlaylistName());
-                    playlist.setTotalVideoCount(Integer.parseInt(youTubeParser.getVideoCount()));
-                    playlist.setPlaylistThumbnailUrl(youTubeParser.getThumbnailLink());
-                    LOG.trace("Playlist data successfully parsed.");
+                    parsePlaylistData(playlist);
                     if (ThreadManager.getExecutionPermission() && ConnectionChecker
                             .getInstance()
                             .checkInternetConnection()) {
@@ -243,7 +230,7 @@ public class PlaylistManager {
     /**
      * Sets requested status of requested playlist
      */
-    public void updatePlaylistStatus(Playlist playlist, QUEUE_STATUS status) {
+    public void updatePlaylistStatus(Playlist playlist, PLAYLIST_STATUS status) {
         ThreadManager
                 .getInstance()
                 .sendVoidTask(new Thread(() -> {
@@ -252,12 +239,52 @@ public class PlaylistManager {
                                     .equals(playlist1.getPlaylistLink()))
                             .forEach(playlist1 -> {
                                 playlist1.setStatus(status);
-                                if (status == QUEUE_STATUS.DOWNLOADING) {
+                                if (status == PLAYLIST_STATUS.DOWNLOADING) {
                                     playlist1.setCurrentVideoCount(0);
                                 }
                                 saveToJson();
                             });
                 }), TASK_TYPE.PLAYLIST);
+    }
+
+
+    private void parsePlaylistData(Playlist playlist) {
+        if (ConnectionChecker.getInstance().checkInternetConnection()) {
+            YouTubeParser youTubeParser = new YouTubeParser(playlist.getPlaylistLink());
+            int parserRetryCount = 0;
+            while (!youTubeParser.validateDocument() && parserRetryCount < 10) {
+                youTubeParser = new YouTubeParser(playlist.getPlaylistLink());
+                parserRetryCount++;
+            }
+            if (parserRetryCount >= 10) {
+                LOG.error("Could not parse playlist info, " +
+                        "check if your firewall doesn't block youtube access");
+            }
+            playlist.setPlaylistName(youTubeParser.getPlaylistName());
+            playlist.setTotalVideoCount(Integer.parseInt(youTubeParser.getVideoCount()));
+            playlist.setPlaylistThumbnailUrl(youTubeParser.getThumbnailLink());
+            LOG.trace("Playlist data successfully parsed.");
+            saveToJson();
+        }
+    }
+
+
+    public Boolean updatePlaylistData(Playlist playlist) {
+        Future playlistUpdaterThread = ThreadManager
+                .getInstance()
+                .sendTask(() -> {
+                    playlists.stream()
+                            .filter(playlist1 -> playlist.getPlaylistLink()
+                                    .equals(playlist1.getPlaylistLink()))
+                            .forEach(playlist1 -> parsePlaylistData(playlist));
+                    return true;
+                }, TASK_TYPE.PLAYLIST);
+        try {
+            return (Boolean) playlistUpdaterThread.get();
+        } catch (InterruptedException | ExecutionException e) {
+            LOG.error("Could not receive playlist data", e);
+        }
+        return null;
     }
 
 
