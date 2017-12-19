@@ -33,6 +33,9 @@ public class ConversionWindowController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        //Disable command textfield by default
+        customCommandTextField.setDisable(true);
+
         //Create menu entries for both menu buttons
         for (FILE_EXTENSION f : FILE_EXTENSION.values()) {
             MenuItem menuItem = new MenuItem(f.toString());
