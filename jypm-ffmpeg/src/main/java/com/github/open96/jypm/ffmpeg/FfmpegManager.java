@@ -26,6 +26,8 @@ public class FfmpegManager {
     public static final Integer[] availableBitrates = {
             8, 16, 24, 32, 40, 48, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320
     };
+    //List of booleans that stores state of conversion tasks
+    List<Boolean> conversionProgress;
 
 
     private FfmpegManager() {
@@ -74,6 +76,11 @@ public class FfmpegManager {
             return false;
         }
         return true;
+    }
+
+
+    public List<Boolean> getConversionProgress() {
+        return conversionProgress;
     }
 
     /**
@@ -128,6 +135,7 @@ public class FfmpegManager {
             LOG.warn("No files in directory, conversion is not possible...");
             return null;
         }
+        conversionProgress = taskList;
         return taskList;
     }
 

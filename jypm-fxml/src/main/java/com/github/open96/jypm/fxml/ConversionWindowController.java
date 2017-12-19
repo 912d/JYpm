@@ -28,7 +28,6 @@ public class ConversionWindowController implements Initializable {
 
     //Variables needed to start conversion process
     private Playlist playlist;
-    private List<Boolean> conversionProgress;
 
 
     @FXML
@@ -121,9 +120,9 @@ public class ConversionWindowController implements Initializable {
             if (playlist.getStatus() == PLAYLIST_STATUS.DOWNLOADED) {
                 //Start conversion
                 playlist.setStatus(PLAYLIST_STATUS.CONVERTING);
-                conversionProgress = FfmpegManager
+                List<Boolean> conversionProgress = FfmpegManager
                         .getInstance()
-                        .convertDirectory(playlist.getPlaylistLocation(), FILE_EXTENSION.MP3, 320);
+                        .convertDirectory(playlist.getPlaylistLocation(), fileExtension, bitrate);
                 //Wait until all videos have been converted
                 int convertedVideos = 0;
                 while (convertedVideos != conversionProgress.size()) {
@@ -150,8 +149,7 @@ public class ConversionWindowController implements Initializable {
     }
 
 
-    public void setData(Playlist playlist, List<Boolean> conversionProgress) {
+    public void setData(Playlist playlist) {
         this.playlist = playlist;
-        this.conversionProgress = conversionProgress;
     }
 }

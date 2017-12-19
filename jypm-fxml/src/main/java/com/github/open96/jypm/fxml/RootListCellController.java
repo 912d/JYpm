@@ -1,6 +1,7 @@
 package com.github.open96.jypm.fxml;
 
 import com.github.open96.jypm.download.DownloadManager;
+import com.github.open96.jypm.ffmpeg.FfmpegManager;
 import com.github.open96.jypm.playlist.PLAYLIST_STATUS;
 import com.github.open96.jypm.playlist.PlaylistManager;
 import com.github.open96.jypm.playlist.pojo.Playlist;
@@ -228,7 +229,7 @@ public class RootListCellController extends ListCell<Playlist> {
                                         .getResource("/fxml/conversionWindow.fxml"));
                                 Parent window = fxmlLoader.load();
                                 ConversionWindowController controller = fxmlLoader.getController();
-                                controller.setData(playlist, conversionProgress);
+                                controller.setData(playlist);
                                 //Create a scene, add FXML layout to it.
                                 Scene scene = new Scene(window);
 
@@ -272,17 +273,16 @@ public class RootListCellController extends ListCell<Playlist> {
                                     .getInstance()
                                     .getPlaylistByLink(playlist.getPlaylistLink()).getStatus()) {
                                 case CONVERTING:
-                                    if (conversionProgress != null) {
-                                        //Count converted videos and display them
-                                        int convertedVideos = conversionProgress
-                                                .stream()
-                                                .filter(conversionState -> conversionState.equals(Boolean.TRUE))
-                                                .toArray()
-                                                .length;
-                                        Platform.runLater(() -> currentStatusLabel.setText("Converting ("
-                                                + convertedVideos + "/" + conversionProgress.size() + ")"));
-                                        lastKnownState = PLAYLIST_STATUS.QUEUED;
-                                    }
+                                    //Count converted videos and display them
+                                    conversionProgress = FfmpegManager.getInstance().getConversionProgress();
+                                    int convertedVideos = conversionProgress
+                                            .stream()
+                                            .filter(conversionState -> conversionState.equals(Boolean.TRUE))
+                                            .toArray()
+                                            .length;
+                                    Platform.runLater(() -> currentStatusLabel.setText("Converting ("
+                                            + convertedVideos + "/" + conversionProgress.size() + ")"));
+                                    lastKnownState = PLAYLIST_STATUS.CONVERTING;
                                     Platform.runLater(() -> updateItem.setDisable(true));
                                     break;
                                 case QUEUED:
