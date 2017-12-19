@@ -1,7 +1,6 @@
 package com.github.open96.jypm.thread;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.lang.reflect.Field;
@@ -17,7 +16,7 @@ import static org.junit.Assert.assertNull;
 public class ThreadManagerTest {
 
     @Before
-    public void resetSingleton() {
+    public void deleteSingleton() {
         try {
             Field singletonInstance = ThreadManager.class.getDeclaredField("singletonInstance");
             singletonInstance.setAccessible(true);
@@ -28,11 +27,10 @@ public class ThreadManagerTest {
         } catch (IllegalAccessException | NoSuchFieldException e) {
             e.printStackTrace();
         }
-        ThreadManager.getInstance();
     }
 
-    @BeforeClass
-    public static void checkInitialState() {
+    @Test
+    public void checkInitialState() {
         assertFalse(ThreadManager.getExecutionPermission());
         ThreadManager.getInstance();
         assertTrue(ThreadManager.getExecutionPermission());
@@ -41,13 +39,15 @@ public class ThreadManagerTest {
     @Test
     public void checkSendTask() {
         ThreadManager threadManager = ThreadManager.getInstance();
-        try {
-            Callable<Boolean> c = () -> true;
-            Future<Boolean> future = threadManager.sendTask(c, TASK_TYPE.OTHER);
-            Boolean b = future.get();
-            assertTrue(b);
-        } catch (InterruptedException | ExecutionException | RejectedExecutionException e) {
-            e.printStackTrace();
+        for (TASK_TYPE taskType : TASK_TYPE.values()) {
+            try {
+                Callable<Boolean> c = () -> true;
+                Future<Boolean> future = threadManager.sendTask(c, taskType);
+                Boolean b = future.get();
+                assertTrue(b);
+            } catch (InterruptedException | ExecutionException | RejectedExecutionException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -55,15 +55,17 @@ public class ThreadManagerTest {
     @Test
     public void checkSendVoidTask() {
         ThreadManager threadManager = ThreadManager.getInstance();
-        final Boolean[] someVariable = {false};
-        threadManager.sendVoidTask(new Thread(() -> someVariable[0] = true), TASK_TYPE.OTHER);
-        try {
-            while (!someVariable[0]) {
-                Thread.sleep(1);
+        for (TASK_TYPE taskType : TASK_TYPE.values()) {
+            final Boolean[] someVariable = {false};
+            threadManager.sendVoidTask(new Thread(() -> someVariable[0] = true), taskType);
+            try {
+                while (!someVariable[0]) {
+                    Thread.sleep(1);
+                }
+                assertTrue(someVariable[0]);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-            assertTrue(someVariable[0]);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         }
     }
 
@@ -71,19 +73,21 @@ public class ThreadManagerTest {
     @Test
     public void checkStopAllThreads() {
         ThreadManager threadManager = ThreadManager.getInstance();
-        threadManager.stopAllThreads();
-        assertFalse(ThreadManager.getExecutionPermission());
-        try {
-            Callable<Boolean> c = () -> true;
-            Future<Boolean> future = threadManager.sendTask(c, TASK_TYPE.OTHER);
-            Boolean b = future.get();
-            assertNull(b);
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        } catch (RejectedExecutionException e) {
-            assertTrue(true);
+        for (TASK_TYPE taskType : TASK_TYPE.values()) {
+            threadManager.stopAllThreads();
+            assertFalse(ThreadManager.getExecutionPermission());
+            try {
+                Callable<Boolean> c = () -> true;
+                Future<Boolean> future = threadManager.sendTask(c, taskType);
+                Boolean b = future.get();
+                assertNull(b);
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            } catch (RejectedExecutionException e) {
+                assertTrue(true);
+            }
+            //Below line ensures rest of the tests from this module don't fail when ran in single batch
+            deleteSingleton();
         }
-        //Call resetSingleton manually so ThreadManager will be responsible if ran with other test classes
-        resetSingleton();
     }
 }

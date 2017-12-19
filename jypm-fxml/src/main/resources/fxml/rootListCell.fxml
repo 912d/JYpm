@@ -34,6 +34,7 @@
                             <items>
                                 <MenuItem fx:id="updateItem" mnemonicParsing="false" text="Update now"/>
                                 <MenuItem fx:id="openItem" mnemonicParsing="false" text="Open location"/>
+                                <MenuItem fx:id="convertItem" mnemonicParsing="false" text="Convert"/>
                                 <MenuItem fx:id="deleteItem" mnemonicParsing="false" text="Delete"/>
                             </items>
                             <GridPane.margin>

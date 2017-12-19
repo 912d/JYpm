@@ -32,7 +32,7 @@ public class PlaylistManager {
     //File which stores Playlist objects in form of JSON
     private final static String JSON_FILE_NAME = "playlists.json";
     //This object is a singleton thus storing instance of it is needed
-    private static PlaylistManager singletonInstance;
+    private volatile static PlaylistManager singletonInstance;
     //Initialize log4j logger for later use in this class
     private static final Logger LOG = LogManager.getLogger(PlaylistManager.class.getName());
     //Variable where all managed playlists are stored
@@ -50,8 +50,12 @@ public class PlaylistManager {
      */
     public static PlaylistManager getInstance() {
         if (singletonInstance == null) {
-            LOG.debug("Instance is null, initializing...");
-            singletonInstance = new PlaylistManager();
+            synchronized (PlaylistManager.class) {
+                if (singletonInstance == null) {
+                    LOG.debug("Instance is null, initializing...");
+                    singletonInstance = new PlaylistManager();
+                }
+            }
         }
         return singletonInstance;
     }
@@ -226,7 +230,7 @@ public class PlaylistManager {
     /**
      * Sets requested status of requested playlist
      */
-    public void updatePlaylistStatus(Playlist playlist, QUEUE_STATUS status) {
+    public void updatePlaylistStatus(Playlist playlist, PLAYLIST_STATUS status) {
         ThreadManager
                 .getInstance()
                 .sendVoidTask(new Thread(() -> {
@@ -235,7 +239,7 @@ public class PlaylistManager {
                                     .equals(playlist1.getPlaylistLink()))
                             .forEach(playlist1 -> {
                                 playlist1.setStatus(status);
-                                if (status == QUEUE_STATUS.DOWNLOADING) {
+                                if (status == PLAYLIST_STATUS.DOWNLOADING) {
                                     playlist1.setCurrentVideoCount(0);
                                 }
                                 saveToJson();

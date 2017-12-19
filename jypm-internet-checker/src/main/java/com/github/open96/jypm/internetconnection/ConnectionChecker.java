@@ -19,7 +19,7 @@ public class ConnectionChecker {
     //Variable in which connection status is stored
     private Pair<Boolean, Date> isInternetAvailableWithTimeout;
     //Singleton instance of this class
-    private static ConnectionChecker singletonInstance;
+    private volatile static ConnectionChecker singletonInstance;
     //Initialize log4j logger for later use in this class
     private static final Logger LOG = LogManager.getLogger(ConnectionChecker.class.getName());
 
@@ -30,8 +30,12 @@ public class ConnectionChecker {
     //Singleton pattern
     public static ConnectionChecker getInstance() {
         if (singletonInstance == null) {
-            LOG.debug("Instance is null, initializing...");
-            singletonInstance = new ConnectionChecker();
+            synchronized (ConnectionChecker.class) {
+                if (singletonInstance == null) {
+                    LOG.debug("Instance is null, initializing...");
+                    singletonInstance = new ConnectionChecker();
+                }
+            }
         }
         return singletonInstance;
     }

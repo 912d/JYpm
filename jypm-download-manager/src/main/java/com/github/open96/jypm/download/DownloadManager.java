@@ -1,8 +1,8 @@
 package com.github.open96.jypm.download;
 
 import com.github.open96.jypm.internetconnection.ConnectionChecker;
+import com.github.open96.jypm.playlist.PLAYLIST_STATUS;
 import com.github.open96.jypm.playlist.PlaylistManager;
-import com.github.open96.jypm.playlist.QUEUE_STATUS;
 import com.github.open96.jypm.playlist.pojo.Playlist;
 import com.github.open96.jypm.settings.SettingsManager;
 import com.github.open96.jypm.thread.TASK_TYPE;
@@ -16,7 +16,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Queue;
 import java.util.concurrent.Callable;
@@ -26,7 +25,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class DownloadManager {
     //This object is a singleton thus storing instance of it is needed
-    private static DownloadManager singletonInstance;
+    private volatile static DownloadManager singletonInstance;
     //Initialize log4j logger for later use in this class
     private static final Logger LOG = LogManager.getLogger(DownloadManager.class.getName());
     //Store the wrapper in variable as it is critical component of this class
@@ -47,8 +46,12 @@ public class DownloadManager {
      */
     public static DownloadManager getInstance() {
         if (singletonInstance == null) {
-            LOG.debug("Instance is null, initializing...");
-            singletonInstance = new DownloadManager();
+            synchronized (DownloadManager.class) {
+                if (singletonInstance == null) {
+                    LOG.debug("Instance is null, initializing...");
+                    singletonInstance = new DownloadManager();
+                }
+            }
         }
         return singletonInstance;
     }
@@ -57,7 +60,7 @@ public class DownloadManager {
      * Initialize subcomponents on first instance creation
      */
     private void init() {
-        YoutubeDlManager.getInstance();
+        YoutubeDlManager.getInstance().downloadYoutubeDl();
         LOG.trace("Initializing DownloadManager");
         executableWrapper = ExecutableWrapper.getInstance();
         threadLock = false;
@@ -77,7 +80,7 @@ public class DownloadManager {
      */
     public void download(Playlist playlist) {
         //Assign queued status to playlist and put it in queue in ThreadManagers singleThreadExecutor.
-        PlaylistManager.getInstance().updatePlaylistStatus(playlist, QUEUE_STATUS.QUEUED);
+        PlaylistManager.getInstance().updatePlaylistStatus(playlist, PLAYLIST_STATUS.QUEUED);
 
         LOG.trace("Downloading playlist \""
                 + playlist.getPlaylistName() + "\" "
@@ -98,16 +101,14 @@ public class DownloadManager {
                     try {
                         PlaylistManager
                                 .getInstance()
-                                .updatePlaylistStatus(playlist, QUEUE_STATUS.DOWNLOADING);
+                                .updatePlaylistStatus(playlist, PLAYLIST_STATUS.DOWNLOADING);
                         //Start the download
                         Process process = executableWrapper.downloadPlaylist(playlist);
-                        try (InputStream inputStream = process.getInputStream()) {
-                            parseOutputWhileProcessIsAlive(playlist, process, inputStream);
-                        }
+                        parseOutputWhileProcessIsAlive(playlist, process);
                         //Mark playlist as downloaded
                         PlaylistManager
                                 .getInstance()
-                                .updatePlaylistStatus(playlist, QUEUE_STATUS.DOWNLOADED);
+                                .updatePlaylistStatus(playlist, PLAYLIST_STATUS.DOWNLOADED);
                         detailsString.append("\n").append("-----------Task completed-----------").append("\n");
                         LOG.trace("Playlist " + playlist.getPlaylistName() + " has finished downloading");
                     } catch (InterruptedException | IOException | NullPointerException e) {
@@ -122,7 +123,7 @@ public class DownloadManager {
                                 .append("\n")
                                 .append(e.toString());
                         LOG.error("Download failed", e);
-                        PlaylistManager.getInstance().updatePlaylistStatus(playlist, QUEUE_STATUS.FAILED);
+                        PlaylistManager.getInstance().updatePlaylistStatus(playlist, PLAYLIST_STATUS.FAILED);
                     }
                 }), TASK_TYPE.DOWNLOAD);
     }
@@ -208,7 +209,7 @@ public class DownloadManager {
     }
 
     /**
-     * Downloads every playlist that status is different from QUEUE_STATUS.DOWNLOADED.
+     * Downloads every playlist that status is different from PLAYLIST_STATUS.DOWNLOADED.
      */
     private void resumeInterruptedPlaylists() {
         ThreadManager
@@ -232,14 +233,14 @@ public class DownloadManager {
                             Queue<Playlist> resumedPlaylists = new LinkedBlockingQueue<>();
                             //Redownload playlist if its download was interrupted during last shutdown
                             playlists.stream()
-                                    .filter(playlist -> playlist.getStatus() == QUEUE_STATUS.DOWNLOADING)
+                                    .filter(playlist -> playlist.getStatus() == PLAYLIST_STATUS.DOWNLOADING)
                                     .forEach(playlist -> {
                                         download(playlist);
                                         resumedPlaylists.add(playlist);
                                     });
                             //Resume all queued tasks
                             playlists.stream()
-                                    .filter(playlist -> playlist.getStatus() == QUEUE_STATUS.QUEUED)
+                                    .filter(playlist -> playlist.getStatus() == PLAYLIST_STATUS.QUEUED)
                                     .filter(playlist -> !resumedPlaylists.contains(playlist))
                                     .forEach(playlist -> {
                                         download(playlist);
@@ -267,37 +268,42 @@ public class DownloadManager {
                 }), TASK_TYPE.DOWNLOAD);
     }
 
-    private void parseOutputWhileProcessIsAlive(Playlist playlist, Process process, InputStream inputStream)
+    /**
+     * This method is actually a bit different from the one included in ProcessWrapper as this one
+     * will update output in realtime while one in ProcessWrapper returns finished output
+     */
+    private void parseOutputWhileProcessIsAlive(Playlist playlist, Process process)
             throws IOException, InterruptedException {
         //Create BufferedReader and read all output of the process until it dies
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-        String line;
-        while (process.isAlive() && PlaylistManager
-                .getInstance()
-                .getPlaylistByLink(playlist.getPlaylistLink()) != null && ThreadManager.getExecutionPermission()) {
-            if (!threadLock) {
-                if ((line = bufferedReader.readLine()) != null || line != null) {
-                    detailsString.append(line).append("\n");
-                    //Trim the StringBuilder to reduce memory usage
-                    if (detailsString.length() > 16000) {
-                        detailsString.trimToSize();
-                        detailsString = new StringBuilder(detailsString
-                                .toString()
-                                .substring(detailsString.length() - 16000));
-                    }
-                    if (getDownloadProgress() != null) {
-                        Thread.sleep(50);
-                        int currentVideoCount = getDownloadProgress();
-                        if (currentVideoCount != PlaylistManager
-                                .getInstance()
-                                .getPlaylistByLink(playlist.getPlaylistLink())
-                                .getCurrentVideoCount()) {
-                            PlaylistManager
-                                    .getInstance()
-                                    .setCurrentVideoCount(playlist, currentVideoCount);
+        try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+            String line;
+            while (process.isAlive() && PlaylistManager
+                    .getInstance()
+                    .getPlaylistByLink(playlist.getPlaylistLink()) != null && ThreadManager.getExecutionPermission()) {
+                if (!threadLock) {
+                    if ((line = bufferedReader.readLine()) != null || line != null) {
+                        detailsString.append(line).append("\n");
+                        //Trim the StringBuilder to reduce memory usage
+                        if (detailsString.length() > 16000) {
+                            detailsString.trimToSize();
+                            detailsString = new StringBuilder(detailsString
+                                    .toString()
+                                    .substring(detailsString.length() - 16000));
                         }
+                        if (getDownloadProgress() != null) {
+                            Thread.sleep(50);
+                            int currentVideoCount = getDownloadProgress();
+                            if (currentVideoCount != PlaylistManager
+                                    .getInstance()
+                                    .getPlaylistByLink(playlist.getPlaylistLink())
+                                    .getCurrentVideoCount()) {
+                                PlaylistManager
+                                        .getInstance()
+                                        .setCurrentVideoCount(playlist, currentVideoCount);
+                            }
+                        }
+                        Thread.sleep(250);
                     }
-                    Thread.sleep(250);
                 }
             }
         }

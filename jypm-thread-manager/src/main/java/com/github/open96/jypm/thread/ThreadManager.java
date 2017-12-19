@@ -13,7 +13,7 @@ import java.util.concurrent.Future;
 
 public class ThreadManager {
     //This object is a singleton thus storing instance of it is needed
-    private static ThreadManager singletonInstance;
+    private volatile static ThreadManager singletonInstance;
     //Initialize log4j logger for later use in this class
     private static final Logger LOG = LogManager.getLogger(ThreadManager.class.getName());
 
@@ -32,8 +32,12 @@ public class ThreadManager {
      */
     public static ThreadManager getInstance() {
         if (singletonInstance == null) {
-            LOG.debug("Instance is null, initializing...");
-            singletonInstance = new ThreadManager();
+            synchronized (ThreadManager.class) {
+                if (singletonInstance == null) {
+                    LOG.debug("Instance is null, initializing...");
+                    singletonInstance = new ThreadManager();
+                }
+            }
         }
         return singletonInstance;
     }
@@ -60,6 +64,10 @@ public class ThreadManager {
                 case UI:
                 case OTHER:
                     executorServiceMap.put(taskType, Executors.newCachedThreadPool());
+                    break;
+                case CONVERSION:
+                    //TODO Make it source thread count from SettingsManager
+                    executorServiceMap.put(taskType, Executors.newFixedThreadPool(4));
                     break;
                 //Rest of executorServices should only process one task at a time
                 default:

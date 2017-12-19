@@ -1,4 +1,4 @@
-package com.github.open96.jypm.fxml.util;
+package com.github.open96.jypm.fxml.window;
 
 import com.github.open96.jypm.api.github.pojo.release.ReleaseJSON;
 import com.github.open96.jypm.fxml.DialogWindowController;
