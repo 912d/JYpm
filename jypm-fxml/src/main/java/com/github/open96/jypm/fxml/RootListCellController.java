@@ -284,6 +284,7 @@ public class RootListCellController extends ListCell<Playlist> {
                                             + convertedVideos + "/" + conversionProgress.size() + ")"));
                                     lastKnownState = PLAYLIST_STATUS.CONVERTING;
                                     Platform.runLater(() -> updateItem.setDisable(true));
+                                    Platform.runLater(() -> convertItem.setDisable(true));
                                     break;
                                 case QUEUED:
                                     if (lastKnownState != PLAYLIST_STATUS.QUEUED) {
@@ -291,6 +292,7 @@ public class RootListCellController extends ListCell<Playlist> {
                                         lastKnownState = PLAYLIST_STATUS.QUEUED;
                                     }
                                     Platform.runLater(() -> updateItem.setDisable(true));
+                                    Platform.runLater(() -> convertItem.setDisable(true));
                                     break;
                                 case DOWNLOADING:
                                     Integer currentCount = playlist.getCurrentVideoCount();
@@ -301,6 +303,7 @@ public class RootListCellController extends ListCell<Playlist> {
                                     }
                                     lastKnownState = PLAYLIST_STATUS.DOWNLOADING;
                                     Platform.runLater(() -> updateItem.setDisable(true));
+                                    Platform.runLater(() -> convertItem.setDisable(true));
                                     break;
                                 case DOWNLOADED:
                                     if (lastKnownState != PLAYLIST_STATUS.DOWNLOADED) {
@@ -308,6 +311,7 @@ public class RootListCellController extends ListCell<Playlist> {
                                         lastKnownState = PLAYLIST_STATUS.DOWNLOADED;
                                     }
                                     Platform.runLater(() -> updateItem.setDisable(false));
+                                    Platform.runLater(() -> convertItem.setDisable(false));
                                     break;
                                 case FAILED:
                                     if (lastKnownState != PLAYLIST_STATUS.FAILED) {
@@ -315,6 +319,7 @@ public class RootListCellController extends ListCell<Playlist> {
                                         lastKnownState = PLAYLIST_STATUS.FAILED;
                                     }
                                     Platform.runLater(() -> updateItem.setDisable(false));
+                                    Platform.runLater(() -> convertItem.setDisable(true));
                                     break;
                             }
                             try {
