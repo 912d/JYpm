@@ -77,13 +77,14 @@ public class ConversionWindowController implements Initializable {
             customCommandTextField.setDisable(false);
             bitrateSplitMenuButton.setDisable(true);
         });
-        targetExtensionSplitMenuButton.getItems().addAll(customCommandMenuItem);
+        //For now i will leave it unavailable
+        //targetExtensionSplitMenuButton.getItems().addAll(customCommandMenuItem);
 
     }
 
 
     public void onConvertButtonClick(ActionEvent actionEvent) {
-        
+
     }
 
 
