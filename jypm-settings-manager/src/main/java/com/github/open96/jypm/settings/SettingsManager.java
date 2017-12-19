@@ -22,7 +22,7 @@ public class SettingsManager {
     //File which stores Playlist objects in form of JSON
     private final static String JSON_FILE_NAME = "settings.json";
     //This object is a singleton thus storing instance of it is needed
-    private static SettingsManager singletonInstance;
+    private volatile static SettingsManager singletonInstance;
     //Initialize log4j logger for later use in this class
     private static final Logger LOG = LogManager.getLogger(SettingsManager.class.getName());
     //Pojo object where settings are stored during the runtime
@@ -41,8 +41,12 @@ public class SettingsManager {
      */
     public static SettingsManager getInstance() {
         if (singletonInstance == null) {
-            LOG.debug("Instance is null, initializing...");
-            singletonInstance = new SettingsManager();
+            synchronized (SettingsManager.class) {
+                if (singletonInstance == null) {
+                    LOG.debug("Instance is null, initializing...");
+                    singletonInstance = new SettingsManager();
+                }
+            }
         }
         return singletonInstance;
     }
@@ -72,6 +76,7 @@ public class SettingsManager {
         }
         determineHostOS();
         setDefaultFileManagerIfNotSet();
+        setFfmpegExecutableIfPossibleAndNotSet();
         saveToJson();
         LOG.debug("SettingsManager has been successfully initialized");
     }
@@ -115,11 +120,46 @@ public class SettingsManager {
      */
     public void setYoutubeDlExecutable(String executableLocation) {
 
-        //Create a Runnable thread that will download needed playlist and video data
         ThreadManager
                 .getInstance()
                 .sendVoidTask(new Thread(() -> {
                     settings.setYoutubeDlExecutable(executableLocation);
+                    if (ThreadManager.getExecutionPermission()) {
+                        saveToJson();
+                    }
+                }), TASK_TYPE.SETTING);
+    }
+
+
+    /**
+     * @return Path to ffmpeg executable stored in SettingsManager in form of String object
+     */
+    public String getFfmpegExecutable() {
+
+        Callable<String> settingsGetterThread = () -> settings.getFfmpegExecutable();
+        Future<String> settingsFuture = ThreadManager
+                .getInstance()
+                .sendTask(settingsGetterThread, TASK_TYPE.SETTING);
+
+        try {
+            return settingsFuture.get();
+        } catch (InterruptedException | ExecutionException e) {
+            LOG.error("Failed to retrieve setting", e);
+        }
+        return null;
+    }
+
+    /**
+     * Sets path to ffmpeg executable and saves it in SettingsManager
+     *
+     * @param executableLocation path to youtube-dl executable
+     */
+    public void setFfmpegExecutable(String executableLocation) {
+
+        ThreadManager
+                .getInstance()
+                .sendVoidTask(new Thread(() -> {
+                    settings.setFfmpegExecutable(executableLocation);
                     if (ThreadManager.getExecutionPermission()) {
                         saveToJson();
                     }
@@ -279,6 +319,43 @@ public class SettingsManager {
     }
 
 
+    /**
+     * @return maximum number of allowed ffmpeg  concurrent tasks
+     */
+    public Integer getFfmpegThreadLimit() {
+
+        Callable<Integer> settingsGetterThread = () -> settings.getFfmpegThreadLimit();
+        Future<Integer> settingsFuture = ThreadManager
+                .getInstance()
+                .sendTask(settingsGetterThread, TASK_TYPE.SETTING);
+
+        try {
+            return settingsFuture.get();
+        } catch (InterruptedException | ExecutionException e) {
+            LOG.error("Failed to retrieve setting", e);
+        }
+        return null;
+    }
+
+    /**
+     * Sets maximum number of allowed ffmpeg  concurrent tasks
+     *
+     * @param ffmpegThreadLimit Number of desired allowed concurrent tasks
+     */
+    public void setFfmpegThreadLimit(Integer ffmpegThreadLimit) {
+
+        //Create a Runnable thread that will download needed playlist and video data
+        ThreadManager
+                .getInstance()
+                .sendVoidTask(new Thread(() -> {
+                    settings.setFfmpegThreadLimit(ffmpegThreadLimit);
+                    if (ThreadManager.getExecutionPermission()) {
+                        saveToJson();
+                    }
+                }), TASK_TYPE.SETTING);
+    }
+
+
     private void determineHostOS() {
         if (SystemUtils.IS_OS_WINDOWS) {
             settings.setOsType(OS_TYPE.WINDOWS);
@@ -300,6 +377,17 @@ public class SettingsManager {
             } else if (getOS() == OS_TYPE.OPEN_SOURCE_UNIX) {
                 setFileManagerCommand("xdg-open");
             }
+        }
+    }
+
+    private void setFfmpegExecutableIfPossibleAndNotSet() {
+        if (getOS() != OS_TYPE.WINDOWS && getFfmpegExecutable().equals("")) {
+            setFfmpegExecutable("ffmpeg");
+            LOG.warn("FFmpeg has been assumed to be available via \"ffmpeg\" command. Make sure it is available" +
+                    "via command line or download it from page/via your package manager.");
+        }
+        if (getOS() == OS_TYPE.WINDOWS && getFfmpegExecutable().equals("")) {
+            LOG.warn("Ffmpeg is not set, download one and set it in settings to make video conversion possible.");
         }
     }
 

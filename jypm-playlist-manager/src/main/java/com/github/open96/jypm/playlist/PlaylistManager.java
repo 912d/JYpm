@@ -32,7 +32,7 @@ public class PlaylistManager {
     //File which stores Playlist objects in form of JSON
     private final static String JSON_FILE_NAME = "playlists.json";
     //This object is a singleton thus storing instance of it is needed
-    private static PlaylistManager singletonInstance;
+    private volatile static PlaylistManager singletonInstance;
     //Initialize log4j logger for later use in this class
     private static final Logger LOG = LogManager.getLogger(PlaylistManager.class.getName());
     //Variable where all managed playlists are stored
@@ -50,8 +50,12 @@ public class PlaylistManager {
      */
     public static PlaylistManager getInstance() {
         if (singletonInstance == null) {
-            LOG.debug("Instance is null, initializing...");
-            singletonInstance = new PlaylistManager();
+            synchronized (PlaylistManager.class) {
+                if (singletonInstance == null) {
+                    LOG.debug("Instance is null, initializing...");
+                    singletonInstance = new PlaylistManager();
+                }
+            }
         }
         return singletonInstance;
     }
@@ -85,7 +89,7 @@ public class PlaylistManager {
     /**
      * Stores playlists object's state to a JSON file.
      */
-    private void saveToJson() {
+    private synchronized void saveToJson() {
         GsonBuilder gsonBuilder = new GsonBuilder();
         Gson gson = gsonBuilder.create();
         try (FileWriter fileWriter = new FileWriter(JSON_FILE_NAME)) {
@@ -102,7 +106,7 @@ public class PlaylistManager {
      * @param playlist Object of Playlist class that should be stored into PlaylistManager's array of playlists.
      * @return true if successful, false otherwise.
      */
-    public boolean add(Playlist playlist) {
+    public synchronized boolean add(Playlist playlist) {
         if (playlists.stream()
                 .anyMatch(playlist1 -> playlist1.getPlaylistLink().equals(playlist.getPlaylistLink()))) {
             LOG.warn("Adding two playlists with the same link is unsupported.");
@@ -121,11 +125,7 @@ public class PlaylistManager {
         ThreadManager
                 .getInstance().
                 sendVoidTask(new Thread(() -> {
-                    YouTubeParser youTubeParser = new YouTubeParser(playlist.getPlaylistLink());
-                    playlist.setPlaylistName(youTubeParser.getPlaylistName());
-                    playlist.setTotalVideoCount(Integer.parseInt(youTubeParser.getVideoCount()));
-                    playlist.setPlaylistThumbnailUrl(youTubeParser.getThumbnailLink());
-                    LOG.trace("Playlist data successfully parsed.");
+                    parsePlaylistData(playlist);
                     if (ThreadManager.getExecutionPermission() && ConnectionChecker
                             .getInstance()
                             .checkInternetConnection()) {
@@ -142,7 +142,7 @@ public class PlaylistManager {
      *
      * @param playlist Object of Playlist class that should be removed from PlaylistManager's playlists variable.
      */
-    public void remove(Playlist playlist, boolean deleteDir) {
+    public synchronized void remove(Playlist playlist, boolean deleteDir) {
         ThreadManager
                 .getInstance()
                 .sendVoidTask(new Thread(() -> {
@@ -177,7 +177,6 @@ public class PlaylistManager {
                         }
                     }), TASK_TYPE.OTHER);
         }
-
     }
 
     /**
@@ -230,7 +229,7 @@ public class PlaylistManager {
     /**
      * Sets requested status of requested playlist
      */
-    public void updatePlaylistStatus(Playlist playlist, QUEUE_STATUS status) {
+    public void updatePlaylistStatus(Playlist playlist, PLAYLIST_STATUS status) {
         ThreadManager
                 .getInstance()
                 .sendVoidTask(new Thread(() -> {
@@ -239,12 +238,52 @@ public class PlaylistManager {
                                     .equals(playlist1.getPlaylistLink()))
                             .forEach(playlist1 -> {
                                 playlist1.setStatus(status);
-                                if (status == QUEUE_STATUS.DOWNLOADING) {
+                                if (status == PLAYLIST_STATUS.DOWNLOADING) {
                                     playlist1.setCurrentVideoCount(0);
                                 }
                                 saveToJson();
                             });
                 }), TASK_TYPE.PLAYLIST);
+    }
+
+
+    private void parsePlaylistData(Playlist playlist) {
+        if (ConnectionChecker.getInstance().checkInternetConnection()) {
+            YouTubeParser youTubeParser = new YouTubeParser(playlist.getPlaylistLink());
+            int parserRetryCount = 0;
+            while (!youTubeParser.validateDocument() && parserRetryCount < 10) {
+                youTubeParser = new YouTubeParser(playlist.getPlaylistLink());
+                parserRetryCount++;
+            }
+            if (parserRetryCount >= 10) {
+                LOG.error("Could not parse playlist info, " +
+                        "check if your firewall doesn't block youtube access");
+            }
+            playlist.setPlaylistName(youTubeParser.getPlaylistName());
+            playlist.setTotalVideoCount(Integer.parseInt(youTubeParser.getVideoCount()));
+            playlist.setPlaylistThumbnailUrl(youTubeParser.getThumbnailLink());
+            LOG.trace("Playlist data successfully parsed.");
+            saveToJson();
+        }
+    }
+
+
+    public Boolean updatePlaylistData(Playlist playlist) {
+        Future playlistUpdaterThread = ThreadManager
+                .getInstance()
+                .sendTask(() -> {
+                    playlists.stream()
+                            .filter(playlist1 -> playlist.getPlaylistLink()
+                                    .equals(playlist1.getPlaylistLink()))
+                            .forEach(playlist1 -> parsePlaylistData(playlist));
+                    return true;
+                }, TASK_TYPE.PLAYLIST);
+        try {
+            return (Boolean) playlistUpdaterThread.get();
+        } catch (InterruptedException | ExecutionException e) {
+            LOG.error("Could not receive playlist data", e);
+        }
+        return null;
     }
 
 

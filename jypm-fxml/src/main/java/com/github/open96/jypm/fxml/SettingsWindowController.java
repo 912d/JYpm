@@ -1,8 +1,8 @@
 package com.github.open96.jypm.fxml;
 
-import com.github.open96.jypm.fxml.util.UpdateWindow;
+import com.github.open96.jypm.fxml.window.UpdateWindow;
+import com.github.open96.jypm.playlist.PLAYLIST_STATUS;
 import com.github.open96.jypm.playlist.PlaylistManager;
-import com.github.open96.jypm.playlist.QUEUE_STATUS;
 import com.github.open96.jypm.playlist.pojo.Playlist;
 import com.github.open96.jypm.settings.OS_TYPE;
 import com.github.open96.jypm.settings.SettingsManager;
@@ -43,7 +43,13 @@ public class SettingsWindowController implements Initializable {
     @FXML
     Label runtimeVersionLabel;
     @FXML
+    Label threadCountLabel;
+    @FXML
+    Label threadCounterLabel;
+    @FXML
     Label notificationLabel;
+    @FXML
+    Label ffmpegLocationLabel;
     @FXML
     Button saveSettingsButton;
     @FXML
@@ -53,7 +59,13 @@ public class SettingsWindowController implements Initializable {
     @FXML
     Button updateYTDLButton;
     @FXML
+    Button incrementThreadCountButton;
+    @FXML
+    Button decrementThreadCountButton;
+    @FXML
     TextField fileManagerCommandTextField;
+    @FXML
+    TextField ffmpegLocationTextField;
     @FXML
     CheckBox notificationCheckBox;
 
@@ -77,11 +89,17 @@ public class SettingsWindowController implements Initializable {
         fileManagerCommandTextField.setText(SettingsManager
                 .getInstance()
                 .getFileManagerCommand());
+        ffmpegLocationTextField.setText(SettingsManager
+                .getInstance()
+                .getFfmpegExecutable());
         if (SettingsManager
                 .getInstance()
                 .getNotificationPolicy()) {
             notificationCheckBox.setSelected(true);
         }
+        threadCounterLabel.setText(String.valueOf(SettingsManager
+                .getInstance()
+                .getFfmpegThreadLimit()));
 
         //Prevent user from enforcing youtube-dl from updating while download is in progress
         ThreadManager
@@ -92,7 +110,7 @@ public class SettingsWindowController implements Initializable {
                         for (Playlist p : PlaylistManager
                                 .getInstance()
                                 .getPlaylists()) {
-                            if (p.getStatus() == QUEUE_STATUS.QUEUED || p.getStatus() == QUEUE_STATUS.DOWNLOADING) {
+                            if (p.getStatus() == PLAYLIST_STATUS.QUEUED || p.getStatus() == PLAYLIST_STATUS.DOWNLOADING) {
                                 isDownloadInProgress = true;
                                 break;
                             }
@@ -121,7 +139,13 @@ public class SettingsWindowController implements Initializable {
                 .setFileManagerCommand(fileManagerCommandTextField.getText());
         SettingsManager
                 .getInstance()
+                .setFfmpegExecutable(ffmpegLocationTextField.getText());
+        SettingsManager
+                .getInstance()
                 .setNotificationPolicy(notificationCheckBox.isSelected());
+        SettingsManager
+                .getInstance()
+                .setFfmpegThreadLimit(Integer.valueOf(threadCounterLabel.getText()));
         rootPane.getScene().getWindow().hide();
     }
 
@@ -202,4 +226,19 @@ public class SettingsWindowController implements Initializable {
                 }), TASK_TYPE.UI);
     }
 
+
+    public void onIncrementThreadCountButtonClick(ActionEvent actionEvent) {
+        Integer currentThreadCount = Integer.valueOf(threadCounterLabel.getText());
+        if (currentThreadCount < 100) {
+            threadCounterLabel.setText(String.valueOf(currentThreadCount + 1));
+        }
+    }
+
+
+    public void onDecrementThreadCountButtonClick(ActionEvent actionEvent) {
+        Integer currentThreadCount = Integer.valueOf(threadCounterLabel.getText());
+        if (currentThreadCount > 1) {
+            threadCounterLabel.setText(String.valueOf(currentThreadCount - 1));
+        }
+    }
 }

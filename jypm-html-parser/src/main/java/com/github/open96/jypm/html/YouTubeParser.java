@@ -71,4 +71,10 @@ public class YouTubeParser {
         return "";
     }
 
+    public boolean validateDocument() {
+        return !getPlaylistName().equals("null")
+                && !getVideoCount().equals("null")
+                && !getThumbnailLink().equals("null");
+    }
+
 }

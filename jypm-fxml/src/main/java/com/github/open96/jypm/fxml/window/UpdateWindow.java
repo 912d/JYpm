@@ -1,4 +1,4 @@
-package com.github.open96.jypm.fxml.util;
+package com.github.open96.jypm.fxml.window;
 
 import com.github.open96.jypm.api.github.pojo.release.ReleaseJSON;
 import com.github.open96.jypm.fxml.DialogWindowController;
@@ -88,8 +88,9 @@ public class UpdateWindow {
                                         , negativeButtonText, positiveButtonEventHandler);
                                 Scene scene = new Scene(root);
                                 subStage.setScene(scene);
-                                subStage.show();
                                 subStage.setAlwaysOnTop(true);
+                                subStage.show();
+                                subStage.toFront();
                                 subStage.requestFocus();
                             } catch (IOException e) {
                                 LOG.error("Failed to load dialogWindow.fxml", e);

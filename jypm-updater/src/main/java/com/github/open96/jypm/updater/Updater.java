@@ -14,7 +14,7 @@ import java.util.Properties;
 
 public class Updater {
     //This object is a singleton thus storing instance of it is needed
-    private static Updater singletonInstance;
+    private volatile static Updater singletonInstance;
     //Initialize log4j logger for later use in this class
     private static final Logger LOG = LogManager.getLogger(Updater.class.getName());
     //Field to store ready for querying retrofit client
@@ -34,8 +34,12 @@ public class Updater {
      */
     public static Updater getInstance() {
         if (singletonInstance == null) {
-            LOG.debug("Instance is null, initializing...");
-            singletonInstance = new Updater();
+            synchronized (Updater.class) {
+                if (singletonInstance == null) {
+                    LOG.debug("Instance is null, initializing...");
+                    singletonInstance = new Updater();
+                }
+            }
         }
         return singletonInstance;
     }

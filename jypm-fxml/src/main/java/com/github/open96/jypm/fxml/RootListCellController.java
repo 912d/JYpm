@@ -1,8 +1,9 @@
 package com.github.open96.jypm.fxml;
 
 import com.github.open96.jypm.download.DownloadManager;
+import com.github.open96.jypm.ffmpeg.FfmpegManager;
+import com.github.open96.jypm.playlist.PLAYLIST_STATUS;
 import com.github.open96.jypm.playlist.PlaylistManager;
-import com.github.open96.jypm.playlist.QUEUE_STATUS;
 import com.github.open96.jypm.playlist.pojo.Playlist;
 import com.github.open96.jypm.settings.SettingsManager;
 import com.github.open96.jypm.thread.TASK_TYPE;
@@ -28,6 +29,7 @@ import org.apache.logging.log4j.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -36,6 +38,8 @@ import java.util.Map;
 public class RootListCellController extends ListCell<Playlist> {
 
     private static final Logger LOG = LogManager.getLogger(RootListCellController.class.getName());
+
+    private List<Boolean> conversionProgress;
 
     //Load elements from fxml file that have id and cast them to objects of their respective types
 
@@ -55,6 +59,8 @@ public class RootListCellController extends ListCell<Playlist> {
     private MenuItem updateItem;
     @FXML
     private MenuItem openItem;
+    @FXML
+    private MenuItem convertItem;
     @FXML
     private ImageView thumbnailImageView;
     //In this FXMLLoader our listCell layout will be stored
@@ -86,23 +92,7 @@ public class RootListCellController extends ListCell<Playlist> {
             }
             LOG.debug("Loading playlist " + playlist.getPlaylistName());
 
-            //Now it's time to load values into their respective fields
-            playlistNameLabel.setText(playlist.getPlaylistName());
-            videoCountLabel.setText(playlist.getTotalVideoCount() + " videos");
-
-            //Load thumbnail asynchronously from main JavaFX thread
-            ThreadManager
-                    .getInstance()
-                    .sendVoidTask(new Thread(() -> {
-                        if (thumbnailImageView.getImage() == null) {
-                            Image thumbnailImage = new Image(playlist.getPlaylistThumbnailUrl());
-                            Platform.runLater(() -> thumbnailImageView.setImage(thumbnailImage));
-                        } else if (!thumbnailImageView.getImage().getUrl().equals(playlist.getPlaylistThumbnailUrl())
-                                && ThreadManager.getExecutionPermission()) {
-                            Image thumbnailImage = new Image(playlist.getPlaylistThumbnailUrl());
-                            Platform.runLater(() -> thumbnailImageView.setImage(thumbnailImage));
-                        }
-                    }), TASK_TYPE.UI);
+            updateUIItems(playlist);
 
             createStatusUpdaterThread(playlist);
 
@@ -129,11 +119,6 @@ public class RootListCellController extends ListCell<Playlist> {
                                                 .filter(playlist1 -> playlist1.getPlaylistLink().equals(playlist
                                                         .getPlaylistLink()))
                                                 .forEach(playlist1 -> {
-                                                    Platform.runLater(() ->
-                                                            PlaylistManager
-                                                                    .getInstance()
-                                                                    .getPlaylists()
-                                                                    .remove(playlist1));
                                                     ThreadManager
                                                             .getInstance()
                                                             .sendVoidTask(new Thread(() ->
@@ -156,11 +141,6 @@ public class RootListCellController extends ListCell<Playlist> {
                                                 .filter(playlist1 -> playlist1.getPlaylistLink().equals(playlist
                                                         .getPlaylistLink()))
                                                 .forEach(playlist1 -> {
-                                                    Platform.runLater(() ->
-                                                            PlaylistManager
-                                                                    .getInstance()
-                                                                    .getPlaylists()
-                                                                    .remove(playlist1));
                                                     ThreadManager
                                                             .getInstance()
                                                             .sendVoidTask(new Thread(() ->
@@ -185,12 +165,25 @@ public class RootListCellController extends ListCell<Playlist> {
                 }
             });
 
-            updateItem.setOnAction(actionEvent -> ThreadManager
-                    .getInstance()
-                    .sendVoidTask(new Thread(() ->
-                            DownloadManager
-                                    .getInstance()
-                                    .download(playlist)), TASK_TYPE.OTHER));
+            updateItem.setOnAction(actionEvent -> ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
+                //Parse playlist data from youtube
+                Boolean isParsed = PlaylistManager
+                        .getInstance()
+                        .updatePlaylistData(playlist);
+                while (isParsed == null || !isParsed) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        LOG.error("Thread sleep has been interrupted");
+                    }
+                }
+                //Update GUI
+                Platform.runLater(() -> updateUIItems(playlist));
+                //Trigger download
+                DownloadManager
+                        .getInstance()
+                        .download(playlist);
+            }), TASK_TYPE.OTHER));
 
             openItem.setOnAction(actionEvent -> ThreadManager
                     .getInstance()
@@ -205,6 +198,45 @@ public class RootListCellController extends ListCell<Playlist> {
                         }
                     }), TASK_TYPE.OTHER));
 
+
+            convertItem.setOnAction(actionEvent -> ThreadManager
+                    .getInstance()
+                    .sendVoidTask(new Thread(() -> Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            //Create new stage and set its title
+                            Stage subStage = new Stage();
+                            subStage.setTitle("Conversion options");
+
+                            //Make window unable to be resized
+                            subStage.setResizable(true);
+
+                            //Set window icon
+                            //subStage.getIcons().add(LAUNCHER_ICON);
+
+                            try {
+                                FXMLLoader fxmlLoader = new FXMLLoader(getClass()
+                                        .getResource("/fxml/conversionWindow.fxml"));
+                                Parent window = fxmlLoader.load();
+                                ConversionWindowController controller = fxmlLoader.getController();
+                                controller.setData(playlist);
+                                //Create a scene, add FXML layout to it.
+                                Scene scene = new Scene(window);
+
+                                //Finally, show the window to user.
+                                subStage.setScene(scene);
+                            } catch (IOException e) {
+                                LOG.error("Some .fxml files are corrupt or could not be loaded", e);
+                            }
+
+                            subStage.show();
+                            subStage.setAlwaysOnTop(true);
+
+                            //Also request focus on that stage
+                            subStage.requestFocus();
+                        }
+                    })), TASK_TYPE.CONVERSION));
+
             setGraphic(rootHBox);
         }
 
@@ -215,7 +247,7 @@ public class RootListCellController extends ListCell<Playlist> {
                 .getInstance()
                 .sendVoidTask(new Thread(() -> {
                     threadHashMap.put(playlist.getPlaylistLink(), Thread.currentThread());
-                    QUEUE_STATUS lastKnownState = QUEUE_STATUS.UNKNOWN;
+                    PLAYLIST_STATUS lastKnownState = PLAYLIST_STATUS.UNKNOWN;
                     while (ThreadManager.getExecutionPermission()) {
                         //Dirty cheat because JavaFX changes references to objects on listview update,
                         //so it is obligatory to make sure we are still operating on same object.
@@ -230,12 +262,27 @@ public class RootListCellController extends ListCell<Playlist> {
                             switch (PlaylistManager
                                     .getInstance()
                                     .getPlaylistByLink(playlist.getPlaylistLink()).getStatus()) {
+                                case CONVERTING:
+                                    //Count converted videos and display them
+                                    conversionProgress = FfmpegManager.getInstance().getConversionProgress();
+                                    int convertedVideos = conversionProgress
+                                            .stream()
+                                            .filter(conversionState -> conversionState.equals(Boolean.TRUE))
+                                            .toArray()
+                                            .length;
+                                    Platform.runLater(() -> currentStatusLabel.setText("Converting ("
+                                            + convertedVideos + "/" + conversionProgress.size() + ")"));
+                                    lastKnownState = PLAYLIST_STATUS.CONVERTING;
+                                    Platform.runLater(() -> updateItem.setDisable(true));
+                                    Platform.runLater(() -> convertItem.setDisable(true));
+                                    break;
                                 case QUEUED:
-                                    if (lastKnownState != QUEUE_STATUS.QUEUED) {
+                                    if (lastKnownState != PLAYLIST_STATUS.QUEUED) {
                                         Platform.runLater(() -> currentStatusLabel.setText("In queue"));
-                                        lastKnownState = QUEUE_STATUS.QUEUED;
+                                        lastKnownState = PLAYLIST_STATUS.QUEUED;
                                     }
                                     Platform.runLater(() -> updateItem.setDisable(true));
+                                    Platform.runLater(() -> convertItem.setDisable(true));
                                     break;
                                 case DOWNLOADING:
                                     Integer currentCount = playlist.getCurrentVideoCount();
@@ -244,24 +291,34 @@ public class RootListCellController extends ListCell<Playlist> {
                                                 .setText("Downloading (" + currentCount +
                                                         "/" + playlist.getTotalVideoCount() + ")"));
                                     }
-                                    lastKnownState = QUEUE_STATUS.DOWNLOADING;
+                                    lastKnownState = PLAYLIST_STATUS.DOWNLOADING;
                                     Platform.runLater(() -> updateItem.setDisable(true));
+                                    Platform.runLater(() -> convertItem.setDisable(true));
                                     break;
                                 case DOWNLOADED:
-                                    if (lastKnownState != QUEUE_STATUS.DOWNLOADED) {
+                                    if (lastKnownState != PLAYLIST_STATUS.DOWNLOADED) {
                                         Platform.runLater(() -> currentStatusLabel.setText("Downloaded"));
-                                        lastKnownState = QUEUE_STATUS.DOWNLOADED;
+                                        lastKnownState = PLAYLIST_STATUS.DOWNLOADED;
                                     }
                                     Platform.runLater(() -> updateItem.setDisable(false));
+                                    Platform.runLater(() -> convertItem.setDisable(false));
                                     break;
                                 case FAILED:
-                                    if (lastKnownState != QUEUE_STATUS.FAILED) {
+                                    if (lastKnownState != PLAYLIST_STATUS.FAILED) {
                                         Platform.runLater(() -> currentStatusLabel.setText("Error during downloading"));
-                                        lastKnownState = QUEUE_STATUS.FAILED;
+                                        lastKnownState = PLAYLIST_STATUS.FAILED;
                                     }
                                     Platform.runLater(() -> updateItem.setDisable(false));
+                                    Platform.runLater(() -> convertItem.setDisable(true));
                                     break;
                             }
+                            //Don't allow conversions of multiple playlists at a time
+                            boolean isConversionInProgress = PlaylistManager
+                                    .getInstance()
+                                    .getPlaylists()
+                                    .stream()
+                                    .anyMatch(playlist1 -> playlist1.getStatus().equals(PLAYLIST_STATUS.CONVERTING));
+                            convertItem.setDisable(isConversionInProgress);
                             try {
                                 Thread.sleep(250);
                             } catch (InterruptedException e) {
@@ -272,6 +329,27 @@ public class RootListCellController extends ListCell<Playlist> {
                             //in case when user deletes a list and terminate that thread
                             break;
                         }
+                    }
+                }), TASK_TYPE.UI);
+    }
+
+
+    public void updateUIItems(Playlist playlist) {
+        //Load values into their respective fields
+        playlistNameLabel.setText(playlist.getPlaylistName());
+        videoCountLabel.setText(playlist.getTotalVideoCount() + " videos");
+
+        //Load thumbnail asynchronously from main JavaFX thread
+        ThreadManager
+                .getInstance()
+                .sendVoidTask(new Thread(() -> {
+                    if (thumbnailImageView.getImage() == null) {
+                        Image thumbnailImage = new Image(playlist.getPlaylistThumbnailUrl());
+                        Platform.runLater(() -> thumbnailImageView.setImage(thumbnailImage));
+                    } else if (!thumbnailImageView.getImage().getUrl().equals(playlist.getPlaylistThumbnailUrl())
+                            && ThreadManager.getExecutionPermission()) {
+                        Image thumbnailImage = new Image(playlist.getPlaylistThumbnailUrl());
+                        Platform.runLater(() -> thumbnailImageView.setImage(thumbnailImage));
                     }
                 }), TASK_TYPE.UI);
     }
