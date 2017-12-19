@@ -1,15 +1,12 @@
 package com.github.open96.jypm.fxml;
 
 import com.github.open96.jypm.download.DownloadManager;
-import com.github.open96.jypm.ffmpeg.FILE_EXTENSION;
-import com.github.open96.jypm.ffmpeg.FfmpegManager;
 import com.github.open96.jypm.playlist.PLAYLIST_STATUS;
 import com.github.open96.jypm.playlist.PlaylistManager;
 import com.github.open96.jypm.playlist.pojo.Playlist;
 import com.github.open96.jypm.settings.SettingsManager;
 import com.github.open96.jypm.thread.TASK_TYPE;
 import com.github.open96.jypm.thread.ThreadManager;
-import com.github.open96.jypm.tray.TrayIcon;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -213,35 +210,38 @@ public class RootListCellController extends ListCell<Playlist> {
 
             convertItem.setOnAction(actionEvent -> ThreadManager
                     .getInstance()
-                    .sendVoidTask(new Thread(() -> {
-                        if (playlist.getStatus() == PLAYLIST_STATUS.DOWNLOADED) {
-                            //Start conversion
-                            playlist.setStatus(PLAYLIST_STATUS.CONVERTING);
-                            conversionProgress = FfmpegManager
-                                    .getInstance()
-                                    .convertDirectory(playlist.getPlaylistLocation(), FILE_EXTENSION.MP3, 320);
-                            //Wait until all videos have been converted
-                            int convertedVideos = 0;
-                            while (convertedVideos != conversionProgress.size()) {
-                                try {
-                                    convertedVideos = conversionProgress
-                                            .stream()
-                                            .filter(conversionState -> conversionState.equals(Boolean.TRUE))
-                                            .toArray()
-                                            .length;
-                                    Thread.sleep(100);
-                                } catch (InterruptedException e) {
-                                    LOG.error("Thread sleep has been interrupted!");
-                                }
+                    .sendVoidTask(new Thread(() -> Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            //Create new stage and set its title
+                            Stage subStage = new Stage();
+                            subStage.setTitle("Conversion options");
+
+                            //Make window unable to be resized
+                            subStage.setResizable(true);
+
+                            //Set window icon
+                            //subStage.getIcons().add(LAUNCHER_ICON);
+
+                            try {
+                                Parent window = FXMLLoader.load(getClass().getResource("/fxml/conversionWindow.fxml"));
+
+                                //Create a scene, add FXML layout to it.
+                                Scene scene = new Scene(window);
+
+                                //Finally, show the window to user.
+                                subStage.setScene(scene);
+                            } catch (IOException e) {
+                                LOG.error("Some .fxml files are corrupt or could not be loaded", e);
                             }
-                            //Indicate that playlist has finished it's conversion
-                            playlist.setStatus(PLAYLIST_STATUS.DOWNLOADED);
+
+                            subStage.show();
+                            subStage.setAlwaysOnTop(true);
+
+                            //Also request focus on that stage
+                            subStage.requestFocus();
                         }
-                        //Display notification from tray
-                        if (TrayIcon.isTrayWorking()) {
-                            TrayIcon.getInstance().displayNotification("Conversion finished", playlist.getPlaylistName() + " has been converted");
-                        }
-                    }), TASK_TYPE.CONVERSION));
+                    })), TASK_TYPE.CONVERSION));
 
             setGraphic(rootHBox);
         }

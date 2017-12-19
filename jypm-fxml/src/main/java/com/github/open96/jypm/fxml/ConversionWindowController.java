@@ -1,8 +1,11 @@
 package com.github.open96.jypm.fxml;
 
+import com.github.open96.jypm.ffmpeg.FILE_EXTENSION;
+import com.github.open96.jypm.ffmpeg.FfmpegManager;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitMenuButton;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
@@ -30,6 +33,16 @@ public class ConversionWindowController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        //Create menu entries for both menu buttons
+        for (FILE_EXTENSION f : FILE_EXTENSION.values()) {
+            MenuItem menuItem = new MenuItem(f.toString());
+            targetExtensionSplitMenuButton.getItems().addAll(menuItem);
+        }
+
+        for (Integer bitrate : FfmpegManager.availableBitrates) {
+            MenuItem menuItem = new MenuItem(bitrate.toString());
+            bitrateSplitMenuButton.getItems().addAll(menuItem);
+        }
 
     }
 
