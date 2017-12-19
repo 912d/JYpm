@@ -107,7 +107,7 @@ public class ConversionWindowController implements Initializable {
         if (extension != FILE_EXTENSION.MP3) {
             bitrate = 0;
         }
-        if (extension != null) {
+        if (extension == FILE_EXTENSION.MP4 || (extension == FILE_EXTENSION.MP3 && bitrate != null)) {
             triggerConversion(extension, bitrate);
             //Close conversion window
             rootPane.getScene().getWindow().hide();
