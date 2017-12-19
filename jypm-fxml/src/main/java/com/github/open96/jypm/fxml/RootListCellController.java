@@ -284,6 +284,7 @@ public class RootListCellController extends ListCell<Playlist> {
                                         lastKnownState = PLAYLIST_STATUS.QUEUED;
                                     }
                                     Platform.runLater(() -> updateItem.setDisable(true));
+                                    break;
                                 case QUEUED:
                                     if (lastKnownState != PLAYLIST_STATUS.QUEUED) {
                                         Platform.runLater(() -> currentStatusLabel.setText("In queue"));
