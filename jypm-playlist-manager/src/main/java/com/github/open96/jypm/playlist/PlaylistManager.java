@@ -106,7 +106,7 @@ public class PlaylistManager {
      * @param playlist Object of Playlist class that should be stored into PlaylistManager's array of playlists.
      * @return true if successful, false otherwise.
      */
-    public boolean add(Playlist playlist) {
+    public synchronized boolean add(Playlist playlist) {
         if (playlists.stream()
                 .anyMatch(playlist1 -> playlist1.getPlaylistLink().equals(playlist.getPlaylistLink()))) {
             LOG.warn("Adding two playlists with the same link is unsupported.");
@@ -142,7 +142,7 @@ public class PlaylistManager {
      *
      * @param playlist Object of Playlist class that should be removed from PlaylistManager's playlists variable.
      */
-    public void remove(Playlist playlist, boolean deleteDir) {
+    public synchronized void remove(Playlist playlist, boolean deleteDir) {
         ThreadManager
                 .getInstance()
                 .sendVoidTask(new Thread(() -> {
