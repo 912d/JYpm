@@ -322,6 +322,13 @@ public class RootListCellController extends ListCell<Playlist> {
                                     Platform.runLater(() -> convertItem.setDisable(true));
                                     break;
                             }
+                            //Don't allow conversions of multiple playlists at a time
+                            boolean isConversionInProgress = PlaylistManager
+                                    .getInstance()
+                                    .getPlaylists()
+                                    .stream()
+                                    .anyMatch(playlist1 -> playlist1.getStatus().equals(PLAYLIST_STATUS.CONVERTING));
+                            convertItem.setDisable(isConversionInProgress);
                             try {
                                 Thread.sleep(250);
                             } catch (InterruptedException e) {
