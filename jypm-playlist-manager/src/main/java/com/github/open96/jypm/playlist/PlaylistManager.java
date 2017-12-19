@@ -89,7 +89,7 @@ public class PlaylistManager {
     /**
      * Stores playlists object's state to a JSON file.
      */
-    private void saveToJson() {
+    private synchronized void saveToJson() {
         GsonBuilder gsonBuilder = new GsonBuilder();
         Gson gson = gsonBuilder.create();
         try (FileWriter fileWriter = new FileWriter(JSON_FILE_NAME)) {
