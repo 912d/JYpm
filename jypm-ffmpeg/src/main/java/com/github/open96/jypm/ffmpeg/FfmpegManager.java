@@ -112,12 +112,12 @@ public class FfmpegManager {
                 ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
                     try {
                         //Create command that will be issued via Runtime
-                        String command[] = createCommand(file.getName(), targetExtension, bitrate);
-                        if (command != null) {
-                            if (file.getName().endsWith(targetExtension.toString())) {
-                                LOG.trace(file.getName() + " - Conversion from to same format is pointless, skipping");
-                            } else {
-                                if (ThreadManager.getExecutionPermission()) {
+                        if (ThreadManager.getExecutionPermission()) {
+                            String command[] = createCommand(file.getName(), targetExtension, bitrate);
+                            if (command != null) {
+                                if (file.getName().endsWith(targetExtension.toString())) {
+                                    LOG.trace(file.getName() + " - Conversion from to same format is pointless, skipping");
+                                } else {
                                     //Run ffmpeg
                                     Process p = runtime.exec(command, null, targetDirectory);
                                     //Wait until it finishes
