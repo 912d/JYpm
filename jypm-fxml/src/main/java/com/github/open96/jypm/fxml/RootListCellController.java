@@ -257,6 +257,14 @@ public class RootListCellController extends ListCell<Playlist> {
                         if (threadHashMap.get(playlist.getPlaylistLink()) != Thread.currentThread()) {
                             break;
                         }
+                        //Don't allow conversions of multiple playlists at a time
+                        boolean isConversionInProgress = PlaylistManager
+                                .getInstance()
+                                .getPlaylists()
+                                .stream()
+                                .anyMatch(playlist1 -> playlist1.getStatus().equals(PLAYLIST_STATUS.CONVERTING));
+                        Platform.runLater(() -> convertItem.setDisable(isConversionInProgress));
+
                         //Based on status of playlist show appropriate label
                         try {
                             switch (PlaylistManager
@@ -274,7 +282,6 @@ public class RootListCellController extends ListCell<Playlist> {
                                             + convertedVideos + "/" + conversionProgress.size() + ")"));
                                     lastKnownState = PLAYLIST_STATUS.CONVERTING;
                                     Platform.runLater(() -> updateItem.setDisable(true));
-                                    Platform.runLater(() -> convertItem.setDisable(true));
                                     break;
                                 case QUEUED:
                                     if (lastKnownState != PLAYLIST_STATUS.QUEUED) {
@@ -301,7 +308,6 @@ public class RootListCellController extends ListCell<Playlist> {
                                         lastKnownState = PLAYLIST_STATUS.DOWNLOADED;
                                     }
                                     Platform.runLater(() -> updateItem.setDisable(false));
-                                    Platform.runLater(() -> convertItem.setDisable(false));
                                     break;
                                 case FAILED:
                                     if (lastKnownState != PLAYLIST_STATUS.FAILED) {
@@ -309,16 +315,8 @@ public class RootListCellController extends ListCell<Playlist> {
                                         lastKnownState = PLAYLIST_STATUS.FAILED;
                                     }
                                     Platform.runLater(() -> updateItem.setDisable(false));
-                                    Platform.runLater(() -> convertItem.setDisable(true));
                                     break;
                             }
-                            //Don't allow conversions of multiple playlists at a time
-                            boolean isConversionInProgress = PlaylistManager
-                                    .getInstance()
-                                    .getPlaylists()
-                                    .stream()
-                                    .anyMatch(playlist1 -> playlist1.getStatus().equals(PLAYLIST_STATUS.CONVERTING));
-                            convertItem.setDisable(isConversionInProgress);
                             try {
                                 Thread.sleep(250);
                             } catch (InterruptedException e) {
