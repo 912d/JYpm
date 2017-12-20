@@ -56,7 +56,7 @@ Instructions below are only for linux users. Windows users can probably do the s
 
 If you want to contribute this might be useful.
 
-![Dependency graph](https://i.imgur.com/F9MXNOC.png)
+![Dependency graph](https://i.imgur.com/rQMNnlE.png)
 
 # Licensing
 

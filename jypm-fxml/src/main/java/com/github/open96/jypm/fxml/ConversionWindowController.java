@@ -3,6 +3,7 @@ package com.github.open96.jypm.fxml;
 import com.github.open96.jypm.ffmpeg.FILE_EXTENSION;
 import com.github.open96.jypm.ffmpeg.FfmpegManager;
 import com.github.open96.jypm.playlist.PLAYLIST_STATUS;
+import com.github.open96.jypm.playlist.PlaylistManager;
 import com.github.open96.jypm.playlist.pojo.Playlist;
 import com.github.open96.jypm.thread.TASK_TYPE;
 import com.github.open96.jypm.thread.ThreadManager;
@@ -10,6 +11,7 @@ import com.github.open96.jypm.tray.TrayIcon;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitMenuButton;
 import javafx.scene.control.TextField;
@@ -116,36 +118,49 @@ public class ConversionWindowController implements Initializable {
 
 
     private void triggerConversion(FILE_EXTENSION fileExtension, Integer bitrate) {
-        ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
-            if (playlist.getStatus() == PLAYLIST_STATUS.DOWNLOADED) {
-                //Start conversion
-                playlist.setStatus(PLAYLIST_STATUS.CONVERTING);
-                List<Boolean> conversionProgress = FfmpegManager
-                        .getInstance()
-                        .convertDirectory(playlist.getPlaylistLocation(), fileExtension, bitrate);
-                //Wait until all videos have been converted
-                int convertedVideos = 0;
-                while (convertedVideos != conversionProgress.size()) {
-                    try {
-                        convertedVideos = conversionProgress
-                                .stream()
-                                .filter(conversionState -> conversionState.equals(Boolean.TRUE))
-                                .toArray()
-                                .length;
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        LOG.error("Thread sleep has been interrupted!");
+        if (PlaylistManager
+                .getInstance()
+                .getPlaylists()
+                .stream()
+                .anyMatch(playlist1 -> playlist1.getStatus() == PLAYLIST_STATUS.CONVERTING)) {
+            ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
+                if (playlist.getStatus() == PLAYLIST_STATUS.DOWNLOADED) {
+                    //Start conversion
+                    playlist.setStatus(PLAYLIST_STATUS.CONVERTING);
+                    List<Boolean> conversionProgress = FfmpegManager
+                            .getInstance()
+                            .convertDirectory(playlist.getPlaylistLocation(), fileExtension, bitrate);
+                    //Wait until all videos have been converted
+                    int convertedVideos = 0;
+                    while (convertedVideos != conversionProgress.size()) {
+                        try {
+                            convertedVideos = conversionProgress
+                                    .stream()
+                                    .filter(conversionState -> conversionState.equals(Boolean.TRUE))
+                                    .toArray()
+                                    .length;
+                            Thread.sleep(100);
+                        } catch (InterruptedException e) {
+                            LOG.error("Thread sleep has been interrupted!");
+                        }
                     }
+                    //Indicate that playlist has finished it's conversion
+                    playlist.setStatus(PLAYLIST_STATUS.DOWNLOADED);
                 }
-                //Indicate that playlist has finished it's conversion
-                playlist.setStatus(PLAYLIST_STATUS.DOWNLOADED);
-            }
-            //Display notification from tray
-            if (TrayIcon.isTrayWorking()) {
-                TrayIcon.getInstance().displayNotification("Conversion finished",
-                        playlist.getPlaylistName() + " has been converted");
-            }
-        }), TASK_TYPE.CONVERSION);
+                //Display notification from tray
+                if (TrayIcon.isTrayWorking()) {
+                    TrayIcon.getInstance().displayNotification("Conversion finished",
+                            playlist.getPlaylistName() + " has been converted");
+                }
+            }), TASK_TYPE.CONVERSION);
+        } else {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setHeaderText(null);
+            alert.setTitle("Conversion already in progress");
+            alert.setContentText("Conversion is already in progress, please wait " +
+                    "for it to finish before issuing another one");
+            alert.showAndWait();
+        }
     }
 
 
