@@ -118,7 +118,7 @@ public class ConversionWindowController implements Initializable {
 
 
     private void triggerConversion(FILE_EXTENSION fileExtension, Integer bitrate) {
-        if (PlaylistManager
+        if (!PlaylistManager
                 .getInstance()
                 .getPlaylists()
                 .stream()
