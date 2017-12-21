@@ -389,6 +389,7 @@ public class SettingsManager {
         if (getOS() == OS_TYPE.WINDOWS && getFfmpegExecutable().equals("")) {
             LOG.warn("Ffmpeg is not set, download one and set it in settings to make video conversion possible.");
         }
+        ThreadManager.getInstance().overrideConversionQueueSize(settings.getFfmpegThreadLimit());
     }
 
 }
