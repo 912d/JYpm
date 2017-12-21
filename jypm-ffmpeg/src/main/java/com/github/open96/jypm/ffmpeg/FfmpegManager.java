@@ -117,7 +117,8 @@ public class FfmpegManager {
                             String command[] = createCommand(file.getName(), targetExtension, bitrate);
                             if (command != null) {
                                 if (file.getName().endsWith(targetExtension.toString())) {
-                                    LOG.trace(file.getName() + " - Conversion from to same format is pointless, skipping");
+                                    LOG.trace(file.getName() +
+                                            " - Conversion from to same format is pointless, skipping");
                                 } else {
                                     //Run ffmpeg
                                     Process p = runtime.exec(command, null, targetDirectory);
