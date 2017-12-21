@@ -152,7 +152,11 @@ public class FfmpegManager {
 
 
     private String[] createCommand(String fileName, FILE_EXTENSION extension, Integer bitrate) {
-        String fileNameWithoutExtension = fileName.split("\\.")[0];
+        //Get file name without extension
+        String fileNameWithoutExtension = "";
+        for (int x = 0; x < fileName.split("\\.").length - 1; x++) {
+            fileNameWithoutExtension += fileName.split("\\.")[x];
+        }
         String command[] = {SettingsManager.getInstance().getFfmpegExecutable(), "-threads", "1", "-y", "-i",
                 wrapFileNameForWindows(fileName)};
         String extensionCommand[];
