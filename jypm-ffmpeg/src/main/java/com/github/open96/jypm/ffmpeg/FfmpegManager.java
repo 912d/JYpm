@@ -3,6 +3,7 @@ package com.github.open96.jypm.ffmpeg;
 
 import com.github.open96.jypm.playlist.PLAYLIST_STATUS;
 import com.github.open96.jypm.playlist.PlaylistManager;
+import com.github.open96.jypm.settings.OS_TYPE;
 import com.github.open96.jypm.settings.SettingsManager;
 import com.github.open96.jypm.thread.TASK_TYPE;
 import com.github.open96.jypm.thread.ThreadManager;
@@ -120,7 +121,14 @@ public class FfmpegManager {
                                 //Run ffmpeg
                                 Process p = runtime.exec(command, null, targetDirectory);
                                 //Wait until it finishes
-                                while (p.isAlive()) {
+                                OS_TYPE hostOS = SettingsManager.getInstance().getOS();
+                                while (new ProcessWrapper(p).checkIfProcessIsAlive()) {
+                                    //It is hard for me to believe that but apparently Windows CMD won't execute
+                                    //ffmpeg until it finishes until you read its error stream.
+                                    //Don't ask me for logic behind this, I use linux.
+                                    if (hostOS == OS_TYPE.WINDOWS) {
+                                        System.out.println(new ProcessWrapper(p).getProcessError());
+                                    }
                                     Thread.sleep(100);
                                 }
                             }
@@ -140,21 +148,30 @@ public class FfmpegManager {
     }
 
 
-    private String[] createCommand(String filename, FILE_EXTENSION extension, Integer bitrate) {
-        String command[] = {SettingsManager.getInstance().getFfmpegExecutable(), "-threads", "1", "-y", "-i", filename};
-        String filenameWithoutExtension = filename.split("\\.")[0];
+    private String[] createCommand(String fileName, FILE_EXTENSION extension, Integer bitrate) {
+        String fileNameWithoutExtension = fileName.split("\\.")[0];
+        String command[] = {SettingsManager.getInstance().getFfmpegExecutable(), "-threads", "1", "-y", "-i",
+                wrapFileNameForWindows(fileName)};
         String extensionCommand[];
         switch (extension) {
             case MP3:
-                extensionCommand = new String[]{"-codec:a", "libmp3lame", "-b:a", bitrate + "k", filenameWithoutExtension + ".mp3"};
+                extensionCommand = new String[]{"-codec:a", "libmp3lame", "-b:a", bitrate + "k",
+                        wrapFileNameForWindows(fileNameWithoutExtension + ".mp3")};
                 return ArrayUtils.addAll(command, extensionCommand);
             case MP4:
-                extensionCommand = new String[]{filenameWithoutExtension + ".mp4"};
+                extensionCommand = new String[]{wrapFileNameForWindows(fileNameWithoutExtension + ".mp4")};
                 return ArrayUtils.addAll(command, extensionCommand);
             default:
                 LOG.error("Extension is not supported!");
         }
         return null;
+    }
+
+    private String wrapFileNameForWindows(String fileName) {
+        if (SettingsManager.getInstance().getOS() == OS_TYPE.WINDOWS) {
+            return "\"" + fileName + "\"";
+        }
+        return fileName;
     }
 
 
