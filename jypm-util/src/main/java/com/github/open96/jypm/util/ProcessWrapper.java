@@ -51,4 +51,41 @@ public class ProcessWrapper {
         }
         return null;
     }
+
+
+    public boolean checkIfProcessIsAlive() {
+        try {
+            process.exitValue();
+            return false;
+        } catch (Exception e) {
+            return true;
+        }
+    }
+
+
+    public String getProcessError() {
+        //Create BufferedReader that will read process's output
+        Callable<String> processOutputGetter = () -> {
+            try (InputStream inputStream = process.getErrorStream()) {
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                String line;
+                StringBuilder output = new StringBuilder();
+                while ((line = bufferedReader.readLine()) != null || process.isAlive()) {
+                    if (line != null) {
+                        output.append(line);
+                    }
+                }
+                process.waitFor();
+                bufferedReader.close();
+                return output.toString();
+            }
+        };
+        Future<String> processOutputFuture = ThreadManager.getInstance().sendTask(processOutputGetter, TASK_TYPE.OTHER);
+        try {
+            return processOutputFuture.get();
+        } catch (ExecutionException | InterruptedException e) {
+            LOG.error(e);
+        }
+        return null;
+    }
 }
