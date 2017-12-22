@@ -7,7 +7,7 @@
     <groupId>com.github.open96.jypm</groupId>
     <artifactId>jypm</artifactId>
     <packaging>pom</packaging>
-    <version>1.3.0</version>
+    <version>1.3.1</version>
     <url>https://github.com/Open96/jypm</url>
     <description>jypm - Java YouTube Playlist Manager</description>
     <modules>

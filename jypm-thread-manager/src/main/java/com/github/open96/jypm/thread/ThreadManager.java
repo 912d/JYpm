@@ -66,7 +66,6 @@ public class ThreadManager {
                     executorServiceMap.put(taskType, Executors.newCachedThreadPool());
                     break;
                 case CONVERSION:
-                    //TODO Make it source thread count from SettingsManager
                     executorServiceMap.put(taskType, Executors.newFixedThreadPool(4));
                     break;
                 //Rest of executorServices should only process one task at a time
@@ -104,5 +103,11 @@ public class ThreadManager {
     public void stopAllThreads() {
         executorServiceMap.forEach((taskType, executorService) -> executorService.shutdown());
         executionPermission = false;
+    }
+
+
+    public void overrideConversionQueueSize(int queueSize) {
+        executorServiceMap.remove(TASK_TYPE.CONVERSION);
+        executorServiceMap.put(TASK_TYPE.CONVERSION, Executors.newFixedThreadPool(queueSize));
     }
 }
