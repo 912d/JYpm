@@ -58,6 +58,8 @@ public class NotificationBarController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         //Start a thread that handles displaying messages on bottom bar of main application window
         startNotifierThread();
+        //Start a thread that blocks Sync button from being clicked when any playlist is not ready for download
+        startSyncButtonThread();
     }
 
 
@@ -268,6 +270,30 @@ public class NotificationBarController implements Initializable {
                         }
                     }
                 }), TASK_TYPE.UI);
+    }
+
+
+    private void startSyncButtonThread() {
+        ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
+            while (ThreadManager.getExecutionPermission()) {
+                if (PlaylistManager
+                        .getInstance()
+                        .getPlaylists()
+                        .stream()
+                        .anyMatch(playlist -> playlist.getStatus() == PLAYLIST_STATUS.DOWNLOADING
+                                || playlist.getStatus() == PLAYLIST_STATUS.QUEUED
+                                || playlist.getStatus() == PLAYLIST_STATUS.CONVERTING)) {
+                    Platform.runLater(() -> syncButton.setDisable(true));
+                } else {
+                    Platform.runLater(() -> syncButton.setDisable(false));
+                }
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    LOG.error("Thread sleep has been interrupt", e);
+                }
+            }
+        }), TASK_TYPE.UI);
     }
 
 }
