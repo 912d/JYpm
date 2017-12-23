@@ -152,74 +152,75 @@ public class YoutubeDlManager {
      */
     public void downloadYoutubeDl() {
         ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
-            //Wait for internet connection
-            while (!ConnectionChecker
+            if (ConnectionChecker
                     .getInstance()
                     .checkInternetConnection()) {
-                try {
-                    Thread.sleep(250);
-                } catch (InterruptedException e) {
-                    LOG.error("Thread sleep has been interrupted", e);
+
+                getAPIResponse();
+                boolean isVersionOutOfDate = (!SettingsManager
+                        .getInstance()
+                        .getYoutubeDlVersion().equals(onlineVersion));
+                boolean doesFileIntegritySeemOk = !new File(YOUTUBE_DL_DIRECTORY).exists()
+                        || (new File(YOUTUBE_DL_DIRECTORY).exists()
+                        && new File(YOUTUBE_DL_DIRECTORY).listFiles().length != 1);
+                if ((isVersionOutOfDate || doesFileIntegritySeemOk) && ThreadManager.getExecutionPermission()) {
+                    LOG.debug("New youtube-dl version available, downloading...");
+                    try {
+                        //Create URL based on OS type
+                        URL downloadLink;
+                        Asset asset;
+                        if (SettingsManager
+                                .getInstance()
+                                .getOS() == OS_TYPE.WINDOWS) {
+                            asset = assets.get(OS_TYPE.WINDOWS);
+                        } else {
+                            asset = assets.get(OS_TYPE.OPEN_SOURCE_UNIX);
+                        }
+                        downloadLink = new URL(asset.getBrowserDownloadUrl());
+
+                        //Clean youtube-dl directory before making any changes to it
+                        deletePreviousVersionIfExists();
+
+                        //Download youtube-dl
+                        ReadableByteChannel readableByteChannel = Channels.newChannel(downloadLink.openStream());
+                        String pathToExecutable = YOUTUBE_DL_DIRECTORY + "/" + asset.getName();
+                        FileOutputStream fileOutputStream = new FileOutputStream(pathToExecutable);
+                        fileOutputStream.getChannel().transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
+                        fileOutputStream.close();
+                        readableByteChannel.close();
+                        LOG.debug("youtube-dl " + onlineVersion + " has been downloaded");
+
+                        //Make file executable
+                        if (SettingsManager
+                                .getInstance()
+                                .getOS() != OS_TYPE.WINDOWS) {
+                            LOG.debug("Making youtube-dl executable");
+                            String[] command = new String[]{"chmod", "+x", pathToExecutable};
+                            Runtime.getRuntime().exec(command);
+                        }
+
+                        SettingsManager
+                                .getInstance()
+                                .setYoutubeDlVersion(onlineVersion);
+                        SettingsManager
+                                .getInstance()
+                                .setYoutubeDlExecutable(new File(pathToExecutable).getAbsolutePath());
+                        LOG.debug("Download finished");
+                    } catch (MalformedURLException e) {
+                        LOG.error("Invalid GitHub url", e);
+                    } catch (IOException e) {
+                        LOG.error("Error during opening stream", e);
+                    }
+                }
+                executableState = EXECUTABLE_STATE.READY;
+            } else {
+                boolean doesFileIntegritySeemOk = !new File(YOUTUBE_DL_DIRECTORY).exists()
+                        || (new File(YOUTUBE_DL_DIRECTORY).exists()
+                        && new File(YOUTUBE_DL_DIRECTORY).listFiles().length != 1);
+                if (doesFileIntegritySeemOk) {
+                    executableState = EXECUTABLE_STATE.READY;
                 }
             }
-
-            getAPIResponse();
-            boolean isVersionOutOfDate = (!SettingsManager
-                    .getInstance()
-                    .getYoutubeDlVersion().equals(onlineVersion));
-            boolean doesFileIntegritySeemOk = !new File(YOUTUBE_DL_DIRECTORY).exists()
-                    || (new File(YOUTUBE_DL_DIRECTORY).exists()
-                    && new File(YOUTUBE_DL_DIRECTORY).listFiles().length != 1);
-            if ((isVersionOutOfDate || doesFileIntegritySeemOk) && ThreadManager.getExecutionPermission()) {
-                LOG.debug("New youtube-dl version available, downloading...");
-                try {
-                    //Create URL based on OS type
-                    URL downloadLink;
-                    Asset asset;
-                    if (SettingsManager
-                            .getInstance()
-                            .getOS() == OS_TYPE.WINDOWS) {
-                        asset = assets.get(OS_TYPE.WINDOWS);
-                    } else {
-                        asset = assets.get(OS_TYPE.OPEN_SOURCE_UNIX);
-                    }
-                    downloadLink = new URL(asset.getBrowserDownloadUrl());
-
-                    //Clean youtube-dl directory before making any changes to it
-                    deletePreviousVersionIfExists();
-
-                    //Download youtube-dl
-                    ReadableByteChannel readableByteChannel = Channels.newChannel(downloadLink.openStream());
-                    String pathToExecutable = YOUTUBE_DL_DIRECTORY + "/" + asset.getName();
-                    FileOutputStream fileOutputStream = new FileOutputStream(pathToExecutable);
-                    fileOutputStream.getChannel().transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
-                    fileOutputStream.close();
-                    readableByteChannel.close();
-                    LOG.debug("youtube-dl " + onlineVersion + " has been downloaded");
-
-                    //Make file executable
-                    if (SettingsManager
-                            .getInstance()
-                            .getOS() != OS_TYPE.WINDOWS) {
-                        LOG.debug("Making youtube-dl executable");
-                        String[] command = new String[]{"chmod", "+x", pathToExecutable};
-                        Runtime.getRuntime().exec(command);
-                    }
-
-                    SettingsManager
-                            .getInstance()
-                            .setYoutubeDlVersion(onlineVersion);
-                    SettingsManager
-                            .getInstance()
-                            .setYoutubeDlExecutable(new File(pathToExecutable).getAbsolutePath());
-                    LOG.debug("Download finished");
-                } catch (MalformedURLException e) {
-                    LOG.error("Invalid GitHub url", e);
-                } catch (IOException e) {
-                    LOG.error("Error during opening stream", e);
-                }
-            }
-            executableState = EXECUTABLE_STATE.READY;
         }), TASK_TYPE.DOWNLOAD);
     }
 
