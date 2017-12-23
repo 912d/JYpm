@@ -8,11 +8,26 @@ MacOS - Not supported. I don't own a Mac but by Java's nature it should probably
 
 ![Example screenshot](https://i.imgur.com/dNd7WFz.png)
 
+# Future plans
+
+Pretty much none. Application does what I wanted it to do,  and I learned many things while creating it.
+If I had to write it again I would write it in a cleaner manner (and probably another programming language).
+That doesn't mean I think JYpm is bad, it just could have been done much better but I wanted an application that
+would let me download youtube playlists and convert them to have them available offline. If I or
+someone else encounters any bug I will patch it, but that's all I will do in that project.
+
 # Requirements
 
 * JRE 9+ (JDK 9 for compiling from source)
 * JavaFX (most likely bundled into JDK unless you are using Gentoo Linux, which requires adding USE flag to your Java build)
 * Apache Maven
+
+
+# How to convert playlists
+
+1. Download FFmpeg (from their site, or your system's package manager)
+2. In settings specify FFmpeg's location (if FFmpeg is available in your system path, ```ffmpeg``` will be enough).
+3. Now you can freely convert your playlists
 
 # How to compile
 
@@ -46,11 +61,6 @@ Instructions below are only for linux users. Windows users can probably do the s
 
 * Look into executables directory if you want to wrap your jar file into executable.
 
-
-### Future development plans
-
-* Video format conversion
-* If any macOS user wants to have this application usable in macOS please contact me as I don't have macOS system to test it myself
 
 # Maven dependency graph
 
