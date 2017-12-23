@@ -92,7 +92,7 @@ public class ConnectionChecker {
                 //Start all threads that should check for internet connectivity
                 for (Future<Boolean> future : futures) {
                     if (!future.get()) {
-                        isInternetAvailableWithTimeout = new Pair<>(Boolean.TRUE, new Date());
+                        isInternetAvailableWithTimeout = new Pair<>(Boolean.FALSE, new Date());
                         return false;
                     }
                 }
