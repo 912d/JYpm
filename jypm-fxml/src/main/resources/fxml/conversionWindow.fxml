@@ -32,14 +32,14 @@
                         <Insets left="10.0"/>
                     </GridPane.margin>
                 </Label>
-                <SplitMenuButton fx:id="targetExtensionSplitMenuButton" maxHeight="-Infinity"
-                                 maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="30.0"
-                                 text="Choose extension" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS"
-                                 GridPane.valignment="CENTER">
+                <MenuButton fx:id="targetExtensionMenuButton" maxHeight="-Infinity"
+                            maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="30.0"
+                            text="Choose extension" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS"
+                            GridPane.valignment="CENTER">
                     <GridPane.margin>
                         <Insets left="10.0" right="10.0"/>
                     </GridPane.margin>
-                </SplitMenuButton>
+                </MenuButton>
             </children>
         </GridPane>
         <GridPane GridPane.rowIndex="1">
@@ -56,13 +56,13 @@
                         <Insets left="10.0"/>
                     </GridPane.margin>
                 </Label>
-                <SplitMenuButton fx:id="bitrateSplitMenuButton" maxHeight="-Infinity" maxWidth="1.7976931348623157E308"
-                                 mnemonicParsing="false" prefHeight="30.0" text="Choose bitrate"
-                                 GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.valignment="CENTER">
+                <MenuButton fx:id="bitrateMenuButton" maxHeight="-Infinity" maxWidth="1.7976931348623157E308"
+                            mnemonicParsing="false" prefHeight="30.0" text="Choose bitrate"
+                            GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.valignment="CENTER">
                     <GridPane.margin>
                         <Insets left="10.0" right="10.0"/>
                     </GridPane.margin>
-                </SplitMenuButton>
+                </MenuButton>
             </children>
         </GridPane>
         <GridPane GridPane.rowIndex="2">
