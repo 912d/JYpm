@@ -151,6 +151,11 @@ public class YoutubeDlManager {
      * Utilizing methods in this class this method checks for youtube-dl update and appends it if needed.
      */
     public void downloadYoutubeDl() {
+        File youtubeDlDirectory = new File(YOUTUBE_DL_DIRECTORY);
+        boolean doesFileIntegritySeemOk = youtubeDlDirectory.exists()
+                && youtubeDlDirectory.isDirectory()
+                && youtubeDlDirectory.listFiles() != null
+                && youtubeDlDirectory.listFiles().length == 1;
         ThreadManager.getInstance().sendVoidTask(new Thread(() -> {
             if (ConnectionChecker
                     .getInstance()
@@ -160,10 +165,7 @@ public class YoutubeDlManager {
                 boolean isVersionOutOfDate = (!SettingsManager
                         .getInstance()
                         .getYoutubeDlVersion().equals(onlineVersion));
-                boolean doesFileIntegritySeemOk = !new File(YOUTUBE_DL_DIRECTORY).exists()
-                        || (new File(YOUTUBE_DL_DIRECTORY).exists()
-                        && new File(YOUTUBE_DL_DIRECTORY).listFiles().length != 1);
-                if ((isVersionOutOfDate || doesFileIntegritySeemOk) && ThreadManager.getExecutionPermission()) {
+                if ((isVersionOutOfDate || !doesFileIntegritySeemOk) && ThreadManager.getExecutionPermission()) {
                     LOG.debug("New youtube-dl version available, downloading...");
                     try {
                         //Create URL based on OS type
@@ -214,9 +216,6 @@ public class YoutubeDlManager {
                 }
                 executableState = EXECUTABLE_STATE.READY;
             } else {
-                boolean doesFileIntegritySeemOk = !new File(YOUTUBE_DL_DIRECTORY).exists()
-                        || (new File(YOUTUBE_DL_DIRECTORY).exists()
-                        && new File(YOUTUBE_DL_DIRECTORY).listFiles().length != 1);
                 if (doesFileIntegritySeemOk) {
                     executableState = EXECUTABLE_STATE.READY;
                 }
