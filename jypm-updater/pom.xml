@@ -33,7 +33,6 @@
             <groupId>com.github.open96.jypm</groupId>
             <artifactId>jypm-internet-checker</artifactId>
             <version>${project.version}</version>
-            <scope>test</scope>
         </dependency>
 
         <dependency>
