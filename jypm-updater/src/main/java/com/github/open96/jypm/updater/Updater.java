@@ -96,10 +96,9 @@ public class Updater {
      * Refreshes API response
      */
     public void refresh() {
-        boolean s = ConnectionChecker
+        if (ConnectionChecker
                 .getInstance()
-                .checkInternetConnection();
-        if (s) {
+                .checkInternetConnection()) {
             try {
                 Call<ReleaseJSON> releaseJSONCall = apiService.getLatestRelease("Open96", "JYpm");
                 //Cast API response to ReleaseJSON
