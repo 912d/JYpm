@@ -36,7 +36,7 @@
             </rowConstraints>
             <children>
                 <Label fx:id="executableVersionTextLabel" minHeight="25.0" minWidth="200.0"
-                       text="youtube-dl executable version" GridPane.rowIndex="1">
+                       text="Youtube-dl executable version" GridPane.rowIndex="1">
                     <GridPane.margin>
                         <Insets left="10.0"/>
                     </GridPane.margin>
@@ -194,7 +194,7 @@
                                GridPane.halignment="CENTER" GridPane.valignment="CENTER"/>
                     </children>
                 </GridPane>
-                <Label fx:id="youtubeDlFallbackLabel" minHeight="25.0" minWidth="85.0" text="youtube-dl fallback mode"
+                <Label fx:id="youtubeDlFallbackLabel" minHeight="25.0" minWidth="85.0" text="Youtube-dl fallback mode"
                        GridPane.rowIndex="6">
                     <GridPane.margin>
                         <Insets left="10.0"/>
