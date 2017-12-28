@@ -231,7 +231,7 @@ public class NotificationBarController implements Initializable {
                                     .getInstance()
                                     .getExecutableState() == EXECUTABLE_STATE.NOT_READY) {
                                 Platform.runLater(() -> notificationText
-                                        .setText("Looking for youtube-dl executable..."));
+                                        .setText("Checking youtube-dl..."));
                             }
                             if (PlaylistManager.getInstance().getPlaylists()
                                     .stream()
