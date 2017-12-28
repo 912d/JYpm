@@ -214,11 +214,13 @@ public class YoutubeDlManager {
                         LOG.error("Error during opening stream", e);
                     }
                 }
+            }
+            boolean doesFileIntegritySeemOkAfter = youtubeDlDirectory.exists()
+                    && youtubeDlDirectory.isDirectory()
+                    && youtubeDlDirectory.listFiles() != null
+                    && youtubeDlDirectory.listFiles().length == 1;
+            if (doesFileIntegritySeemOkAfter) {
                 executableState = EXECUTABLE_STATE.READY;
-            } else {
-                if (doesFileIntegritySeemOk) {
-                    executableState = EXECUTABLE_STATE.READY;
-                }
             }
         }), TASK_TYPE.DOWNLOAD);
     }
