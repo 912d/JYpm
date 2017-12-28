@@ -32,6 +32,7 @@
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
             </rowConstraints>
             <children>
                 <Label fx:id="executableVersionTextLabel" minHeight="25.0" minWidth="200.0"
@@ -193,6 +194,22 @@
                                GridPane.halignment="CENTER" GridPane.valignment="CENTER"/>
                     </children>
                 </GridPane>
+                <Label fx:id="youtubeDlFallbackLabel" minHeight="25.0" minWidth="85.0" text="youtube-dl fallback mode"
+                       GridPane.rowIndex="6">
+                    <GridPane.margin>
+                        <Insets left="10.0"/>
+                    </GridPane.margin>
+                </Label>
+                <CheckBox fx:id="youtubeDlFallbackCheckBox" alignment="CENTER_RIGHT" ellipsisString="" minHeight="18.0"
+                          minWidth="30.0" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" textAlignment="RIGHT"
+                          GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="6">
+                    <padding>
+                        <Insets right="10.0"/>
+                    </padding>
+                    <GridPane.margin>
+                        <Insets right="10.0"/>
+                    </GridPane.margin>
+                </CheckBox>
             </children>
         </GridPane>
         <GridPane GridPane.rowIndex="1">
