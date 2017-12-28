@@ -3,6 +3,7 @@ package com.github.open96.jypm.updater;
 import com.github.open96.jypm.api.github.GitHubApiClient;
 import com.github.open96.jypm.api.github.GitHubApiEndpointInterface;
 import com.github.open96.jypm.api.github.pojo.release.ReleaseJSON;
+import com.github.open96.jypm.internetconnection.ConnectionChecker;
 import com.github.open96.jypm.settings.SettingsManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -87,8 +88,6 @@ public class Updater {
                         + releaseJSON.getTagName());
                 return releaseJSON.getTagName();
             }
-        } else {
-            LOG.error("API object is empty!", new IllegalStateException("API object is empty!"));
         }
         return null;
     }
@@ -97,28 +96,32 @@ public class Updater {
      * Refreshes API response
      */
     public void refresh() {
-        try {
-            Call<ReleaseJSON> releaseJSONCall = apiService.getLatestRelease("Open96", "JYpm");
-            //Cast API response to ReleaseJSON
-            releaseJSON = releaseJSONCall.execute().body();
-            //If api object is empty call API again
-            int retryCount = 0;
-            while (true) {
-                if (releaseJSON == null) {
-                    Call<ReleaseJSON> repeatedJSONCall = apiService
-                            .getLatestRelease("Open96", "JYpm");
-                    releaseJSON = repeatedJSONCall.execute().body();
-                    retryCount++;
-                    if (retryCount > 10) {
-                        LOG.fatal("Could not get API object...");
-                        throw new IllegalStateException("Empty API response");
+        if (ConnectionChecker
+                .getInstance()
+                .checkInternetConnection()) {
+            try {
+                Call<ReleaseJSON> releaseJSONCall = apiService.getLatestRelease("Open96", "JYpm");
+                //Cast API response to ReleaseJSON
+                releaseJSON = releaseJSONCall.execute().body();
+                //If api object is empty call API again
+                int retryCount = 0;
+                while (true) {
+                    if (releaseJSON == null) {
+                        Call<ReleaseJSON> repeatedJSONCall = apiService
+                                .getLatestRelease("Open96", "JYpm");
+                        releaseJSON = repeatedJSONCall.execute().body();
+                        retryCount++;
+                        if (retryCount > 10) {
+                            LOG.fatal("Could not get API object...");
+                            throw new IllegalStateException("Empty API response");
+                        }
+                    } else {
+                        break;
                     }
-                } else {
-                    break;
                 }
+            } catch (IOException e) {
+                LOG.error("There was an IO error during GitHub API call", e);
             }
-        } catch (IOException e) {
-            LOG.error("There was an IO error during GitHub API call", e);
         }
     }
 

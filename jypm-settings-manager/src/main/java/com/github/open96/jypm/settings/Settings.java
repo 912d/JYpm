@@ -9,12 +9,14 @@ class Settings {
     private String youtubeDlVersion;
     private String runtimeVersion;
     private Integer ffmpegThreadLimit;
+    private boolean youtubeDlFallback;
 
     public Settings() {
         ffmpegExecutable = "";
         youtubeDlExecutable = "";
         fileManagerCommand = "";
         notificationPolicy = true;
+        youtubeDlFallback = false;
         youtubeDlVersion = "";
         runtimeVersion = "";
         ffmpegThreadLimit = 2;
@@ -82,5 +84,13 @@ class Settings {
 
     public void setFfmpegThreadLimit(Integer ffmpegThreadLimit) {
         this.ffmpegThreadLimit = ffmpegThreadLimit;
+    }
+
+    public boolean getYoutubeDlFallback() {
+        return youtubeDlFallback;
+    }
+
+    public void setYoutubeDlFallback(boolean youtubeDlFallback) {
+        this.youtubeDlFallback = youtubeDlFallback;
     }
 }

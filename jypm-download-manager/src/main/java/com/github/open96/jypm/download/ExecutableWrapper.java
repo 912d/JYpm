@@ -36,7 +36,7 @@ public class ExecutableWrapper {
      */
     public static ExecutableWrapper getInstance() {
         if (singletonInstance == null) {
-            synchronized (ExecutableWrapper.class){
+            synchronized (ExecutableWrapper.class) {
                 if (singletonInstance == null) {
                     LOG.debug("Instance is null, initializing...");
                     singletonInstance = new ExecutableWrapper();
@@ -70,8 +70,14 @@ public class ExecutableWrapper {
             return null;
         }
         //Issue main youtube-dl command for an actual download and return it's process for further operations on it
-        String command[] = {settingsManager
-                .getYoutubeDlExecutable(), "-i", "-o %(title)s.%(ext)s", BASE_YOUTUBE_URL + playlist.getPlaylistLink()};
+        String command[];
+        if (SettingsManager.getInstance().getYoutubeDlFallback()) {
+            command = new String[]{settingsManager
+                    .getYoutubeDlExecutable(), "-i", BASE_YOUTUBE_URL + playlist.getPlaylistLink()};
+        } else {
+            command = new String[]{settingsManager
+                    .getYoutubeDlExecutable(), "-i", "-o %(title)s.%(ext)s", BASE_YOUTUBE_URL + playlist.getPlaylistLink()};
+        }
         return runtime.exec(command, null, new File(playlist.getPlaylistLocation()));
     }
 

@@ -12,8 +12,8 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
+import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.SplitMenuButton;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import org.apache.logging.log4j.LogManager;
@@ -35,9 +35,9 @@ public class ConversionWindowController implements Initializable {
     @FXML
     GridPane rootPane;
     @FXML
-    SplitMenuButton targetExtensionSplitMenuButton;
+    MenuButton targetExtensionMenuButton;
     @FXML
-    SplitMenuButton bitrateSplitMenuButton;
+    MenuButton bitrateMenuButton;
     @FXML
     TextField customCommandTextField;
 
@@ -46,47 +46,47 @@ public class ConversionWindowController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         //Disable command textfield and bitrate menubutton by default
         customCommandTextField.setDisable(true);
-        bitrateSplitMenuButton.setDisable(true);
+        bitrateMenuButton.setDisable(true);
 
         //Create menu entries for both menu buttons
         for (FILE_EXTENSION f : FILE_EXTENSION.values()) {
             MenuItem menuItem = new MenuItem(f.toString());
             menuItem.setOnAction(actionEvent -> {
-                targetExtensionSplitMenuButton.setText(menuItem.getText());
+                targetExtensionMenuButton.setText(menuItem.getText());
                 customCommandTextField.setDisable(true);
                 if (menuItem.getText().equals("MP3")) {
-                    bitrateSplitMenuButton.setDisable(false);
+                    bitrateMenuButton.setDisable(false);
                 } else {
-                    bitrateSplitMenuButton.setDisable(true);
+                    bitrateMenuButton.setDisable(true);
                 }
             });
-            targetExtensionSplitMenuButton.getItems().addAll(menuItem);
+            targetExtensionMenuButton.getItems().addAll(menuItem);
         }
 
         for (Integer bitrate : FfmpegManager.availableBitrates) {
             MenuItem menuItem = new MenuItem(bitrate.toString());
             menuItem.setOnAction(actionEvent -> {
-                bitrateSplitMenuButton.setText(menuItem.getText());
+                bitrateMenuButton.setText(menuItem.getText());
             });
-            bitrateSplitMenuButton.getItems().addAll(menuItem);
+            bitrateMenuButton.getItems().addAll(menuItem);
         }
 
-        //Also add "custom" option for targetExtensionSplitMenuButton
+        //Also add "custom" option for targetExtensionMenuButton
         MenuItem customCommandMenuItem = new MenuItem("Custom");
         customCommandMenuItem.setOnAction(actionEvent -> {
-            targetExtensionSplitMenuButton.setText(customCommandMenuItem.getText());
+            targetExtensionMenuButton.setText(customCommandMenuItem.getText());
             customCommandTextField.setDisable(false);
-            bitrateSplitMenuButton.setDisable(true);
+            bitrateMenuButton.setDisable(true);
         });
         //For now i will leave it unavailable
-        //targetExtensionSplitMenuButton.getItems().addAll(customCommandMenuItem);
+        //targetExtensionMenuButton.getItems().addAll(customCommandMenuItem);
 
     }
 
 
     public void onConvertButtonClick(ActionEvent actionEvent) {
         //Cast target extension to enum
-        String targetExtension = targetExtensionSplitMenuButton.getText();
+        String targetExtension = targetExtensionMenuButton.getText();
         FILE_EXTENSION extension = null;
         for (FILE_EXTENSION f : FILE_EXTENSION.values()) {
             if (f.toString().toLowerCase().equals(targetExtension.toLowerCase())) {
@@ -95,7 +95,7 @@ public class ConversionWindowController implements Initializable {
         }
 
         //Cast bitrate to Integer
-        String targetBitrate = bitrateSplitMenuButton.getText();
+        String targetBitrate = bitrateMenuButton.getText();
         Integer bitrate = null;
         if (extension == FILE_EXTENSION.MP3) {
             for (Integer i : FfmpegManager.availableBitrates) {

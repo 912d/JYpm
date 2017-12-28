@@ -356,6 +356,42 @@ public class SettingsManager {
     }
 
 
+    /**
+     * @return boolean that specifies if youtube-dl should be ran in "fallback" mode
+     */
+    public Boolean getYoutubeDlFallback() {
+
+        Callable<Boolean> settingsGetterThread = () -> settings.getYoutubeDlFallback();
+        Future<Boolean> settingsFuture = ThreadManager
+                .getInstance()
+                .sendTask(settingsGetterThread, TASK_TYPE.SETTING);
+
+        try {
+            return settingsFuture.get();
+        } catch (InterruptedException | ExecutionException e) {
+            LOG.error("Failed to retrieve setting", e);
+        }
+        return null;
+    }
+
+    /**
+     * Sets youtubedl fallback boolean
+     *
+     * @param youtubeDlFallback Number of desired allowed concurrent tasks
+     */
+    public void setYoutubeDlFallback(Boolean youtubeDlFallback) {
+
+        //Create a Runnable thread that will download needed playlist and video data
+        ThreadManager
+                .getInstance()
+                .sendVoidTask(new Thread(() -> {
+                    settings.setYoutubeDlFallback(youtubeDlFallback);
+                    if (ThreadManager.getExecutionPermission()) {
+                        saveToJson();
+                    }
+                }), TASK_TYPE.SETTING);
+    }
+
     private void determineHostOS() {
         if (SystemUtils.IS_OS_WINDOWS) {
             settings.setOsType(OS_TYPE.WINDOWS);

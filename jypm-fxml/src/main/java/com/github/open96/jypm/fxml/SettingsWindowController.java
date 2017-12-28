@@ -47,6 +47,8 @@ public class SettingsWindowController implements Initializable {
     @FXML
     Label threadCounterLabel;
     @FXML
+    Label youtubeDlFallbackLabel;
+    @FXML
     Label notificationLabel;
     @FXML
     Label ffmpegLocationLabel;
@@ -68,6 +70,8 @@ public class SettingsWindowController implements Initializable {
     TextField ffmpegLocationTextField;
     @FXML
     CheckBox notificationCheckBox;
+    @FXML
+    CheckBox youtubeDlFallbackCheckBox;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -96,6 +100,11 @@ public class SettingsWindowController implements Initializable {
                 .getInstance()
                 .getNotificationPolicy()) {
             notificationCheckBox.setSelected(true);
+        }
+        if (SettingsManager
+                .getInstance()
+                .getYoutubeDlFallback()) {
+            youtubeDlFallbackCheckBox.setSelected(true);
         }
         threadCounterLabel.setText(String.valueOf(SettingsManager
                 .getInstance()
@@ -143,6 +152,9 @@ public class SettingsWindowController implements Initializable {
         SettingsManager
                 .getInstance()
                 .setNotificationPolicy(notificationCheckBox.isSelected());
+        SettingsManager
+                .getInstance()
+                .setYoutubeDlFallback(youtubeDlFallbackCheckBox.isSelected());
         SettingsManager
                 .getInstance()
                 .setFfmpegThreadLimit(Integer.valueOf(threadCounterLabel.getText()));

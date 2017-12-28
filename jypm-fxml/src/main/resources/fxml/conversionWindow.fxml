@@ -21,7 +21,7 @@
         <GridPane>
             <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="260.0"/>
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="338.0" minWidth="10.0" prefWidth="338.0"/>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="338.0"/>
             </columnConstraints>
             <rowConstraints>
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
@@ -32,12 +32,14 @@
                         <Insets left="10.0"/>
                     </GridPane.margin>
                 </Label>
-                <SplitMenuButton fx:id="targetExtensionSplitMenuButton" maxWidth="1.7976931348623157E308"
-                                 mnemonicParsing="false" text="Choose extension" GridPane.columnIndex="1">
+                <MenuButton fx:id="targetExtensionMenuButton" maxHeight="-Infinity"
+                            maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="30.0"
+                            text="Choose extension" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS"
+                            GridPane.valignment="CENTER">
                     <GridPane.margin>
                         <Insets left="10.0" right="10.0"/>
                     </GridPane.margin>
-                </SplitMenuButton>
+                </MenuButton>
             </children>
         </GridPane>
         <GridPane GridPane.rowIndex="1">
@@ -54,12 +56,13 @@
                         <Insets left="10.0"/>
                     </GridPane.margin>
                 </Label>
-                <SplitMenuButton fx:id="bitrateSplitMenuButton" maxWidth="1.7976931348623157E308"
-                                 mnemonicParsing="false" text="Choose bitrate" GridPane.columnIndex="1">
+                <MenuButton fx:id="bitrateMenuButton" maxHeight="-Infinity" maxWidth="1.7976931348623157E308"
+                            mnemonicParsing="false" prefHeight="30.0" text="Choose bitrate"
+                            GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.valignment="CENTER">
                     <GridPane.margin>
                         <Insets left="10.0" right="10.0"/>
                     </GridPane.margin>
-                </SplitMenuButton>
+                </MenuButton>
             </children>
         </GridPane>
         <GridPane GridPane.rowIndex="2">
@@ -76,7 +79,8 @@
                         <Insets left="10.0"/>
                     </GridPane.margin>
                 </Label>
-                <TextField fx:id="customCommandTextField" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1">
+                <TextField fx:id="customCommandTextField" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1"
+                           GridPane.hgrow="ALWAYS" GridPane.valignment="CENTER">
                     <GridPane.margin>
                         <Insets left="10.0" right="10.0"/>
                     </GridPane.margin>
