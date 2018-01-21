@@ -223,7 +223,7 @@
             </rowConstraints>
             <children>
                 <Button fx:id="saveSettingsButton" minHeight="26.0" minWidth="150.0" mnemonicParsing="false"
-                        onAction="#onSaveSettingsButtonClick" text="Save and exit" textAlignment="CENTER"
+                        onAction="#onSaveSettingsButtonClick" text="Save and close" textAlignment="CENTER"
                         GridPane.halignment="CENTER" GridPane.valignment="CENTER"/>
                 <Button fx:id="restoreDefaultsButton" minHeight="26.0" minWidth="150.0" mnemonicParsing="false"
                         onAction="#onRestoreDefaultsButtonClick" text="Restore defaults" textAlignment="CENTER"
