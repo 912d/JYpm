@@ -142,7 +142,7 @@
                     </children>
                 </GridPane>
                 <TextField fx:id="ffmpegLocationTextField" alignment="CENTER" GridPane.columnIndex="1"
-                           GridPane.rowIndex="2">
+                           editable="false" onMouseClicked="#showFileChooser" GridPane.rowIndex="2">
                     <opaqueInsets>
                         <Insets/>
                     </opaqueInsets>
