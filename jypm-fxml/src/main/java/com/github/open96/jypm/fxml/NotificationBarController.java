@@ -20,6 +20,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -122,7 +123,8 @@ public class NotificationBarController implements Initializable {
         } catch (IOException e) {
             LOG.error("Some .fxml files are corrupt or could not be loaded", e);
         }
-
+        /*Settings menu always over main window*/
+        subStage.initModality(Modality.APPLICATION_MODAL);
         subStage.show();
         subStage.setAlwaysOnTop(true);
 
