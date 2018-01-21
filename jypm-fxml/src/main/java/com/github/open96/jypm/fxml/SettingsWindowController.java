@@ -15,15 +15,19 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
+import javafx.stage.FileChooser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.awt.*;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -251,6 +255,16 @@ public class SettingsWindowController implements Initializable {
         Integer currentThreadCount = Integer.valueOf(threadCounterLabel.getText());
         if (currentThreadCount > 1) {
             threadCounterLabel.setText(String.valueOf(currentThreadCount - 1));
+        }
+    }
+
+    public void showFileChooser(MouseEvent mouseEvent) {
+        FileChooser fileChooser = new FileChooser();
+        Node node = (Node) mouseEvent.getSource();
+        File file = fileChooser.showOpenDialog(node.getScene().getWindow());
+        if (file != null) {
+            SettingsManager.getInstance().setFfmpegExecutable(file.getPath());
+            ffmpegLocationTextField.setText(file.getPath());
         }
     }
 }
