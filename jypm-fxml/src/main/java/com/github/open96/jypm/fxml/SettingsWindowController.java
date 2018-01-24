@@ -29,6 +29,7 @@ import org.apache.logging.log4j.Logger;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -258,8 +259,9 @@ public class SettingsWindowController implements Initializable {
         }
     }
 
-    public void showFileChooser(MouseEvent mouseEvent) {
+    public void showFileChooser(MouseEvent mouseEvent) throws IOException, InterruptedException {
         FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Select ffmpeg file");
         Node node = (Node) mouseEvent.getSource();
         File file = fileChooser.showOpenDialog(node.getScene().getWindow());
         if (file != null) {
