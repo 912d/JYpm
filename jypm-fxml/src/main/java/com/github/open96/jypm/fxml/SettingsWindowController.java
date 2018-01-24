@@ -259,7 +259,7 @@ public class SettingsWindowController implements Initializable {
         }
     }
 
-    public void showFileChooser(MouseEvent mouseEvent) throws IOException, InterruptedException {
+    public void showFileChooser(MouseEvent mouseEvent) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select ffmpeg file");
         Node node = (Node) mouseEvent.getSource();
