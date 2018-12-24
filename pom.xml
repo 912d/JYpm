@@ -30,7 +30,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <retrofitVersion>2.3.0</retrofitVersion>
+        <retrofitVersion>2.5.0</retrofitVersion>
         <gsonVersion>2.8.2</gsonVersion>
         <commonsLangVersion>3.7</commonsLangVersion>
         <jsoupVersion>1.11.2</jsoupVersion>
